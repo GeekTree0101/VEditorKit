@@ -2,11 +2,16 @@ use_frameworks!
 
 target 'VEditorKit_Example' do
   pod 'VEditorKit', :path => '../'
+  pod 'Texture', '2.7'
+  pod 'RxSwift'
+  pod 'RxCocoa'
 
   target 'VEditorKit_Tests' do
     inherit! :search_paths
 
-    pod 'Quick', '~> 1.2.0'
-    pod 'Nimble', '~> 7.0.2'
+    pod 'Quick'
+    pod 'Nimble'
+    pod 'RxTest'
+    pod 'RxBlocking'
   end
 end
