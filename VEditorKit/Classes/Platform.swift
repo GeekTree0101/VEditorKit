@@ -16,6 +16,7 @@ public enum VEditorParserResultScope {
     case success([VEditorContent])
 }
 
+extension NSAttributedString: VEditorContent { }
 public protocol VEdiorMediaContent: VEditorContent {
     init(_ attributes: [String: String])
 }

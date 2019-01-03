@@ -12,7 +12,6 @@ import RxSwift
 import RxCocoa
 
 public protocol VEditorContent { }
-extension NSAttributedString: VEditorContent { }
 extension String: VEditorContent { }
 
 public extension Reactive where Base: VEditorParser {
