@@ -9,7 +9,7 @@
 import Foundation
 import AsyncDisplayKit
 
-final public class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
+final public class VEditorTextStorage: NSTextStorage {
     
     enum TypingStstus {
         case typing
@@ -27,16 +27,6 @@ final public class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
     override public var string: String {
         return self.internalAttributedString.string
     }
-    
-    override init() {
-        super.init()
-        super.delegate = self
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     
     override public func attributes(at location: Int,
                              effectiveRange range: NSRangePointer?) -> [NSAttributedString.Key: Any] {
@@ -93,16 +83,30 @@ final public class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
                     changeInLength: str.count - range.length)
         self.endEditing()
     }
-    
-    func textStorage(_ textStorage: NSTextStorage,
-                     didProcessEditing editedMask: NSTextStorage.EditActions,
-                     range editedRange: NSRange,
-                     changeInLength delta: Int) {
-        self.status = .none
-    }
 }
 
 extension VEditorTextStorage {
+    
+    public func didUpdateText(_ textNode: VEditorTextNode) {
+        self.status = .none
+        textNode.supernode?.setNeedsLayout()
+    }
+    
+    public func updateCurrentTypingAttribute(_ textNode: VEditorTextNode,
+                                             attribute: VEditorStyleAttribute,
+                                             isBlock: Bool) {
+        if isBlock {
+            let blockRange = self.paragraphStyleRange(textNode.selectedRange)
+            self.status = .paste
+            self.setAttributes(attribute, range: blockRange)
+            textNode.setNeedsLayout()
+        } else {
+            self.setAttributes(attribute, range: textNode.selectedRange)
+        }
+        
+        textNode.currentTypingAttribute = attribute
+        self.replaceAttributesIfNeeds(textNode)
+    }
     
     public func updateCurrentLocationAttributesIfNeeds(_ textNode: VEditorTextNode) {
         
@@ -120,8 +124,19 @@ extension VEditorTextStorage {
         return abs(textNode.selectedRange.location - self.prevCursorLocation) > 1
     }
     
-    public func paragraphStyleRange(_ textNode: VEditorTextNode) -> NSRange {
+    public func paragraphStyleRange(_ range: NSRange) -> NSRange {
         return NSString(string: self.internalAttributedString.string)
-            .paragraphRange(for: textNode.selectedRange)
+            .paragraphRange(for: range)
+    }
+}
+
+extension Dictionary where Key == NSAttributedString.Key, Value == Any {
+    
+    internal func typingAttribute() -> [String: Any] {
+        var dict: [String: Any] = [:]
+        self.forEach({ key, value in
+            dict[key.rawValue] = value
+        })
+        return dict
     }
 }

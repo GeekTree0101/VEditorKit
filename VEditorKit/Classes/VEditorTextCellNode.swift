@@ -21,10 +21,12 @@ public class VEditorTextCellNode: ASCellNode {
     public required init(_ insets: UIEdgeInsets,
                          isEdit: Bool,
                          placeholderText: String?,
-                         attributedText: NSAttributedString) {
+                         attributedText: NSAttributedString,
+                         rule: VEditorRule) {
         self.insets = insets
         self.isEdit = isEdit
-        self.textNode = VEditorTextNode(isEdit,
+        self.textNode = VEditorTextNode(rule,
+                                        isEdit: isEdit,
                                         placeholderText: placeholderText,
                                         attributedText: attributedText)
         super.init()

@@ -19,10 +19,21 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         return self.textView.textStorage as? VEditorTextStorage
     }
     
-    public required init(_ isEdit: Bool,
+    public var currentTypingAttribute: [NSAttributedString.Key: Any] = [:] {
+        didSet {
+            self.typingAttributes = currentTypingAttribute.typingAttribute()
+            self.textStorage?.currentTypingAttribute = currentTypingAttribute
+        }
+    }
+    
+    private let rule: VEditorRule
+    
+    public required init(_ rule: VEditorRule,
+                         isEdit: Bool,
                          placeholderText: String?,
                          attributedText: NSAttributedString) {
         self.isEdit = isEdit
+        self.rule = rule
         let textStorage = VEditorTextStorage.init()
         textStorage.setAttributedString(attributedText)
         let textKitComponents: ASTextKitComponents =
@@ -32,10 +43,14 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         let placeholderTextKit: ASTextKitComponents =
             .init(attributedSeedString: nil,
                   textContainerSize: .zero)
-        
         super.init(textKitComponents: textKitComponents,
                    placeholderTextKitComponents: placeholderTextKit)
         super.delegate = self
+    }
+    
+    override public func didLoad() {
+        super.didLoad()
+        self.currentTypingAttribute = rule.defaultAttribute()
     }
     
     public func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
@@ -51,6 +66,10 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     }
     
     public func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
-        self.supernode?.setNeedsLayout()
+        self.textStorage?.didUpdateText(self)
+    }
+    
+    public func updateCurrentTypingAttribute(_ attribute: VEditorStyleAttribute, isBlock: Bool) {
+        self.textStorage?.updateCurrentTypingAttribute(self, attribute: attribute, isBlock: isBlock)
     }
 }

@@ -177,10 +177,6 @@ extension VEditorNode {
         inactiveXMLs = inactiveXMLs
             .filter({ !disableXMLs.contains($0) })
         
-        if activeXMLs.isEmpty {
-            activeXMLs.append(editorRule.defaultStyleXMLTag)
-        }
-        
         for control in typingControls {
             if activeXMLs.contains(control.xmlTag) {
                 control.isSelected = true
@@ -193,9 +189,14 @@ extension VEditorNode {
             }
         }
         
-        let currentActiveXMLs: [String] = typingControls
+        var currentActiveXMLs: [String] = typingControls
             .filter({ $0.isSelected })
             .map({ $0.xmlTag })
+        
+        
+        if currentActiveXMLs.isEmpty {
+            currentActiveXMLs.append(editorRule.defaultStyleXMLTag)
+        }
         
         let initialStyle = VEditorStyle([.extraAttributes([VEditorAttributeKey: currentActiveXMLs])])
         
@@ -207,11 +208,8 @@ extension VEditorNode {
                 return result.byAdding(stringStyle: style)
             }).attributes
         
-        if sender.isBlockStyle {
-            
-        } else {
-            
-        }
+        self.activeTextNode?.updateCurrentTypingAttribute(currentAttribute,
+                                                          isBlock: sender.isBlockStyle)
     }
     
     private func disableAllOfTypingControls() {
