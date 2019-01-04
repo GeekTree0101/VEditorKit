@@ -50,13 +50,16 @@ extension EditorNodeController {
             .registerTypingContols(controlAreaNode.typingControlNodes)
             .observeKeyboardEvent(controlAreaNode.dismissNode)
         
-        self.node.editorContentFactory = { content -> ASCellNode? in
+        self.node.editorContentFactory = { [weak self] content -> ASCellNode? in
+            guard let `self` = self else { return ASCellNode() }
+            
             switch content {
             case let text as NSAttributedString:
                 let node = VEditorTextCellNode(Const.defaultContentInsets,
                                                isEdit: true,
                                                placeholderText: nil,
-                                               attributedText: text)
+                                               attributedText: text,
+                                               rule: self.node.editorRule)
                 
                 return node
             case let imageNode as VImageContent:

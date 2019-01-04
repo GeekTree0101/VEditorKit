@@ -37,3 +37,13 @@ public protocol VEditorRule {
     func inactiveTypingXMLs(_ activeXML: String) -> [String]?
     func activeTypingXMLs(_ inactiveXML: String) -> [String]?
 }
+
+extension VEditorRule {
+    
+    func defaultAttribute() -> [NSAttributedString.Key: Any] {
+        guard let attr = self.paragraphStyle(self.defaultStyleXMLTag, attributes: [:]) else {
+            fatalError("Please setup default:\(self.defaultStyleXMLTag) xml tag style")
+        }
+        return attr.attributes
+    }
+}

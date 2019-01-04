@@ -39,7 +39,8 @@ class EditorControlAreaNode: ASDisplayNode {
     
     lazy var headingNode: VEditorTypingControlNode = {
         let node = VEditorTypingControlNode(EditorRule.XML.heading.rawValue,
-                                            rule: rule)
+                                            rule: rule,
+                                            isBlockStyle: true)
         node.style.preferredSize = Const.controlSize
         node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
         node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
@@ -49,7 +50,8 @@ class EditorControlAreaNode: ASDisplayNode {
     
     lazy var quoteNode: VEditorTypingControlNode = {
         let node = VEditorTypingControlNode(EditorRule.XML.quote.rawValue,
-                                            rule: rule)
+                                            rule: rule,
+                                            isBlockStyle: true)
         node.style.preferredSize = Const.controlSize
         node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
         node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
@@ -59,7 +61,8 @@ class EditorControlAreaNode: ASDisplayNode {
     
     lazy var linkInsertNode: VEditorTypingControlNode = {
         let node = VEditorTypingControlNode(EditorRule.XML.article.rawValue,
-                                            rule: rule)
+                                            rule: rule,
+                                            isExternalHandler: true)
         node.style.preferredSize = Const.controlSize
         node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
         node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
