@@ -9,7 +9,7 @@
 import Foundation
 import VEditorKit
 
-struct EditorRule: VEditorParserRule {
+struct EditorRule: VEditorRule {
     
     enum XML: String, CaseIterable {
         
@@ -20,11 +20,15 @@ struct EditorRule: VEditorParserRule {
         case img
     }
     
+    var defaultStyleXMLTag: String {
+        return XML.p.rawValue
+    }
+    
     var allXML: [String] {
         return XML.allCases.map({ $0.rawValue })
     }
     
-    func paragraph(_ xmlTag: String, attributes: [String : String]) -> VEditorStyle? {
+    func paragraphStyle(_ xmlTag: String, attributes: [String : String]) -> VEditorStyle? {
         guard let xml = XML.init(rawValue: xmlTag) else { return nil }
         
         switch xml {
@@ -57,7 +61,24 @@ struct EditorRule: VEditorParserRule {
         
         switch xml {
         case .img:
-            return VImageContent(attributes)
+            return VImageContent(xmlTag, attributes: attributes)
+        default:
+            return nil
+        }
+    }
+    
+    func parseAttributeToXML(_ xmlTag: String,
+                             attributes: [NSAttributedString.Key : Any]) -> [String : String]? {
+        guard let xml = XML.init(rawValue: xmlTag) else { return nil }
+        
+        switch xml {
+        case .a:
+            if let url = attributes[.link] as? URL,
+                case let urlString = url.absoluteString {
+                return ["href": urlString]
+            } else {
+                return nil
+            }
         default:
             return nil
         }
@@ -66,13 +87,26 @@ struct EditorRule: VEditorParserRule {
 
 class VImageContent: VEdiorMediaContent {
     
-    var url: URL?
-    var ratio: CGFloat = 0.0
+    var xmlTag: String
     
-    required init(_ attributes: [String : String]) {
+    var url: URL?
+    var width: CGFloat
+    var height: CGFloat
+    
+    var ratio: CGFloat {
+        return height / width
+    }
+    
+    required init(_ xmlTag: String, attributes: [String : String]) {
+        self.xmlTag = xmlTag
         self.url = URL(string: attributes["src"] ?? "")
-        let width = CGFloat(Int(attributes["width"] ?? "") ?? 1)
-        let height = CGFloat(Int(attributes["height"] ?? "") ?? 1)
-        self.ratio = height / width
+        self.width = CGFloat(Int(attributes["width"] ?? "") ?? 1)
+        self.height = CGFloat(Int(attributes["height"] ?? "") ?? 1)
+    }
+    
+    func parseAttributeToXML() -> [String : String] {
+        return ["src": url?.absoluteString ?? "",
+                "width": "\(Int(width))",
+                "height": "\(Int(height))"]
     }
 }

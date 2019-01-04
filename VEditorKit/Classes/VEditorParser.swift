@@ -23,11 +23,11 @@ public extension Reactive where Base: VEditorParser {
 
 public class VEditorParser: NSObject, XMLStyler {
     
-    private let parserRule: VEditorParserRule
+    private let parserRule: VEditorRule
     private let styleRules: [XMLStyleRule]
     public let resultRelay = PublishRelay<VEditorParserResultScope>()
     
-    public init(rule: VEditorParserRule) {
+    public init(rule: VEditorRule) {
         self.parserRule = rule
         self.styleRules = rule.allXML.map({ xmlTag -> XMLStyleRule in
             return XMLStyleRule.style(xmlTag, StringStyle.init())
@@ -64,11 +64,23 @@ public class VEditorParser: NSObject, XMLStyler {
         for rule in styleRules {
             switch rule {
             case let .style(string, style) where string == name:
-                if let style = parserRule.paragraph(name, attributes: attributes) {
-                    return currentStyle.byAdding(stringStyle: style)
+                var mutableStyle: StringStyle
+                if let paragraphStyle = parserRule.paragraphStyle(name, attributes: attributes) {
+                    mutableStyle = paragraphStyle
                 } else {
-                    return style
+                    mutableStyle = style
                 }
+                
+                // *** Merge topStyle cached xmlTags list with current xmlTag ***
+                if let cachedXmlTags = currentStyle.attributes[VEditorAttributeKey] as? [String],
+                    cachedXmlTags.contains(name) {
+                    mutableStyle.add(extraAttributes: [VEditorAttributeKey: [name] + cachedXmlTags])
+                } else {
+                    mutableStyle.add(extraAttributes: [VEditorAttributeKey: [name]])
+                }
+                
+                return mutableStyle
+
             default:
                 break
             }
@@ -118,11 +130,11 @@ public class VEditorParser: NSObject, XMLStyler {
 internal class VEditorContentParser: NSObject, XMLParserDelegate {
     
     private let parser: XMLParser
-    private let parserRule: VEditorParserRule
+    private let parserRule: VEditorRule
     private var contents: [VEditorContent] = []
     
     init(_ xmlString: String,
-         rule: VEditorParserRule) {
+         rule: VEditorRule) {
         guard let data = xmlString.data(using: .utf8) else {
             fatalError("Failed to convert data from string as utf8")
         }
@@ -147,7 +159,7 @@ internal class VEditorContentParser: NSObject, XMLParserDelegate {
                 namespaceURI: String?,
                 qualifiedName qName: String?,
                 attributes attributeDict: [String : String] = [:]) {
-        if parserRule.paragraph(elementName, attributes: attributeDict) != nil {
+        if parserRule.paragraphStyle(elementName, attributes: attributeDict) != nil {
             self.contents.append("<\(elementName) \(attributeDict.xmlAttributeToString())>")
         } else if let build = parserRule.build(elementName, attributes: attributeDict) {
             self.contents.append(build)
@@ -164,7 +176,7 @@ internal class VEditorContentParser: NSObject, XMLParserDelegate {
                 didEndElement elementName: String,
                 namespaceURI: String?,
                 qualifiedName qName: String?) {
-        if parserRule.paragraph(elementName, attributes: [:]) != nil {
+        if parserRule.paragraphStyle(elementName, attributes: [:]) != nil {
             self.contents.append("</\(elementName)>")
         }
     }
@@ -187,8 +199,8 @@ extension Dictionary where Key == String, Value == String {
     
     internal func xmlAttributeToString() -> String {
         var attributes: [String] = []
-        self.forEach({ (arg) in
-            let (key, value) = arg
+        self.enumerated().forEach({ _, context in
+            let (key, value) = context
             attributes.append("\(key)=\"\(value)\"")
         })
         return attributes.joined(separator: " ")

@@ -18,5 +18,7 @@ public class VEditorVideoNode: ASCellNode {
         self.insets = insets
         self.isEdit = isEdit
         super.init()
+        self.automaticallyManagesSubnodes = true
+        self.selectionStyle = .none
     }
 }

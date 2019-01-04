@@ -33,8 +33,10 @@ class VEditorParserSpec: QuickSpec {
                 }
                 
                 it("should be parse attributedString") {
-                    let pTagStyle = EditorRule.init().paragraph("p", attributes: [:])
-                    let bTagStyle = EditorRule.init().paragraph("b", attributes: [:])
+                    var pTagStyle = EditorRule.init().paragraphStyle("p", attributes: [:])
+                    pTagStyle?.add(extraAttributes: [VEditorAttributeKey: ["p"]])
+                    var bTagStyle = EditorRule.init().paragraphStyle("b", attributes: [:])
+                    bTagStyle?.add(extraAttributes: [VEditorAttributeKey: ["b"]])
                     let expectedAttrText = NSMutableAttributedString.init()
                     expectedAttrText.append("hello".styled(with: pTagStyle!))
                     expectedAttrText.append("world".styled(with: bTagStyle!))

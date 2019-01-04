@@ -8,11 +8,27 @@
 
 import Foundation
 import AsyncDisplayKit
+import RxSwift
+import RxCocoa
 
+extension Reactive where Base: VEditorNode {
+    
+    public var status: Observable<VEditorNode.Status> {
+        return base.editorStatusRelay.asObservable()
+    }
+}
 
 public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     
-    lazy var tableNode: ASTableNode = {
+    public typealias ContentFactory = (VEditorContent) -> ASCellNode?
+    
+    public enum Status {
+        case loading
+        case some
+        case error(Error?)
+    }
+    
+    public lazy var tableNode: ASTableNode = {
         let node = ASTableNode()
         node.delegate = self
         node.dataSource = self
@@ -26,13 +42,28 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
+    public let parser: VEditorParser
+    public let editorRule: VEditorRule
+    public var editorContents: [VEditorContent] = []
+    public let editorStatusRelay = PublishRelay<Status>()
+    public let disposeBag = DisposeBag()
+    public var editorContentFactory: (ContentFactory)? = nil
+    
     private var keyboardHeight: CGFloat = 0.0
     
-    public init(controlAreaNode: ASDisplayNode?) {
+    public init(editorRule: VEditorRule,
+                controlAreaNode: ASDisplayNode?) {
         self.controlAreaNode = controlAreaNode
+        self.parser = VEditorParser(rule: editorRule)
+        self.editorRule = editorRule
         super.init()
         self.automaticallyManagesSubnodes = true
         self.backgroundColor = .white
+    }
+    
+    public func setEditorContentFactory(_ factory: @escaping ContentFactory) {
+        self.editorContentFactory = factory
+        self.tableNode.reloadData()
     }
     
     public override func didLoad() {
@@ -41,11 +72,11 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.tableNode.view.showsVerticalScrollIndicator = false
         self.tableNode.view.showsHorizontalScrollIndicator = false
         self.observeKeyboardEvent()
+        self.rxInitParser()
     }
     
     public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         var tableNodeInsets: UIEdgeInsets = .zero
-        tableNodeInsets.top = -keyboardHeight
         tableNodeInsets.bottom = keyboardHeight
         
         let tableLayout = ASInsetLayoutSpec(insets: tableNodeInsets,
@@ -62,14 +93,48 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
-    public func tableNode(_ tableNode: ASTableNode, numberOfRowsInSection section: Int) -> Int {
-        return 0
+    public func tableNode(_ tableNode: ASTableNode,
+                          numberOfRowsInSection section: Int) -> Int {
+        return self.editorContents.count
     }
     
-    public func tableNode(_ tableNode: ASTableNode, nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
+    public func tableNode(_ tableNode: ASTableNode,
+                          nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         return {
-            return ASCellNode()
+            guard indexPath.row < self.editorContents.count,
+                let factory = self.editorContentFactory else { return ASCellNode() }
+            return factory(self.editorContents[indexPath.row]) ?? ASCellNode()
         }
+    }
+}
+
+extension VEditorNode {
+    
+    private func rxInitParser() {
+        
+        parser.rx.result
+            .subscribe(onNext: { [weak self] scope in
+                switch scope {
+                case .success(let contents):
+                    self?.editorStatusRelay.accept(.some)
+                    self?.editorContents = contents
+                    self?.tableNode.reloadData()
+                case .error(let error):
+                    self?.editorStatusRelay.accept(.error(error))
+                }
+            }).disposed(by: disposeBag)
+    }
+    
+    public func parseXMLString(_ xmlString: String) {
+        self.editorStatusRelay.accept(.loading)
+        self.parser.parseXML(xmlString)
+    }
+    
+    public func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
+        return VEditorXMLBuilder.shared
+            .buildXML(self.editorContents,
+                      rule: customRule ?? editorRule,
+                      packageTag: packageTag)
     }
 }
 
