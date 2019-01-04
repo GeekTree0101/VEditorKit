@@ -17,11 +17,13 @@ class EditorNodeController: ASViewController<VEditorNode> {
         static let defaultContentInsets: UIEdgeInsets =
             .init(top: 15.0, left: 5.0, bottom: 15.0, right: 5.0)
     }
-    let controlAreaNode: EditorControlAreaNode = .init()
+    let controlAreaNode: EditorControlAreaNode
     let disposeBag = DisposeBag()
     
     init() {
-        super.init(node: .init(editorRule: EditorRule(), controlAreaNode: controlAreaNode))
+        let rule = EditorRule()
+        self.controlAreaNode = EditorControlAreaNode(rule: rule)
+        super.init(node: .init(editorRule: rule, controlAreaNode: controlAreaNode))
     }
     
     override func viewDidLoad() {

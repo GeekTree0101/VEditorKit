@@ -13,15 +13,17 @@ struct EditorRule: VEditorRule {
     
     enum XML: String, CaseIterable {
         
-        case a
-        case p
-        case b
-        case i
-        case img
+        case article = "a"
+        case paragraph = "p"
+        case bold = "b"
+        case italic = "i"
+        case heading = "h2"
+        case quote = "blockquote"
+        case image = "img"
     }
     
     var defaultStyleXMLTag: String {
-        return XML.p.rawValue
+        return XML.paragraph.rawValue
     }
     
     var allXML: [String] {
@@ -32,18 +34,26 @@ struct EditorRule: VEditorRule {
         guard let xml = XML.init(rawValue: xmlTag) else { return nil }
         
         switch xml {
-        case .p:
+        case .paragraph:
             return .init([.font(UIFont.systemFont(ofSize: 15)),
                           .color(.black)])
-        case .b:
+        case .bold:
             return .init([.emphasis(.bold),
                           .font(UIFont.systemFont(ofSize: 15)),
                           .color(.black)])
-        case .i:
+        case .italic:
             return .init([.emphasis(.italic),
                           .font(UIFont.systemFont(ofSize: 15)),
                           .color(.black)])
-        case .a:
+        case .heading:
+            return .init([.font(UIFont.systemFont(ofSize: 30, weight: .medium)),
+                          .color(.black)])
+        case .quote:
+            return .init([.font(UIFont.systemFont(ofSize: 20)),
+                          .color(.gray),
+                          .firstLineHeadIndent(19.0),
+                          .headIndent(19.0)])
+        case .article:
             let style: VEditorStyle = .init([.font(UIFont.systemFont(ofSize: 15)),
                                              .color(.black)])
             if let url = URL(string: attributes["href"] ?? "") {
@@ -51,6 +61,7 @@ struct EditorRule: VEditorRule {
             } else {
                 return style
             }
+        
         default:
             return nil
         }
@@ -60,7 +71,7 @@ struct EditorRule: VEditorRule {
         guard let xml = XML.init(rawValue: xmlTag) else { return nil }
         
         switch xml {
-        case .img:
+        case .image:
             return VImageContent(xmlTag, attributes: attributes)
         default:
             return nil
@@ -72,7 +83,7 @@ struct EditorRule: VEditorRule {
         guard let xml = XML.init(rawValue: xmlTag) else { return nil }
         
         switch xml {
-        case .a:
+        case .article:
             if let url = attributes[.link] as? URL,
                 case let urlString = url.absoluteString {
                 return ["href": urlString]

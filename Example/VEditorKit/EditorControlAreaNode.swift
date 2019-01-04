@@ -13,12 +13,65 @@ import VEditorKit
 class EditorControlAreaNode: ASDisplayNode {
     
     struct Const {
-        static let insets: UIEdgeInsets = .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
+        static let insets: UIEdgeInsets = .init(top: 10.0, left: 5.0, bottom: 5.0, right: 10.0)
         static let controlSize: CGSize = .init(width: 44.0, height: 44.0)
     }
     
-    // Typing Control Node
+    lazy var boldNode: VEditorTypingControlNode = {
+        let node = VEditorTypingControlNode(EditorRule.XML.bold.rawValue,
+                                            rule: rule)
+        node.style.preferredSize = Const.controlSize
+        node.setTitle("<b>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
+        node.setTitle("<b>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("<b>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        return node
+    }()
     
+    lazy var italicNode: VEditorTypingControlNode = {
+        let node = VEditorTypingControlNode(EditorRule.XML.italic.rawValue,
+                                            rule: rule)
+        node.style.preferredSize = Const.controlSize
+        node.setTitle("<i>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
+        node.setTitle("<i>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("<i>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        return node
+    }()
+    
+    lazy var headingNode: VEditorTypingControlNode = {
+        let node = VEditorTypingControlNode(EditorRule.XML.heading.rawValue,
+                                            rule: rule)
+        node.style.preferredSize = Const.controlSize
+        node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
+        node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        return node
+    }()
+    
+    lazy var quoteNode: VEditorTypingControlNode = {
+        let node = VEditorTypingControlNode(EditorRule.XML.quote.rawValue,
+                                            rule: rule)
+        node.style.preferredSize = Const.controlSize
+        node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
+        node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        return node
+    }()
+    
+    lazy var linkInsertNode: VEditorTypingControlNode = {
+        let node = VEditorTypingControlNode(EditorRule.XML.article.rawValue,
+                                            rule: rule)
+        node.style.preferredSize = Const.controlSize
+        node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
+        node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        return node
+    }()
+    
+    lazy var seperateLineNode: ASDisplayNode = {
+        let node = ASDisplayNode()
+        node.backgroundColor = .lightGray
+        return node
+    }()
     
     lazy var scrollNode: ASScrollNode = {
         let node = ASScrollNode()
@@ -35,10 +88,13 @@ class EditorControlAreaNode: ASDisplayNode {
         return node
     }()
     
-    override init() {
+    let rule: EditorRule
+    
+    init(rule: EditorRule) {
+        self.rule = rule
         super.init()
         self.automaticallyManagesSubnodes = true
-        self.backgroundColor = .clear
+        self.backgroundColor = .white
         self.scrollNode.layoutSpecBlock = { [weak self] (_, _) -> ASLayoutSpec in
             return self?.controlButtonsGroupLayoutSpec() ?? ASLayoutSpec()
         }
@@ -60,14 +116,25 @@ class EditorControlAreaNode: ASDisplayNode {
                                             justifyContent: .spaceBetween,
                                             alignItems: .stretch,
                                             children: [scrollNode, dismissNode])
-        return ASInsetLayoutSpec(insets: Const.insets, child: stackLayout)
+        let controlAreaLayout = ASInsetLayoutSpec(insets: Const.insets, child: stackLayout)
+        seperateLineNode.style.height = .init(unit: .points, value: 0.5)
+        return ASStackLayoutSpec(direction: .vertical,
+                                 spacing: 0.0,
+                                 justifyContent: .start,
+                                 alignItems: .stretch,
+                                 children: [seperateLineNode,
+                                            controlAreaLayout])
     }
     
     private func controlButtonsGroupLayoutSpec() -> ASLayoutSpec {
         return ASStackLayoutSpec(direction: .horizontal,
-                                 spacing: 0.0,
+                                 spacing: 10.0,
                                  justifyContent: .start,
                                  alignItems: .start,
-                                 children: [])
+                                 children: [boldNode,
+                                            italicNode,
+                                            quoteNode,
+                                            headingNode,
+                                            linkInsertNode])
     }
 }

@@ -112,13 +112,13 @@
 			isa = PBXGroup;
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
+				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
+				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
 				607FACD71AFB9204008FA782 /* EditorNodeController.swift */,
+				9B457E1021DE063400391EC9 /* EditorRule.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
-				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
-				9B457E1021DE063400391EC9 /* EditorRule.swift */,
 				9B457E1921DF030300391EC9 /* XMLViewController.swift */,
 			);
 			name = "Example for VEditorKit";
