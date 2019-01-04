@@ -21,7 +21,7 @@ class EditorNodeController: ASViewController<VEditorNode> {
     let disposeBag = DisposeBag()
     
     init() {
-        super.init(node: .init(parserRule: EditorRule(), controlAreaNode: controlAreaNode))
+        super.init(node: .init(editorRule: EditorRule(), controlAreaNode: controlAreaNode))
     }
     
     override func viewDidLoad() {
@@ -43,6 +43,13 @@ class EditorNodeController: ASViewController<VEditorNode> {
                 return nil
             }
         }
+        
+        
+        self.navigationItem.rightBarButtonItem =
+            UIBarButtonItem.init(title: "Build",
+                                 style: .plain,
+                                 target: self,
+                                 action: #selector(build))
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -56,6 +63,14 @@ class EditorNodeController: ASViewController<VEditorNode> {
         self.node.parseXMLString(content)
     }
     
+    @objc func build() {
+        guard let output = self.node.buildXML(packageTag: "content") else {
+            return
+        }
+        let vc = XMLViewController.init(output)
+        self.navigationController?.pushViewController(vc, animated: true)
+    }
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

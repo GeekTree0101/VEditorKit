@@ -16,6 +16,7 @@
 		9B457E1121DE063400391EC9 /* EditorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1021DE063400391EC9 /* EditorRule.swift */; };
 		9B457E1221DE0C5C00391EC9 /* EditorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1021DE063400391EC9 /* EditorRule.swift */; };
 		9B457E1821DEFCDA00391EC9 /* VEditorXMLBuilderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */; };
+		9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1921DF030300391EC9 /* XMLViewController.swift */; };
 		9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
 		9B88A6AB21DCDEC300EF3CC8 /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
 		C191B86EDFC34EB0AF1131BD /* Pods_VEditorKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48D26DEF356E2D9A26CBD914 /* Pods_VEditorKit_Tests.framework */; };
@@ -49,6 +50,7 @@
 		678C76B2ADE22C77779D368C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		9B457E1021DE063400391EC9 /* EditorRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorRule.swift; sourceTree = "<group>"; };
 		9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorXMLBuilderSpec.swift; sourceTree = "<group>"; };
+		9B457E1921DF030300391EC9 /* XMLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLViewController.swift; sourceTree = "<group>"; };
 		9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorControlAreaNode.swift; sourceTree = "<group>"; };
 		9B88A6AA21DCDEC300EF3CC8 /* content.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = content.xml; sourceTree = "<group>"; };
 		C3E3AB57DFE5DE8299572A7A /* Pods-VEditorKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Tests/Pods-VEditorKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
 				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
 				9B457E1021DE063400391EC9 /* EditorRule.swift */,
+				9B457E1921DF030300391EC9 /* XMLViewController.swift */,
 			);
 			name = "Example for VEditorKit";
 			path = VEditorKit;
@@ -396,6 +399,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACD81AFB9204008FA782 /* EditorNodeController.swift in Sources */,
+				9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				9B457E1121DE063400391EC9 /* EditorRule.swift in Sources */,
 				9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */,

@@ -43,6 +43,7 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     }
     
     public let parser: VEditorParser
+    public let editorRule: VEditorRule
     public var editorContents: [VEditorContent] = []
     public let editorStatusRelay = PublishRelay<Status>()
     public let disposeBag = DisposeBag()
@@ -50,10 +51,11 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     
     private var keyboardHeight: CGFloat = 0.0
     
-    public init(parserRule: VEditorRule,
+    public init(editorRule: VEditorRule,
                 controlAreaNode: ASDisplayNode?) {
         self.controlAreaNode = controlAreaNode
-        self.parser = VEditorParser(rule: parserRule)
+        self.parser = VEditorParser(rule: editorRule)
+        self.editorRule = editorRule
         super.init()
         self.automaticallyManagesSubnodes = true
         self.backgroundColor = .white
@@ -126,6 +128,13 @@ extension VEditorNode {
     public func parseXMLString(_ xmlString: String) {
         self.editorStatusRelay.accept(.loading)
         self.parser.parseXML(xmlString)
+    }
+    
+    public func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
+        return VEditorXMLBuilder.shared
+            .buildXML(self.editorContents,
+                      rule: customRule ?? editorRule,
+                      packageTag: packageTag)
     }
 }
 
