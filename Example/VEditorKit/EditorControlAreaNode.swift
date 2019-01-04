@@ -88,6 +88,10 @@ class EditorControlAreaNode: ASDisplayNode {
         return node
     }()
     
+    var typingControlNodes: [VEditorTypingControlNode] {
+        return [boldNode, italicNode, quoteNode, headingNode, linkInsertNode]
+    }
+    
     let rule: EditorRule
     
     init(rule: EditorRule) {
@@ -131,10 +135,6 @@ class EditorControlAreaNode: ASDisplayNode {
                                  spacing: 10.0,
                                  justifyContent: .start,
                                  alignItems: .start,
-                                 children: [boldNode,
-                                            italicNode,
-                                            quoteNode,
-                                            headingNode,
-                                            linkInsertNode])
+                                 children: typingControlNodes)
     }
 }

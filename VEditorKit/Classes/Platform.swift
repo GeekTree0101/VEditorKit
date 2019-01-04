@@ -31,4 +31,9 @@ public protocol VEditorRule {
     func paragraphStyle(_ xmlTag: String, attributes: [String: String]) -> VEditorStyle?
     func build(_ xmlTag: String, attributes: [String: String]) -> VEdiorMediaContent?
     func parseAttributeToXML(_ xmlTag: String, attributes: [NSAttributedString.Key: Any]) -> [String: String]?
+    
+    func enableTypingXMLs(_ inActiveXML: String) -> [String]?
+    func disableTypingXMLs(_ activeXML: String) -> [String]?
+    func inactiveTypingXMLs(_ activeXML: String) -> [String]?
+    func activeTypingXMLs(_ inactiveXML: String) -> [String]?
 }

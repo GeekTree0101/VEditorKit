@@ -9,6 +9,8 @@
 import Foundation
 import AsyncDisplayKit
 import BonMot
+import RxSwift
+import RxCocoa
 
 public class VEditorOpenGraphNode: ASCellNode {
     
@@ -16,6 +18,7 @@ public class VEditorOpenGraphNode: ASCellNode {
     public var isEdit: Bool = true
     
     lazy var imageNode = ASNetworkImageNode()
+    public var disposeBag = DisposeBag()
     
     public required init(_ insets: UIEdgeInsets,
                          isEdit: Bool,

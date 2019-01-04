@@ -1,5 +1,7 @@
 language: objective-c
 osx_image: xcode10
+xcode_scheme: VEditorKitTests
+xcode_destination: platform=iOS Simulator,OS=12.0,name=iPhone X
 
 cache: cocoapods
 podfile: Example/Podfile
@@ -14,6 +16,3 @@ branches:
 script:
 - xcodebuild clean -workspace Example/VEditorKit.xcworkspace -scheme RxCocoa-Texture | xcpretty
 - xcodebuild build -sdk iphonesimulator -workspace Example/VEditorKit.xcworkspace -scheme VEditorKit CODE_SIGNING_REQUIRED=NO | xcpretty
-# references:
-# * https://www.objc.io/issues/6-build-tools/travis-ci/
-# * https://github.com/supermarin/xcpretty#usage/

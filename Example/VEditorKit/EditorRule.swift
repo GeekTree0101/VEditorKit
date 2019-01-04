@@ -94,6 +94,50 @@ struct EditorRule: VEditorRule {
             return nil
         }
     }
+    
+    func enableTypingXMLs(_ inActiveXML: String) -> [String]? {
+        guard let xml = XML.init(rawValue: inActiveXML) else { return nil }
+        
+        switch xml {
+        case .heading, .quote:
+            return [XML.bold.rawValue,
+                    XML.italic.rawValue,
+                    XML.paragraph.rawValue]
+        default:
+            return nil
+        }
+    }
+    
+    func disableTypingXMLs(_ activeXML: String) -> [String]? {
+        guard let xml = XML.init(rawValue: activeXML) else { return nil }
+        
+        switch xml {
+        case .heading, .quote:
+            return [XML.bold.rawValue,
+                    XML.italic.rawValue,
+                    XML.paragraph.rawValue]
+        default:
+            return nil
+        }
+    }
+    
+    func inactiveTypingXMLs(_ activeXML: String) -> [String]? {
+        guard let xml = XML.init(rawValue: activeXML) else { return nil }
+        
+        switch xml {
+        case .heading:
+            return [XML.quote.rawValue]
+        case .quote:
+            return [XML.heading.rawValue]
+        default:
+            return nil
+        }
+    }
+    
+    func activeTypingXMLs(_ inactiveXML: String) -> [String]? {
+        return nil
+    }
+    
 }
 
 class VImageContent: VEdiorMediaContent {
