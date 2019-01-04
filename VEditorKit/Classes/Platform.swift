@@ -17,12 +17,18 @@ public enum VEditorParserResultScope {
 }
 
 extension NSAttributedString: VEditorContent { }
+public let VEditorAttributeKey: NSAttributedString.Key = .init(rawValue: "VEditorKit.AttributeKey")
+
 public protocol VEdiorMediaContent: VEditorContent {
-    init(_ attributes: [String: String])
+    var xmlTag: String { get }
+    init(_ xmlTag: String, attributes: [String: String])
+    func parseAttributeToXML() -> [String: String] // parseto xml attribute from media content
 }
 
-public protocol VEditorParserRule {
+public protocol VEditorRule {
     var allXML: [String] { get }
-    func paragraph(_ xmlTag: String, attributes: [String: String]) -> VEditorStyle?
+    var defaultStyleXMLTag: String { get }
+    func paragraphStyle(_ xmlTag: String, attributes: [String: String]) -> VEditorStyle?
     func build(_ xmlTag: String, attributes: [String: String]) -> VEdiorMediaContent?
+    func parseAttributeToXML(_ xmlTag: String, attributes: [NSAttributedString.Key: Any]) -> [String: String]?
 }

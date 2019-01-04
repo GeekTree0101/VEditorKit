@@ -25,8 +25,10 @@ public class VEditorImageNode: ASCellNode {
         self.isEdit = isEdit
         self.ratio = ratio
         super.init()
+        self.imageNode.backgroundColor = .lightGray
         self.imageNode.setURL(url, resetToDefault: true)
-        
+        self.automaticallyManagesSubnodes = true
+        self.selectionStyle = .none
     }
     
     override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {

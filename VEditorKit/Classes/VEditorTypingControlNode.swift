@@ -12,4 +12,8 @@ import AsyncDisplayKit
 public class VEditorTypingControlNode: ASButtonNode {
     
     
+    init(_ xmlTag: String) {
+        super.init()
+        
+    }
 }

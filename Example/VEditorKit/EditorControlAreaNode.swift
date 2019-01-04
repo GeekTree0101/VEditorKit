@@ -36,7 +36,7 @@ class EditorControlAreaNode: ASDisplayNode {
     override init() {
         super.init()
         self.automaticallyManagesSubnodes = true
-        self.backgroundColor = .white
+        self.backgroundColor = .clear
         self.scrollNode.layoutSpecBlock = { [weak self] (_, _) -> ASLayoutSpec in
             return self?.controlButtonsGroupLayoutSpec() ?? ASLayoutSpec()
         }
