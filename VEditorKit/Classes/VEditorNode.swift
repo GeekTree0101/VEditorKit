@@ -93,6 +93,12 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
+    override public func layout() {
+        super.layout()
+        guard let height = controlAreaNode?.frame.height else { return }
+        self.tableNode.contentInset.bottom = height
+    }
+    
     public func tableNode(_ tableNode: ASTableNode,
                           numberOfRowsInSection section: Int) -> Int {
         return self.editorContents.count

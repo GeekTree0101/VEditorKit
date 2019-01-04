@@ -13,7 +13,8 @@ import VEditorKit
 class EditorControlAreaNode: ASDisplayNode {
     
     struct Const {
-        static let insets: UIEdgeInsets = .init(top: 15.0, left: 5.0, bottom: 15.0, right: 5.0)
+        static let insets: UIEdgeInsets = .init(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
+        static let controlSize: CGSize = .init(width: 44.0, height: 44.0)
     }
     
     // Typing Control Node
@@ -29,7 +30,8 @@ class EditorControlAreaNode: ASDisplayNode {
     
     lazy var dismissNode: ASButtonNode = {
         let node = ASButtonNode()
-        
+        node.setImage(#imageLiteral(resourceName: "keyboard.png"), for: .normal)
+        node.style.preferredSize = Const.controlSize
         return node
     }()
     
@@ -49,6 +51,10 @@ class EditorControlAreaNode: ASDisplayNode {
     }
     
     override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+        scrollNode.style.flexShrink = 1.0
+        scrollNode.style.flexGrow = 0.0
+        dismissNode.style.flexShrink = 1.0
+        dismissNode.style.flexGrow = 0.0
         let stackLayout = ASStackLayoutSpec(direction: .horizontal,
                                             spacing: 5.0,
                                             justifyContent: .spaceBetween,
