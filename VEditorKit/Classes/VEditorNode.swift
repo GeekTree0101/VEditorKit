@@ -48,7 +48,9 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     public let editorStatusRelay = PublishRelay<Status>()
     public let disposeBag = DisposeBag()
     public var editorContentFactory: (ContentFactory)? = nil
+    public var activeTextNode: VEditorTextNode?
     
+    private var typingControls: [VEditorTypingControlNode] = []
     private var keyboardHeight: CGFloat = 0.0
     
     public init(editorRule: VEditorRule,
@@ -61,6 +63,14 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.backgroundColor = .white
     }
     
+    /**
+     Setup editor content factory
+     
+     - important: Recommend read reference
+     
+     - parameters:
+     - factory: you will got VEditorContent and than return optional ASCellNode
+     */
     public func setEditorContentFactory(_ factory: @escaping ContentFactory) {
         self.editorContentFactory = factory
         self.tableNode.reloadData()
@@ -71,7 +81,6 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.tableNode.view.separatorStyle = .none
         self.tableNode.view.showsVerticalScrollIndicator = false
         self.tableNode.view.showsHorizontalScrollIndicator = false
-        self.observeKeyboardEvent()
         self.rxInitParser()
     }
     
@@ -114,10 +123,158 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     }
 }
 
+// MARK: - Editor Text Control
 extension VEditorNode {
     
-    private func rxInitParser() {
+    /**
+     Register Typing Control Nodes
+     
+     - parameters:
+     - controls: Array of VEditorTypingControlNode
+     */
+    @discardableResult public func registerTypingContols(_ controls: [VEditorTypingControlNode]) -> Self {
+        guard self.typingControls.isEmpty else {
+            fatalError("VEditorKit Error: Already registed typing controls")
+        }
+        self.typingControls = controls
+        for controlNode in self.typingControls {
+            controlNode.addTarget(self, action: #selector(didTapTypingControl(_:)), forControlEvents: .touchUpInside)
+        }
+        self.disableAllOfTypingControls()
+        return self
+    }
+    
+    @objc private func didTapTypingControl(_ sender: VEditorTypingControlNode) {
+        guard !sender.isExternalHandler else { return }
+        guard let activeTextNode = self.loadActiveTextNode() else { return }
         
+        let isActive: Bool = sender.isSelected
+        let currentXMLTag: String = sender.xmlTag
+        
+        var activeXMLs: [String] =
+            typingControls
+                .filter({ $0 != sender })
+                .filter({ $0.isSelected })
+                .map({ $0.xmlTag })
+        
+        var inactiveXMLs: [String] = []
+        var disableXMLs: [String] = []
+        
+        if isActive {
+            inactiveXMLs.append(currentXMLTag)
+            inactiveXMLs.append(contentsOf: editorRule.enableTypingXMLs(currentXMLTag) ?? [])
+            activeXMLs.append(contentsOf: editorRule.activeTypingXMLs(currentXMLTag) ?? [])
+        } else {
+            activeXMLs.append(currentXMLTag)
+            disableXMLs.append(contentsOf: editorRule.disableTypingXMLs(currentXMLTag) ?? [])
+            inactiveXMLs.append(contentsOf: editorRule.inactiveTypingXMLs(currentXMLTag) ?? [])
+        }
+        
+        activeXMLs = activeXMLs
+            .filter({ !inactiveXMLs.contains($0) })
+            .filter({ !disableXMLs.contains($0) })
+        
+        inactiveXMLs = inactiveXMLs
+            .filter({ !disableXMLs.contains($0) })
+        
+        if activeXMLs.isEmpty {
+            activeXMLs.append(editorRule.defaultStyleXMLTag)
+        }
+        
+        for control in typingControls {
+            if activeXMLs.contains(control.xmlTag) {
+                control.isSelected = true
+                control.isEnabled = true
+            } else if inactiveXMLs.contains(control.xmlTag) {
+                control.isSelected = false
+                control.isEnabled = true
+            } else if disableXMLs.contains(control.xmlTag) {
+                control.isEnabled = false
+            }
+        }
+        
+        let currentActiveXMLs: [String] = typingControls
+            .filter({ $0.isSelected })
+            .map({ $0.xmlTag })
+        
+        let initialStyle = VEditorStyle([.extraAttributes([VEditorAttributeKey: currentActiveXMLs])])
+        
+        let currentAttribute: VEditorStyleAttribute = currentActiveXMLs
+            .map({ self.editorRule.paragraphStyle($0, attributes: [:]) })
+            .filter { $0 != nil }
+            .map { $0! }
+            .reduce(initialStyle, { result, style -> VEditorStyle in
+                return result.byAdding(stringStyle: style)
+            }).attributes
+        
+        if sender.isBlockStyle {
+            
+        } else {
+            
+        }
+    }
+    
+    private func disableAllOfTypingControls() {
+        self.typingControls.forEach({ node in
+            node.isEnabled = false
+        })
+    }
+    
+    private func enableAllOfTypingControls() {
+        self.typingControls.forEach({ node in
+            node.isEnabled = true
+            node.isSelected = false
+        })
+    }
+    
+    /**
+     Load already active(firstResponder) textNode from cells
+     */
+    public func loadActiveTextNode() -> VEditorTextNode? {
+        guard let aciveTextCellNode: VEditorTextCellNode? =
+            self.tableNode.visibleNodes
+                .map({ $0 as? VEditorTextCellNode })
+                .filter({ $0?.textNode.isFirstResponder() ?? false })
+                .first,
+            let textNode = aciveTextCellNode?.textNode else {
+                return nil
+        }
+        self.activeTextNode = textNode
+        return textNode
+    }
+}
+
+// MARK - Editor XML Parser & Builder
+extension VEditorNode {
+    
+    /**
+     Parse XML string to Contents
+     
+     - parameters:
+     - xlmString: XML String
+     */
+    public func parseXMLString(_ xmlString: String) {
+        self.editorStatusRelay.accept(.loading)
+        self.parser.parseXML(xmlString)
+    }
+    
+    /**
+     Build content to XML string
+     
+     - important: package tag means capsule tag. eg: <PACKAGE>...output...</PACKAGE>
+     
+     - parameters:
+     - customRule: if you set customReule params than default rule will ignore
+     - packageTag: capsule tag for output xml content string
+     */
+    public func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
+        return VEditorXMLBuilder.shared
+            .buildXML(self.editorContents,
+                      rule: customRule ?? editorRule,
+                      packageTag: packageTag)
+    }
+    
+    private func rxInitParser() {
         parser.rx.result
             .subscribe(onNext: { [weak self] scope in
                 switch scope {
@@ -130,30 +287,39 @@ extension VEditorNode {
                 }
             }).disposed(by: disposeBag)
     }
-    
-    public func parseXMLString(_ xmlString: String) {
-        self.editorStatusRelay.accept(.loading)
-        self.parser.parseXML(xmlString)
-    }
-    
-    public func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
-        return VEditorXMLBuilder.shared
-            .buildXML(self.editorContents,
-                      rule: customRule ?? editorRule,
-                      packageTag: packageTag)
-    }
 }
 
 // MARK: - observe Keyboard
 extension VEditorNode {
     
-    private func observeKeyboardEvent() {
+    /**
+     Observe keyboard event and observe dismiss node touchUpInside event.
+     
+     - parameters:
+     - node: Dismiss keyboard button node
+     */
+    @discardableResult public func observeKeyboardEvent(_ node: ASControlNode?) -> Self {
+        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(VEditorNode.keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(VEditorNode.keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
+        node?.addTarget(self,
+                        action: #selector(keyboardDismissIfNeeds),
+                        forControlEvents: .touchUpInside)
+        return self
+    }
+    
+    /**
+     Dismiss Keyboard from ActiveTextNode
+     */
+    @objc public func keyboardDismissIfNeeds() {
+        guard let textNode = self.loadActiveTextNode() else { return }
+        textNode.resignFirstResponder()
     }
     
     @objc func keyboardWillShow(notification: Notification) {
@@ -161,11 +327,17 @@ extension VEditorNode {
             return
         }
         self.keyboardHeight = keyboardSize.height
-        self.transitionLayout(withAnimation: true, shouldMeasureAsync: false, measurementCompletion: nil)
+        self.enableAllOfTypingControls()
+        self.transitionLayout(withAnimation: true,
+                              shouldMeasureAsync: false,
+                              measurementCompletion: nil)
     }
     
     @objc func keyboardWillHide(notification: Notification) {
         self.keyboardHeight = 0.0
-        self.transitionLayout(withAnimation: true, shouldMeasureAsync: false, measurementCompletion: nil)
+        self.disableAllOfTypingControls()
+        self.transitionLayout(withAnimation: true,
+                              shouldMeasureAsync: false,
+                              measurementCompletion: nil)
     }
 }

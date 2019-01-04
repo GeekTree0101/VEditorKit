@@ -28,14 +28,37 @@ class EditorNodeController: ASViewController<VEditorNode> {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.setupEditorNode()
+        self.setupNavigationBarButtonItem()
+    }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadXMLContent()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+extension EditorNodeController {
+    
+    func setupEditorNode() {
+        
+        self.node
+            .registerTypingContols(controlAreaNode.typingControlNodes)
+            .observeKeyboardEvent(controlAreaNode.dismissNode)
+        
         self.node.editorContentFactory = { content -> ASCellNode? in
             switch content {
             case let text as NSAttributedString:
-                return VEditorTextCellNode(Const.defaultContentInsets,
-                                           isEdit: true,
-                                           placeholderText: nil,
-                                           attributedText: text)
+                let node = VEditorTextCellNode(Const.defaultContentInsets,
+                                               isEdit: true,
+                                               placeholderText: nil,
+                                               attributedText: text)
+                
+                return node
             case let imageNode as VImageContent:
                 return VEditorImageNode(Const.defaultContentInsets,
                                         isEdit: true,
@@ -45,17 +68,12 @@ class EditorNodeController: ASViewController<VEditorNode> {
                 return nil
             }
         }
-        
-        
-        self.navigationItem.rightBarButtonItem =
-            UIBarButtonItem.init(title: "Build",
-                                 style: .plain,
-                                 target: self,
-                                 action: #selector(build))
     }
+}
+
+extension EditorNodeController {
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    private func loadXMLContent() {
         
         guard let path = Bundle.main.path(forResource: "content", ofType: "xml"),
             case let pathURL = URL(fileURLWithPath: path),
@@ -65,15 +83,19 @@ class EditorNodeController: ASViewController<VEditorNode> {
         self.node.parseXMLString(content)
     }
     
-    @objc func build() {
+    private func setupNavigationBarButtonItem() {
+        self.navigationItem.rightBarButtonItem =
+            UIBarButtonItem.init(title: "Build",
+                                 style: .plain,
+                                 target: self,
+                                 action: #selector(pushXMLViewer))
+    }
+    
+    @objc func pushXMLViewer() {
         guard let output = self.node.buildXML(packageTag: "content") else {
             return
         }
         let vc = XMLViewController.init(output)
         self.navigationController?.pushViewController(vc, animated: true)
-    }
-
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

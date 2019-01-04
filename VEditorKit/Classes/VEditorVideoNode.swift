@@ -8,11 +8,14 @@
 
 import Foundation
 import AsyncDisplayKit
+import RxSwift
+import RxCocoa
 
 public class VEditorVideoNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
+    public let disposeBag = DisposeBag()
     
     public required init(_ insets: UIEdgeInsets, isEdit: Bool) {
         self.insets = insets

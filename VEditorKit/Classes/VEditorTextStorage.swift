@@ -9,7 +9,7 @@
 import Foundation
 import AsyncDisplayKit
 
-final internal class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
+final public class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
     
     enum TypingStstus {
         case typing
@@ -24,7 +24,7 @@ final internal class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
     private var internalAttributedString: NSMutableAttributedString = .init()
     private var prevCursorLocation: Int = 0
     
-    override var string: String {
+    override public var string: String {
         return self.internalAttributedString.string
     }
     
@@ -38,13 +38,13 @@ final internal class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
     }
     
     
-    override func attributes(at location: Int,
+    override public func attributes(at location: Int,
                              effectiveRange range: NSRangePointer?) -> [NSAttributedString.Key: Any] {
         guard self.internalAttributedString.length > location else { return [:] }
         return internalAttributedString.attributes(at: location, effectiveRange: range)
     }
     
-    override func setAttributes(_ attrs: [NSAttributedString.Key: Any]?,
+    override public func setAttributes(_ attrs: [NSAttributedString.Key: Any]?,
                                 range: NSRange) {
         guard internalAttributedString.length > range.location else { return }
         
@@ -59,12 +59,12 @@ final internal class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
         self.endEditing()
     }
     
-    override func setAttributedString(_ attrString: NSAttributedString) {
+    override public func setAttributedString(_ attrString: NSAttributedString) {
         self.status = .paste
         super.setAttributedString(attrString)
     }
     
-    override func processEditing() {
+    override public func processEditing() {
         switch status {
         case .typing:
             self.internalAttributedString
@@ -76,12 +76,12 @@ final internal class VEditorTextStorage: NSTextStorage, NSTextStorageDelegate {
         super.processEditing()
     }
     
-    override func fixAttributes(in range: NSRange) {
+    override public func fixAttributes(in range: NSRange) {
         // TODO: real time regex base attribute update
         super.fixAttributes(in: range)
     }
     
-    override func replaceCharacters(in range: NSRange, with str: String) {
+    override public func replaceCharacters(in range: NSRange, with str: String) {
         if self.status != .paste {
             self.status = str.isEmpty ? .remove: .typing
         }

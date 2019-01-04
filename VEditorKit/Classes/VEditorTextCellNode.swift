@@ -8,12 +8,15 @@
 
 import Foundation
 import AsyncDisplayKit
+import RxSwift
+import RxCocoa
 
 public class VEditorTextCellNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
     public var textNode: VEditorTextNode
+    public let disposeBag = DisposeBag()
     
     public required init(_ insets: UIEdgeInsets,
                          isEdit: Bool,
