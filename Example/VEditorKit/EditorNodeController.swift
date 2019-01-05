@@ -10,6 +10,8 @@ import AsyncDisplayKit
 import VEditorKit
 import RxCocoa
 import RxSwift
+import Photos
+import MobileCoreServices
 
 class EditorNodeController: ASViewController<VEditorNode> {
     
@@ -32,6 +34,7 @@ class EditorNodeController: ASViewController<VEditorNode> {
         self.setupEditorNode()
         self.setupNavigationBarButtonItem()
         self.loadXMLContent()
+        self.rxAlbumAccess()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -101,5 +104,63 @@ extension EditorNodeController {
             let vc = XMLViewController.init(output)
             self?.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+    private func rxAlbumAccess() {
+        
+        self.controlAreaNode.photoLoadControlNode
+            .addTarget(self,
+                       action: #selector(didTapPhotoAlbumControl),
+                       forControlEvents: .touchUpInside)
+        
+        self.controlAreaNode.videoLoadControlNode
+            .addTarget(self,
+                       action: #selector(didTapVideoAlbumControl),
+                       forControlEvents: .touchUpInside)
+    }
+    
+    @objc private func didTapPhotoAlbumControl() {
+        self.openAlbum(.imageOnly)
+    }
+    
+    @objc private func didTapVideoAlbumControl() {
+        self.openAlbum(.videoOnly)
+    }
+    
+    enum MeidaScope {
+        
+        case imageOnly
+        case videoOnly
+        
+        var value: String {
+            switch self {
+            case .imageOnly:
+                return kUTTypeImage as String
+            case .videoOnly:
+                return kUTTypeMovie as String
+            }
+        }
+    }
+    
+    private func openAlbum(_ type: MeidaScope) {
+        let imagePickerController = UIImagePickerController()
+        imagePickerController.delegate = self
+        imagePickerController.sourceType = .photoLibrary
+        imagePickerController.mediaTypes = [type.value]
+        imagePickerController.allowsEditing = false
+        self.present(imagePickerController, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController,
+                               didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        
+        if let mediaURL = info[.referenceURL] as? URL {
+            print("DEBUG* \(mediaURL.absoluteString)")
+        }
+        
+        picker.dismiss(animated: true, completion: nil)
     }
 }
