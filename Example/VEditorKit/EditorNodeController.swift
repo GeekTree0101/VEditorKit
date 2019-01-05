@@ -24,6 +24,7 @@ class EditorNodeController: ASViewController<VEditorNode> {
         let rule = EditorRule()
         self.controlAreaNode = EditorControlAreaNode(rule: rule)
         super.init(node: .init(editorRule: rule, controlAreaNode: controlAreaNode))
+        self.title = "Editor"
     }
     
     override func viewDidLoad() {

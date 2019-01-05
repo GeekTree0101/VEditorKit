@@ -84,6 +84,20 @@ class EditorControlAreaNode: ASDisplayNode {
         return node
     }()
     
+    lazy var photoLoadControlNode: ASButtonNode = {
+        let node = ASButtonNode()
+        node.setImage(#imageLiteral(resourceName: "image.png"), for: .normal)
+        node.style.preferredSize = Const.controlSize
+        return node
+    }()
+    
+    lazy var videoLoadControlNode: ASButtonNode = {
+        let node = ASButtonNode()
+        node.setImage(#imageLiteral(resourceName: "video.png"), for: .normal)
+        node.style.preferredSize = Const.controlSize
+        return node
+    }()
+    
     lazy var dismissNode: ASButtonNode = {
         let node = ASButtonNode()
         node.setImage(#imageLiteral(resourceName: "keyboard.png"), for: .normal)
@@ -134,10 +148,12 @@ class EditorControlAreaNode: ASDisplayNode {
     }
     
     private func controlButtonsGroupLayoutSpec() -> ASLayoutSpec {
+        let mediaControlNodes: [ASLayoutElement] =
+            [photoLoadControlNode, videoLoadControlNode]
         return ASStackLayoutSpec(direction: .horizontal,
                                  spacing: 10.0,
                                  justifyContent: .start,
                                  alignItems: .start,
-                                 children: typingControlNodes)
+                                 children: mediaControlNodes + typingControlNodes)
     }
 }

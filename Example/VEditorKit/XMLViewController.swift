@@ -20,6 +20,7 @@ class XMLViewController: ASViewController<ASScrollNode> {
         self.title = "XML Viewer"
         self.node.automaticallyManagesContentSize = true
         self.node.automaticallyManagesSubnodes = true
+        self.node.automaticallyRelayoutOnSafeAreaChanges = true
         self.node.backgroundColor = .white
         self.node.layoutSpecBlock = { [weak self] (_, sizeRange) -> ASLayoutSpec in
             return self?.layoutSpecThatFits(sizeRange) ?? ASLayoutSpec()
@@ -31,7 +32,18 @@ class XMLViewController: ASViewController<ASScrollNode> {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.node.view.setContentOffset(.init(x: 0.0, y: -self.node.safeAreaInsets.top),
+                                        animated: true)
+    }
+    
     private func layoutSpecThatFits(_ constraintedSize: ASSizeRange) -> ASLayoutSpec {
-        return ASInsetLayoutSpec(insets: .init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0), child: textNode)
+        var insets: UIEdgeInsets = self.node.safeAreaInsets
+        insets.left += 10.0
+        insets.right += 10.0
+        insets.bottom += 10.0
+        insets.top += 20.0
+        return ASInsetLayoutSpec(insets: insets, child: textNode)
     }
 }
