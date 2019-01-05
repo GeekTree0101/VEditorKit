@@ -30,10 +30,6 @@ class EditorNodeController: ASViewController<VEditorNode> {
         super.viewDidLoad()
         self.setupEditorNode()
         self.setupNavigationBarButtonItem()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         self.loadXMLContent()
     }
     
