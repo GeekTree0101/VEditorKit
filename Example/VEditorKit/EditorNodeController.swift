@@ -91,10 +91,14 @@ extension EditorNodeController {
     }
     
     @objc func pushXMLViewer() {
-        guard let output = self.node.buildXML(packageTag: "content") else {
-            return
+        
+        self.node.synchronizeFetchContents { [weak self] () in
+            
+            guard let output = self?.node.buildXML(packageTag: "content") else {
+                return
+            }
+            let vc = XMLViewController.init(output)
+            self?.navigationController?.pushViewController(vc, animated: true)
         }
-        let vc = XMLViewController.init(output)
-        self.navigationController?.pushViewController(vc, animated: true)
     }
 }

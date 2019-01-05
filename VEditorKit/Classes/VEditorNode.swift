@@ -285,6 +285,64 @@ extension VEditorNode {
                 }
             }).disposed(by: disposeBag)
     }
+    
+    /**
+     Synchronize contents fetching
+     
+     - important: You can use this method before make & save editor draft
+     - parameters:
+     - section: editor target section
+     - complate: complate syncronize callback
+     */
+    public func synchronizeFetchContents(in section: Int = 0,
+                                         _ complate: @escaping () -> Void) {
+        let numberOfSection = self.tableNode.numberOfSections
+        guard section >= 0, section < numberOfSection else {
+            fatalError("Invalid access section \(section) in \(numberOfSection)")
+        }
+        
+        let nodeCount = tableNode.numberOfRows(inSection: section)
+        let nodes = (0 ..< nodeCount)
+            .map({ IndexPath.init(row: $0, section: section) })
+            .map({ tableNode.nodeForRow(at: $0) })
+            .map({ $0 as? VEditorTextCellNode })
+            .filter({ $0 != nil })
+            .map({ $0! })
+        
+        for node in nodes {
+            guard let index = node.indexPath?.row,
+                let currentAttributedText = node.textNode.textStorage?
+                    .attributedString() else { return }
+            self.editorContents[index] = currentAttributedText
+        }
+        
+        complate()
+    }
+    
+    /**
+     merge two text content
+     
+     - important: when you remove media content between text nodes than it should be run
+     - parameters:
+     - target: remove target indexPath
+     - to: attach text node indexPath
+     - animated: remove node animation
+     */
+    public func mergeTextContents(target: IndexPath,
+                                  to: IndexPath,
+                                  animated: Bool) {
+        
+        guard let targetNode = tableNode.nodeForRow(at: target) as? VEditorTextCellNode,
+            let sourceNode = tableNode.nodeForRow(at: to) as? VEditorTextCellNode,
+            let targetAttributedText = targetNode.textNode.attributedText else {
+                return
+        }
+        
+        self.editorContents.remove(at: target.row)
+        self.tableNode.deleteRows(at: [target], with: animated ? .automatic: .none)
+        sourceNode.textNode.textStorage?.append(targetAttributedText)
+        sourceNode.textNode.setNeedsLayout()
+    }
 }
 
 // MARK: - observe Keyboard
