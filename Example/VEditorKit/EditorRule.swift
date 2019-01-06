@@ -149,7 +149,6 @@ struct EditorRule: VEditorRule {
     func activeTypingXMLs(_ inactiveXML: String) -> [String]? {
         return nil
     }
-    
 }
 
 class VImageContent: VEdiorMediaContent {
