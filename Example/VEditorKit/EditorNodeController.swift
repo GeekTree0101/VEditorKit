@@ -55,18 +55,27 @@ extension EditorNodeController {
             
             switch content {
             case let text as NSAttributedString:
-                let node = VEditorTextCellNode(Const.defaultContentInsets,
-                                               isEdit: true,
-                                               placeholderText: nil,
-                                               attributedText: text,
-                                               rule: self.node.editorRule)
+                let cellNode = VEditorTextCellNode(Const.defaultContentInsets,
+                                                   isEdit: true,
+                                                   placeholderText: nil,
+                                                   attributedText: text,
+                                                   rule: self.node.editorRule)
                 
-                return node
+                return cellNode
             case let imageNode as VImageContent:
-                return VEditorImageNode(Const.defaultContentInsets,
-                                        isEdit: true,
-                                        url: imageNode.url,
-                                        ratio: imageNode.ratio)
+                let cellNode = VEditorImageNode(Const.defaultContentInsets,
+                                                isEdit: true,
+                                                url: imageNode.url,
+                                                ratio: imageNode.ratio)
+                
+                cellNode.rx.didTapDelete
+                    .map({ [weak cellNode] () -> IndexPath? in
+                        return cellNode?.indexPath
+                    })
+                    .bind(to: self.node.rx.deleteContent(animated: true))
+                    .disposed(by: cellNode.disposeBag)
+        
+                return cellNode
             default:
                 return nil
             }

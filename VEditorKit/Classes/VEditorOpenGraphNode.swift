@@ -12,12 +12,20 @@ import BonMot
 import RxSwift
 import RxCocoa
 
+extension Reactive where Base: VEditorOpenGraphNode {
+
+    public var didTapDelete: Observable<Void> {
+        return base.deleteControlNode.rx.didTapDelete
+    }
+}
+
 public class VEditorOpenGraphNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
     
     lazy var imageNode = ASNetworkImageNode()
+    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil)
     public var disposeBag = DisposeBag()
     
     public required init(_ insets: UIEdgeInsets,
