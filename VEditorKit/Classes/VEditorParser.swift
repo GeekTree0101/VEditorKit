@@ -38,7 +38,9 @@ public class VEditorParser: NSObject, XMLStyler {
     public func parseXML(_ xmlString: String,
                          onSuccess: (([VEditorContent]) -> Void)? = nil,
                          onError: ((Error?) -> Void)? = nil) {
-        let parser = VEditorContentParser(xmlString.replacingOccurrences(of: "\\", with: ""), rule: self.parserRule)
+        let parser = VEditorContentParser(xmlString
+            .replacingOccurrences(of: "\\n", with: "\n")
+            .replacingOccurrences(of: "\\", with: ""), rule: self.parserRule)
         
         switch parser.parseXMLContents() {
         case .success(let contents):

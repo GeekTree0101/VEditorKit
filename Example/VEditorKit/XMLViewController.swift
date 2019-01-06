@@ -25,7 +25,7 @@ class XMLViewController: ASViewController<ASScrollNode> {
         self.node.layoutSpecBlock = { [weak self] (_, sizeRange) -> ASLayoutSpec in
             return self?.layoutSpecThatFits(sizeRange) ?? ASLayoutSpec()
         }
-        textNode.attributedText = xmlString.styled(with: .font(UIFont.systemFont(ofSize: 15.0)))
+        textNode.attributedText = xmlString.replacingOccurrences(of: "\n", with: "\\n").styled(with: .font(UIFont.systemFont(ofSize: 15.0)))
     }
     
     required init?(coder aDecoder: NSCoder) {
