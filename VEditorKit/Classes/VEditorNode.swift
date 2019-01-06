@@ -156,6 +156,22 @@ extension VEditorNode {
         return self
     }
     
+    /**
+     Load already active(firstResponder) textNode from cells
+     */
+    public func loadActiveTextNode() -> VEditorTextNode? {
+        guard let aciveTextCellNode: VEditorTextCellNode? =
+            self.tableNode.visibleNodes
+                .map({ $0 as? VEditorTextCellNode })
+                .filter({ $0?.textNode.isFirstResponder() ?? false })
+                .first,
+            let textNode = aciveTextCellNode?.textNode else {
+                return nil
+        }
+        self.activeTextNode = textNode
+        return textNode
+    }
+    
     internal func observeActiveTextNode() {
         // dispose prev activeText observers
         self.activeTextDisposeBag = DisposeBag()
@@ -273,22 +289,6 @@ extension VEditorNode {
             node.isEnabled = true
             node.isSelected = false
         })
-    }
-    
-    /**
-     Load already active(firstResponder) textNode from cells
-     */
-    public func loadActiveTextNode() -> VEditorTextNode? {
-        guard let aciveTextCellNode: VEditorTextCellNode? =
-            self.tableNode.visibleNodes
-                .map({ $0 as? VEditorTextCellNode })
-                .filter({ $0?.textNode.isFirstResponder() ?? false })
-                .first,
-            let textNode = aciveTextCellNode?.textNode else {
-                return nil
-        }
-        self.activeTextNode = textNode
-        return textNode
     }
     
     private func scrollToCursor(_ caretRect: CGRect) {
@@ -452,7 +452,6 @@ extension VEditorNode {
      - node: Dismiss keyboard button node
      */
     @discardableResult public func observeKeyboardEvent(_ node: ASControlNode?) -> Self {
-        
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(VEditorNode.keyboardWillShow),
                                                name: UIResponder.keyboardWillShowNotification,
