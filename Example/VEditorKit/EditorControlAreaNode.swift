@@ -21,9 +21,9 @@ class EditorControlAreaNode: ASDisplayNode {
         let node = VEditorTypingControlNode(EditorRule.XML.bold.rawValue,
                                             rule: rule)
         node.style.preferredSize = Const.controlSize
-        node.setTitle("<b>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
-        node.setTitle("<b>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
-        node.setTitle("<b>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        node.setTitle("B", with: UIFont.systemFont(ofSize: 20.0), with: .black, for: .normal)
+        node.setTitle("B", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("B", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
         return node
     }()
     
@@ -31,9 +31,9 @@ class EditorControlAreaNode: ASDisplayNode {
         let node = VEditorTypingControlNode(EditorRule.XML.italic.rawValue,
                                             rule: rule)
         node.style.preferredSize = Const.controlSize
-        node.setTitle("<i>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
-        node.setTitle("<i>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
-        node.setTitle("<i>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        node.setTitle("I", with: UIFont.systemFont(ofSize: 20.0), with: .black, for: .normal)
+        node.setTitle("I", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("I", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
         return node
     }()
     
@@ -42,9 +42,9 @@ class EditorControlAreaNode: ASDisplayNode {
                                             rule: rule,
                                             isBlockStyle: true)
         node.style.preferredSize = Const.controlSize
-        node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
-        node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
-        node.setTitle("<h>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        node.setTitle("H", with: UIFont.systemFont(ofSize: 20.0), with: .black, for: .normal)
+        node.setTitle("H", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("H", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
         return node
     }()
     
@@ -53,9 +53,9 @@ class EditorControlAreaNode: ASDisplayNode {
                                             rule: rule,
                                             isBlockStyle: true)
         node.style.preferredSize = Const.controlSize
-        node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
-        node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
-        node.setTitle("<q>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        node.setTitle("Q", with: UIFont.systemFont(ofSize: 20.0), with: .black, for: .normal)
+        node.setTitle("Q", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("Q", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
         return node
     }()
     
@@ -64,9 +64,9 @@ class EditorControlAreaNode: ASDisplayNode {
                                             rule: rule,
                                             isExternalHandler: true)
         node.style.preferredSize = Const.controlSize
-        node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0), with: .darkGray, for: .normal)
-        node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
-        node.setTitle("<a>", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
+        node.setTitle("Link", with: UIFont.systemFont(ofSize: 20.0), with: .black, for: .normal)
+        node.setTitle("Link", with: UIFont.systemFont(ofSize: 20.0), with: .lightGray, for: .disabled)
+        node.setTitle("Link", with: UIFont.systemFont(ofSize: 20.0, weight: .bold), with: .blue, for: .selected)
         return node
     }()
     

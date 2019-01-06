@@ -37,7 +37,6 @@ public class VEditorDeleteMediaNode: ASControlNode {
         self.deleteIconImage = deleteIconImage
         super.init()
         self.borderWidth = 5.0
-        self.cornerRadius = 5.0
         self.borderColor = deleteColor.cgColor
         self.automaticallyManagesSubnodes = true
     }
