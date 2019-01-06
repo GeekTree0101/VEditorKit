@@ -20,6 +20,7 @@ struct EditorRule: VEditorRule {
         case heading = "h2"
         case quote = "blockquote"
         case image = "img"
+        case video = "video"
     }
     
     var defaultStyleXMLTag: String {
@@ -79,6 +80,8 @@ struct EditorRule: VEditorRule {
         switch xml {
         case .image:
             return VImageContent(xmlTag, attributes: attributes)
+        case .video:
+            return VVideoContent(xmlTag, attributes: attributes)
         default:
             return nil
         }
@@ -167,6 +170,35 @@ class VImageContent: VEdiorMediaContent {
     
     func parseAttributeToXML() -> [String : String] {
         return ["src": url?.absoluteString ?? "",
+                "width": "\(Int(width))",
+                "height": "\(Int(height))"]
+    }
+}
+
+class VVideoContent: VEdiorMediaContent {
+    
+    var xmlTag: String
+    
+    var url: URL?
+    var posterURL: URL?
+    var width: CGFloat
+    var height: CGFloat
+    
+    var ratio: CGFloat {
+        return height / width
+    }
+    
+    required init(_ xmlTag: String, attributes: [String : String]) {
+        self.xmlTag = xmlTag
+        self.url = URL(string: attributes["src"] ?? "")
+        self.width = CGFloat(Int(attributes["width"] ?? "") ?? 1)
+        self.height = CGFloat(Int(attributes["height"] ?? "") ?? 1)
+        self.posterURL = URL(string: attributes["poster"] ?? "")
+    }
+    
+    func parseAttributeToXML() -> [String : String] {
+        return ["src": url?.absoluteString ?? "",
+                "poster": posterURL?.absoluteString ?? "",
                 "width": "\(Int(width))",
                 "height": "\(Int(height))"]
     }

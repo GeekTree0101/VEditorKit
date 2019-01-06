@@ -74,7 +74,22 @@ extension EditorNodeController {
                     })
                     .bind(to: self.node.rx.deleteContent(animated: true))
                     .disposed(by: cellNode.disposeBag)
-        
+                
+                return cellNode
+            case let videoNode as VVideoContent:
+                let cellNode = VEditorVideoNode(Const.defaultContentInsets,
+                                                isEdit: true,
+                                                ratio: videoNode.ratio,
+                                                source: videoNode.url,
+                                                poster: videoNode.posterURL)
+                
+                cellNode.rx.didTapDelete
+                    .map({ [weak cellNode] () -> IndexPath? in
+                        return cellNode?.indexPath
+                    })
+                    .bind(to: self.node.rx.deleteContent(animated: true))
+                    .disposed(by: cellNode.disposeBag)
+                
                 return cellNode
             default:
                 return nil

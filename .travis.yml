@@ -1,18 +1,17 @@
 language: objective-c
 osx_image: xcode10
-xcode_scheme: VEditorKitTests
-xcode_destination: platform=iOS Simulator,OS=12.0,name=iPhone X
-
 cache: cocoapods
 podfile: Example/Podfile
 
 before_install:
   - pod install --repo-update --project-directory=Example
+  - git submodule update --init --recursive
+  - brew update || brew update
+  - brew outdated xctool || brew upgrade xctool
   
 branches:
   only:
     - master
     
 script:
-- xcodebuild clean -workspace Example/VEditorKit.xcworkspace -scheme RxCocoa-Texture | xcpretty
-- xcodebuild build -sdk iphonesimulator -workspace Example/VEditorKit.xcworkspace -scheme VEditorKit CODE_SIGNING_REQUIRED=NO | xcpretty
+  - rake test:ios
