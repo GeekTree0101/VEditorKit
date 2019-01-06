@@ -21,9 +21,17 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
 - XML Parser & Builder
 - Editor Rule Base Development
 
-## Example
-
-- Under construction :)
+## Example<table>
+  <tr>
+    <td align="center">XML Parse & Build</td>
+    <td align="center">Delete Media Content & Merge TextViews</td>
+  </tr>
+  <tr>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test4.gif"></th>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test3.gif"></th>
+  </tr>
+  <tr>
+</table>
 
 ## Usage
 - Quick Start
