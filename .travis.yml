@@ -12,8 +12,9 @@ branches:
     - master
     
 script:
+- xcodebuild clean -workspace Example/VEditorKit.xcworkspace -scheme VEditorKit
 - xcodebuild -list -sdk iphonesimulator -workspace Example/VEditorKit.xcworkspace -scheme VEditorKit 
-- xcodebuild clean build test -sdk iphonesimulator -workspace Example/VEditorKit.xcworkspace -scheme VEditorKit-Example CODE_SIGNING_REQUIRED=NO | xcpretty
+- xcodebuild build test -sdk iphonesimulator -workspace Example/VEditorKit.xcworkspace -destination 'platform=iOS Simulator,name=iPhone 6,OS=12.0' -scheme VEditorKit-Example CODE_SIGNING_REQUIRED=NO | xcpretty
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
