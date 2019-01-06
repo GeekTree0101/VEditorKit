@@ -15,7 +15,13 @@ extension Reactive where Base: VEditorTextNode {
     
     internal var currentLocationXMLTags: Observable<[String]> {
         return base.currentLocationXMLTagsRelay
-            .throttle(0.5, scheduler: MainScheduler.instance)
+            .throttle(0.1, scheduler: MainScheduler.instance)
+    }
+    
+    internal var caretRect: Observable<CGRect> {
+        return base.caretRectRelay
+            .distinctUntilChanged()
+            .throttle(0.1, scheduler: MainScheduler.instance)
     }
 }
 
@@ -36,6 +42,7 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     private let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
+    internal let caretRectRelay = PublishRelay<CGRect>()
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
@@ -90,6 +97,12 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
                 return
             }
             self.currentLocationXMLTagsRelay.accept(xmlTags)
+        } else {
+            guard let textPostion: UITextPosition = editableTextNode.textView.selectedTextRange?.end else {
+                return
+            }
+            let caretRect: CGRect = editableTextNode.textView.caretRect(for: textPostion)
+            self.caretRectRelay.accept(caretRect)
         }
     }
     
