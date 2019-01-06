@@ -25,10 +25,14 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
   <tr>
     <td align="center">XML Parse & Build</td>
     <td align="center">Delete Media Content & Merge TextViews</td>
+    <td align="center">Bi-direction attribute binding</td>
+    <td align="center">Combined Words TypingAttribute</td>
   </tr>
   <tr>
     <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test4.gif"></th>
     <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test3.gif"></th>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/english.gif"></th>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/korean.gif"></th>
   </tr>
   <tr>
 </table>
