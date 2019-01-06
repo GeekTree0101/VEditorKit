@@ -21,6 +21,7 @@ struct EditorRule: VEditorRule {
         case quote = "blockquote"
         case image = "img"
         case video = "video"
+        case opengraph = "og-object"
     }
     
     var defaultStyleXMLTag: String {
@@ -82,6 +83,8 @@ struct EditorRule: VEditorRule {
             return VImageContent(xmlTag, attributes: attributes)
         case .video:
             return VVideoContent(xmlTag, attributes: attributes)
+        case .opengraph:
+            return VOpenGraphContent(xmlTag, attributes: attributes)
         default:
             return nil
         }
@@ -201,5 +204,30 @@ class VVideoContent: VEdiorMediaContent {
                 "poster": posterURL?.absoluteString ?? "",
                 "width": "\(Int(width))",
                 "height": "\(Int(height))"]
+    }
+}
+
+class VOpenGraphContent: VEdiorMediaContent {
+    
+    var xmlTag: String
+    
+    var title: String?
+    var desc: String?
+    var url: URL?
+    var posterURL: URL?
+    
+    required init(_ xmlTag: String, attributes: [String : String]) {
+        self.xmlTag = xmlTag
+        self.title = attributes["title"]
+        self.desc = attributes["description"]
+        self.url = URL(string: attributes["url"] ?? "")
+        self.posterURL = URL(string: attributes["image"] ?? "")
+    }
+    
+    func parseAttributeToXML() -> [String : String] {
+        return ["title": self.title ?? "",
+                "desc": self.desc ?? "",
+                "url": url?.absoluteString ?? "",
+                "image": posterURL?.absoluteString ?? ""]
     }
 }
