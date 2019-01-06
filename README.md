@@ -1,15 +1,41 @@
-# VEditorKit
+<img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/logo.png" />
 
 [![CI Status](https://img.shields.io/travis/Geektree0101/VEditorKit.svg?style=flat)](https://travis-ci.org/Geektree0101/VEditorKit)
 [![Version](https://img.shields.io/cocoapods/v/VEditorKit.svg?style=flat)](https://cocoapods.org/pods/VEditorKit)
 [![License](https://img.shields.io/cocoapods/l/VEditorKit.svg?style=flat)](https://cocoapods.org/pods/VEditorKit)
 [![Platform](https://img.shields.io/cocoapods/p/VEditorKit.svg?style=flat)](https://cocoapods.org/pods/VEditorKit)
 
+Lightweight and Powerful Editor Kit built on Texture(AsyncDisplayKit)
+https://github.com/texturegroup/texture. 
+</br>
+VEditorKit provides the most core functionality needed for the editor.
+Unfortunately, When combined words are entered then UITextView selectedRange will changed and typingAttribute will cleared. So, In combined words case, Users can't continue typing the style they want.
+</br>
+#### TypingAttributes Spec
+When the text view’s selection changes, the contents of the dictionary are cleared automatically. 
+https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattributes 
+
+#### Basic spec list
+- Advanced EditableTextView (Support Combined words such as Korean)
+- Default Image, Video, Og-Object(Link Preview) UI Components
+- XML Parser & Builder
+- Editor Rule Base Development
+
 ## Example
 
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
+- Under construction :)
+
+## Usage
+- Quick Start
+- What is Editor Rule?
+- How to use VEditorNode?
+- How to use VEditorTextNode?
+- Under construction :)
 
 ## Requirements
+- Xcode <~ 9.0
+- Swift 4.2
+- iOS <~ 9.3
 
 ## Installation
 
