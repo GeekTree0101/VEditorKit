@@ -108,20 +108,11 @@ extension VEditorTextStorage {
         self.replaceAttributesIfNeeds(textNode)
     }
     
-    public func updateCurrentLocationAttributesIfNeeds(_ textNode: VEditorTextNode) {
-        
-        self.prevCursorLocation = textNode.selectedRange.location
-    }
-    
     public func replaceAttributesIfNeeds(_ textNode: VEditorTextNode) {
         guard textNode.selectedRange.length > 1 else { return }
         self.status = .paste
         self.setAttributes(self.currentTypingAttribute,
                            range: textNode.selectedRange)
-    }
-    
-    private func isFlyToTargetLocationWithoutTyping(_ textNode: VEditorTextNode) -> Bool {
-        return abs(textNode.selectedRange.location - self.prevCursorLocation) > 1
     }
     
     public func paragraphStyleRange(_ range: NSRange) -> NSRange {
