@@ -11,6 +11,14 @@ import AsyncDisplayKit
 import RxCocoa
 import RxSwift
 
+extension Reactive where Base: VEditorTextNode {
+    
+    internal var currentLocationXMLTags: Observable<[String]> {
+        return base.currentLocationXMLTagsRelay
+            .throttle(0.5, scheduler: MainScheduler.instance)
+    }
+}
+
 public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     public var isEdit: Bool = true
@@ -27,6 +35,7 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     }
     
     private let rule: VEditorRule
+    internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
@@ -65,6 +74,23 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     public func editableTextNodeDidFinishEditing(_ editableTextNode: ASEditableTextNode) {
      
+    }
+    
+    public func editableTextNodeDidChangeSelection(_ editableTextNode: ASEditableTextNode,
+                                                   fromSelectedRange: NSRange,
+                                                   toSelectedRange: NSRange,
+                                                   dueToEditing: Bool) {
+        if !dueToEditing {
+            // move cursor and pick attribute on cursor
+            let attributes = self.textStorage?
+                .attributes(at: max(toSelectedRange.location - 1, 0),
+                            effectiveRange: nil)
+            
+            guard let xmlTags = attributes?[VEditorAttributeKey] as? [String] else {
+                return
+            }
+            self.currentLocationXMLTagsRelay.accept(xmlTags)
+        }
     }
     
     public func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {

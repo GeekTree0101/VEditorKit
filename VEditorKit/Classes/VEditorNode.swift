@@ -54,10 +54,16 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     public let editorStatusRelay = PublishRelay<Status>()
     public let disposeBag = DisposeBag()
     public var editorContentFactory: (ContentFactory)? = nil
-    public var activeTextNode: VEditorTextNode?
+    
+    public var activeTextNode: VEditorTextNode? {
+        didSet {
+            self.observeActiveTextNode()
+        }
+    }
     
     private var typingControls: [VEditorTypingControlNode] = []
     private var keyboardHeight: CGFloat = 0.0
+    private var activeTextDisposeBag = DisposeBag()
     
     public init(editorRule: VEditorRule,
                 controlAreaNode: ASDisplayNode?) {
@@ -150,6 +156,25 @@ extension VEditorNode {
         return self
     }
     
+    internal func observeActiveTextNode() {
+        // dispose prev activeText observers
+        self.activeTextDisposeBag = DisposeBag()
+        
+        activeTextNode?.rx.currentLocationXMLTags
+            .subscribe(onNext: { [weak self] activeXMLs in
+                // reset control status before fetch current attribute
+                self?.enableAllOfTypingControls()
+                self?.currentAttributeFetch(.location,
+                                           activeXMLs: activeXMLs,
+                                           isBlockStyle: false)
+            }).disposed(by: activeTextDisposeBag)
+    }
+    
+    internal enum VEditorAttributeControlScope {
+        case controlTap(Bool, String)
+        case location
+    }
+    
     @objc private func didTapTypingControl(_ sender: VEditorTypingControlNode) {
         guard !sender.isExternalHandler else { return }
         guard let activeTextNode = self.loadActiveTextNode() else { return }
@@ -157,23 +182,38 @@ extension VEditorNode {
         let isActive: Bool = sender.isSelected
         let currentXMLTag: String = sender.xmlTag
         
-        var activeXMLs: [String] =
+        let activeXMLs: [String] =
             typingControls
                 .filter({ $0 != sender })
                 .filter({ $0.isSelected })
                 .map({ $0.xmlTag })
         
+        self.currentAttributeFetch(.controlTap(isActive, currentXMLTag),
+                                   activeXMLs: activeXMLs,
+                                   isBlockStyle: sender.isBlockStyle)
+    }
+    
+    private func currentAttributeFetch(_ scope: VEditorAttributeControlScope,
+                                       activeXMLs: [String],
+                                       isBlockStyle: Bool) {
+        
+        var activeXMLs: [String] = activeXMLs
         var inactiveXMLs: [String] = []
         var disableXMLs: [String] = []
         
-        if isActive {
-            inactiveXMLs.append(currentXMLTag)
-            inactiveXMLs.append(contentsOf: editorRule.enableTypingXMLs(currentXMLTag) ?? [])
-            activeXMLs.append(contentsOf: editorRule.activeTypingXMLs(currentXMLTag) ?? [])
-        } else {
-            activeXMLs.append(currentXMLTag)
-            disableXMLs.append(contentsOf: editorRule.disableTypingXMLs(currentXMLTag) ?? [])
-            inactiveXMLs.append(contentsOf: editorRule.inactiveTypingXMLs(currentXMLTag) ?? [])
+        switch scope {
+        case .controlTap(let isActive, let currentXMLTag):
+            if isActive {
+                inactiveXMLs.append(currentXMLTag)
+                inactiveXMLs.append(contentsOf: editorRule.enableTypingXMLs(currentXMLTag) ?? [])
+                activeXMLs.append(contentsOf: editorRule.activeTypingXMLs(currentXMLTag) ?? [])
+            } else {
+                activeXMLs.append(currentXMLTag)
+                disableXMLs.append(contentsOf: editorRule.disableTypingXMLs(currentXMLTag) ?? [])
+                inactiveXMLs.append(contentsOf: editorRule.inactiveTypingXMLs(currentXMLTag) ?? [])
+            }
+        case .location:
+            break
         }
         
         activeXMLs = activeXMLs
@@ -199,7 +239,6 @@ extension VEditorNode {
             .filter({ $0.isSelected })
             .map({ $0.xmlTag })
         
-        
         if currentActiveXMLs.isEmpty {
             currentActiveXMLs.append(editorRule.defaultStyleXMLTag)
         }
@@ -215,7 +254,7 @@ extension VEditorNode {
             }).attributes
         
         self.activeTextNode?.updateCurrentTypingAttribute(currentAttribute,
-                                                          isBlock: sender.isBlockStyle)
+                                                          isBlock: isBlockStyle)
     }
     
     private func disableAllOfTypingControls() {
@@ -429,6 +468,7 @@ extension VEditorNode {
         }
         self.keyboardHeight = keyboardSize.height
         self.enableAllOfTypingControls()
+        self.activeTextNode = self.loadActiveTextNode()
         self.transitionLayout(withAnimation: true,
                               shouldMeasureAsync: false,
                               measurementCompletion: nil)
