@@ -16,6 +16,12 @@ extension Reactive where Base: VEditorNode {
     public var status: Observable<VEditorNode.Status> {
         return base.editorStatusRelay.asObservable()
     }
+    
+    public func deleteContent(animated: Bool) -> Binder<IndexPath?> {
+        return Binder(base) { vc, indexPath in
+            vc.deleteTargetContent(indexPath, animated: animated)
+        }
+    }
 }
 
 public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
@@ -338,10 +344,49 @@ extension VEditorNode {
                 return
         }
         
+        var mutableAttrText = NSMutableAttributedString(attributedString: targetAttributedText)
+        var newlineAttribute = self.editorRule.defaultAttribute()
+        newlineAttribute[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
+        mutableAttrText.append(NSAttributedString.init(string: "\n",
+                                                       attributes: newlineAttribute))
+        
         self.editorContents.remove(at: target.row)
         self.tableNode.deleteRows(at: [target], with: animated ? .automatic: .none)
-        sourceNode.textNode.textStorage?.append(targetAttributedText)
+        sourceNode.textNode.textStorage?.insert(mutableAttrText, at: 0)
         sourceNode.textNode.setNeedsLayout()
+    }
+    
+    /**
+     delete target content indexPath
+     
+     - parameters:
+     - indexPath: delete target indexPath
+     */
+    public func deleteTargetContent(_ indexPath: IndexPath?, animated: Bool) {
+        guard let indexPath = indexPath,
+            indexPath.row < self.editorContents.count else { return }
+        self.editorContents.remove(at: indexPath.row)
+        self.tableNode.performBatch(animated: animated, updates: {
+            self.tableNode.deleteRows(at: [indexPath], with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin,
+                indexPath.row < self.editorContents.count,
+                indexPath.row - 1 >= 0 else { return }
+            // merge if needs
+            
+            let beforeCell = self.tableNode
+                .nodeForRow(at: .init(row: indexPath.row - 1,
+                                      section: indexPath.section)) as? VEditorTextCellNode
+            let currentCell = self.tableNode
+                .nodeForRow(at: .init(row: indexPath.row,
+                                      section: indexPath.section)) as? VEditorTextCellNode
+            
+            guard let target = beforeCell?.indexPath,
+                let to = currentCell?.indexPath else {
+                return
+            }
+            self.mergeTextContents(target: target, to: to, animated: animated)
+        })
     }
 }
 

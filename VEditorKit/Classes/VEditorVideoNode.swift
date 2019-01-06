@@ -11,11 +11,19 @@ import AsyncDisplayKit
 import RxSwift
 import RxCocoa
 
+extension Reactive where Base: VEditorVideoNode {
+    
+    public var didTapDelete: Observable<Void> {
+        return base.deleteControlNode.rx.didTapDelete
+    }
+}
 public class VEditorVideoNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
     public let disposeBag = DisposeBag()
+    
+    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil)
     
     public required init(_ insets: UIEdgeInsets, isEdit: Bool) {
         self.insets = insets

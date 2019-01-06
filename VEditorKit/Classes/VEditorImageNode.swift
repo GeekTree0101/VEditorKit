@@ -8,13 +8,25 @@
 
 import Foundation
 import AsyncDisplayKit
+import RxCocoa
+import RxSwift
+
+extension Reactive where Base: VEditorImageNode {
+    
+    public var didTapDelete: Observable<Void> {
+        return base.deleteControlNode.rx.didTapDelete
+    }
+}
 
 public class VEditorImageNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
+    public let disposeBag = DisposeBag()
+    
     private let ratio: CGFloat
     
+    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil)
     lazy var imageNode = ASNetworkImageNode()
     
     public required init(_ insets: UIEdgeInsets,
@@ -31,9 +43,28 @@ public class VEditorImageNode: ASCellNode {
         self.selectionStyle = .none
     }
     
+    override public func didLoad() {
+        super.didLoad()
+        guard self.isEdit else { return }
+        self.deleteControlNode.isHidden = true
+        imageNode.addTarget(self, action: #selector(didTapImage), forControlEvents: .touchUpInside)
+        deleteControlNode.addTarget(self, action: #selector(didTapImage), forControlEvents: .touchUpInside)
+    }
+    
+    @objc public func didTapImage() {
+        guard self.isEdit else { return }
+        self.deleteControlNode.isHidden = !self.deleteControlNode.isHidden
+        self.setNeedsLayout()
+    }
+    
     override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let ratioLayout = ASRatioLayoutSpec(ratio: ratio, child: imageNode)
-        
-        return ASInsetLayoutSpec(insets: insets, child: ratioLayout)
+        if isEdit {
+            let deleteOverlayLayout = ASOverlayLayoutSpec(child: ratioLayout,
+                                                          overlay: deleteControlNode)
+            return ASInsetLayoutSpec(insets: insets, child: deleteOverlayLayout)
+        } else {
+            return ASInsetLayoutSpec(insets: insets, child: ratioLayout)
+        }
     }
 }

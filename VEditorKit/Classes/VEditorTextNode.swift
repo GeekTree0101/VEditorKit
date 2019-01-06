@@ -51,6 +51,8 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     override public func didLoad() {
         super.didLoad()
         self.currentTypingAttribute = rule.defaultAttribute()
+        self.supernode?.setNeedsLayout()
+        self.setNeedsLayout()
     }
     
     public func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {

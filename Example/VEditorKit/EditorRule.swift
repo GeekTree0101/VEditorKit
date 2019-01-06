@@ -35,26 +35,32 @@ struct EditorRule: VEditorRule {
         
         switch xml {
         case .paragraph:
-            return .init([.font(UIFont.systemFont(ofSize: 15)),
+            return .init([.font(UIFont.systemFont(ofSize: 16)),
+                          .minimumLineHeight(26.0),
                           .color(.black)])
         case .bold:
             return .init([.emphasis(.bold),
-                          .font(UIFont.systemFont(ofSize: 15)),
+                          .font(UIFont.systemFont(ofSize: 16)),
+                          .minimumLineHeight(26.0),
                           .color(.black)])
         case .italic:
             return .init([.emphasis(.italic),
-                          .font(UIFont.systemFont(ofSize: 15)),
+                          .font(UIFont.systemFont(ofSize: 16)),
+                          .minimumLineHeight(26.0),
                           .color(.black)])
         case .heading:
             return .init([.font(UIFont.systemFont(ofSize: 30, weight: .medium)),
+                          .minimumLineHeight(40.0),
                           .color(.black)])
         case .quote:
             return .init([.font(UIFont.systemFont(ofSize: 20)),
                           .color(.gray),
                           .firstLineHeadIndent(19.0),
+                          .minimumLineHeight(30.0),
                           .headIndent(19.0)])
         case .article:
-            let style: VEditorStyle = .init([.font(UIFont.systemFont(ofSize: 15)),
+            let style: VEditorStyle = .init([.font(UIFont.systemFont(ofSize: 16)),
+                                             .minimumLineHeight(26.0),
                                              .color(.black)])
             if let url = URL(string: attributes["href"] ?? "") {
                 return style.byAdding([.underline(.single, .black), .link(url)])
