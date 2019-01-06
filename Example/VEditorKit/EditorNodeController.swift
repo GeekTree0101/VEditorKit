@@ -18,6 +18,8 @@ class EditorNodeController: ASViewController<VEditorNode> {
     struct Const {
         static let defaultContentInsets: UIEdgeInsets =
             .init(top: 15.0, left: 5.0, bottom: 15.0, right: 5.0)
+        static let ogObjectContainerInsets: UIEdgeInsets =
+            .init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
     }
     let controlAreaNode: EditorControlAreaNode
     let disposeBag = DisposeBag()
@@ -82,6 +84,34 @@ extension EditorNodeController {
                                                 ratio: videoNode.ratio,
                                                 source: videoNode.url,
                                                 poster: videoNode.posterURL)
+                
+                cellNode.rx.didTapDelete
+                    .map({ [weak cellNode] () -> IndexPath? in
+                        return cellNode?.indexPath
+                    })
+                    .bind(to: self.node.rx.deleteContent(animated: true))
+                    .disposed(by: cellNode.disposeBag)
+                
+                return cellNode
+            case let ogObjectNode as VOpenGraphContent:
+                let cellNode = VEditorOpenGraphNode(Const.defaultContentInsets,
+                                                    isEdit: true,
+                                                    title: ogObjectNode.title,
+                                                    desc: ogObjectNode.desc,
+                                                    url: ogObjectNode.url,
+                                                    imageURL: ogObjectNode.posterURL,
+                                                    containerInsets: Const.ogObjectContainerInsets)
+                    .setTitleAttribute(.init([.font(UIFont.systemFont(ofSize: 16, weight: .bold)),
+                                              .minimumLineHeight(25.0),
+                                              .color(.black)]))
+                    .setDescAttribute(.init([.font(UIFont.systemFont(ofSize: 13)),
+                                             .minimumLineHeight(22.0),
+                                             .color(.black)]))
+                    .setSourceAttribute(.init([.font(UIFont.systemFont(ofSize: 12)),
+                                               .minimumLineHeight(21.0),
+                                               .color(.gray),
+                                               .underline(.single, .gray)]))
+                    .setPreviewImageSize(.init(width: 100.0, height: 100.0))
                 
                 cellNode.rx.didTapDelete
                     .map({ [weak cellNode] () -> IndexPath? in
