@@ -168,6 +168,11 @@ extension VEditorNode {
                                            activeXMLs: activeXMLs,
                                            isBlockStyle: false)
             }).disposed(by: activeTextDisposeBag)
+        
+        activeTextNode?.rx.caretRect
+            .subscribe(onNext: { [weak self] rect in
+                self?.scrollToCursor(rect)
+            }).disposed(by: activeTextDisposeBag)
     }
     
     internal enum VEditorAttributeControlScope {
@@ -284,6 +289,14 @@ extension VEditorNode {
         }
         self.activeTextNode = textNode
         return textNode
+    }
+    
+    private func scrollToCursor(_ caretRect: CGRect) {
+        let visibleRect =
+            self.tableNode.view.convert(caretRect,
+                                        from: self.activeTextNode?.view)
+        (self.tableNode.view as UIScrollView)
+            .scrollRectToVisible(visibleRect, animated: false)
     }
 }
 
