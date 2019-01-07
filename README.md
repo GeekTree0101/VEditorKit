@@ -48,11 +48,7 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
 </table>
 
 ## Usage
-- Quick Start
-- What is Editor Rule?
-- How to use VEditorNode?
-- How to use VEditorTextNode?
-- Under construction :)
+- Wiki: https://github.com/GeekTree0101/VEditorKit/wiki
 
 ## Requirements
 - Xcode <~ 9.0
