@@ -62,6 +62,7 @@ extension EditorNodeController {
                                                    placeholderText: nil,
                                                    attributedText: text,
                                                    rule: self.node.editorRule)
+                cellNode.textNode.regexDelegate = self
                 
                 return cellNode
             case let imageNode as VImageContent:
@@ -216,5 +217,52 @@ extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationCon
         }
         
         picker.dismiss(animated: true, completion: nil)
+    }
+}
+
+extension EditorNodeController: VEditorRegexApplierDelegate {
+    
+    enum EditorTextRegexPattern: String, CaseIterable {
+        
+        case userTag = "@(\\w*[0-9A-Za-z])"
+        case hashTag = "#(\\w*[0-9A-Za-zㄱ-ㅎ가-힣])"
+    }
+    
+    var allPattern: [String] {
+        return EditorTextRegexPattern.allCases.map({ $0.rawValue })
+    }
+    
+    func paragraphStyle(pattern: String) -> VEditorStyle? {
+        guard let scope = EditorTextRegexPattern.init(rawValue: pattern) else { return nil }
+        switch scope {
+        case .userTag:
+            return .init([.color(UIColor.init(red: 0.2, green: 0.8, blue: 0.2, alpha: 1.0))])
+        case .hashTag:
+            return .init([.color(UIColor.init(red: 0.2, green: 0.3, blue: 0.8, alpha: 1.0))])
+        }
+    }
+    
+    func handlePatternTouchEvent(_ pattern: String, value: Any) {
+        guard let scope = EditorTextRegexPattern.init(rawValue: pattern) else { return }
+        switch scope {
+        case .userTag:
+            guard let username = value as? String else { return }
+            let toast = UIAlertController(title: "You did tap username: \(username)",
+                message: nil,
+                preferredStyle: .alert)
+            toast.addAction(.init(title: "OK", style: .cancel, handler: nil))
+            self.present(toast, animated: true, completion: nil)
+        case .hashTag:
+            guard let tag = value as? String else { return }
+            let toast = UIAlertController(title: "You did tap hashTag: \(tag)",
+                message: nil,
+                preferredStyle: .alert)
+            toast.addAction(.init(title: "OK", style: .cancel, handler: nil))
+            self.present(toast, animated: true, completion: nil)
+        }
+    }
+    
+    func handlURLTouchEvent(_ url: URL) {
+        UIApplication.shared.openURL(url)
     }
 }

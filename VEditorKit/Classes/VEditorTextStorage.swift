@@ -90,6 +90,8 @@ extension VEditorTextStorage {
     public func didUpdateText(_ textNode: VEditorTextNode) {
         self.status = .none
         textNode.supernode?.setNeedsLayout()
+        self.replaceAttributeWithRegexPattenIfNeeds(textNode)
+        
     }
     
     public func updateCurrentTypingAttribute(_ textNode: VEditorTextNode,
@@ -118,6 +120,59 @@ extension VEditorTextStorage {
     public func paragraphStyleRange(_ range: NSRange) -> NSRange {
         return NSString(string: self.internalAttributedString.string)
             .paragraphRange(for: range)
+    }
+    
+    public func triggerTouchEventIfNeeds(_ textNode: VEditorTextNode) {
+        guard let regexDelegate = textNode.regexDelegate, !textNode.isEdit else { return }
+        
+        let attributes =
+            self.attributes(at: max(0, textNode.selectedRange.location - 1),
+                            effectiveRange: nil)
+        
+        if let url = attributes[.link] as? URL {
+            regexDelegate.handlURLTouchEvent(url)
+            return
+        }
+        let patternKeys: [NSAttributedString.Key] =
+            regexDelegate.allPattern.map({ NSAttributedString.Key.init(rawValue: $0) })
+        
+        for key in patternKeys {
+            if let value = attributes[key] {
+                regexDelegate.handlePatternTouchEvent(key.rawValue, value: value)
+            }
+        }
+    }
+}
+
+extension VEditorTextStorage {
+
+    private func replaceAttributeWithRegexPattenIfNeeds(_ textNode: VEditorTextNode) {
+        guard let regexDelegate = textNode.regexDelegate else { return }
+        let regexs = regexDelegate.allPattern.map({ regexDelegate.regex($0) })
+        let range: NSRange = .init(location: 0, length: self.internalAttributedString.length)
+        let text: String = self.internalAttributedString.string
+        
+        for regex in regexs {
+            let matchs: [NSTextCheckingResult] = regex.matches(in: text, options: [], range: range)
+            
+            guard !matchs.isEmpty,
+                let attributedStyle: VEditorStyle =
+                regexDelegate.paragraphStyle(pattern: regex.pattern) else { continue }
+            
+            
+            for match in matchs {
+                let matchedRange: NSRange = match.range
+                guard let stringRange: Range<String.Index> =
+                    Range.init(matchedRange, in: text) else { continue }
+                let patternKey = NSAttributedString.Key.init(rawValue: regex.pattern)
+                let matchedValue: Any = text[stringRange] as Any
+                self.internalAttributedString.addAttributes(attributedStyle.attributes,
+                                                            range: matchedRange)
+                self.internalAttributedString.addAttribute(patternKey,
+                                                           value: matchedValue,
+                                                           range: matchedRange)
+            }
+        }
     }
 }
 

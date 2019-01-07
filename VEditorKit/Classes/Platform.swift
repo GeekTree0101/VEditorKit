@@ -25,6 +25,7 @@ public protocol VEdiorMediaContent: VEditorContent {
     func parseAttributeToXML() -> [String: String] // parseto xml attribute from media content
 }
 
+// MARK: - VEditorKit Editor Rule
 public protocol VEditorRule {
     var allXML: [String] { get }
     var defaultStyleXMLTag: String { get }
@@ -45,5 +46,24 @@ extension VEditorRule {
             fatalError("Please setup default:\(self.defaultStyleXMLTag) xml tag style")
         }
         return attr.attributes
+    }
+}
+
+// MARK: - VEditor Regex Text Atttribute Apply Delegate
+public protocol VEditorRegexApplierDelegate: class {
+    
+    var allPattern: [String] { get }
+    func paragraphStyle(pattern: String) -> VEditorStyle?
+    func handlePatternTouchEvent(_ pattern: String, value: Any)
+    func handlURLTouchEvent(_ url: URL)
+}
+
+extension VEditorRegexApplierDelegate {
+    
+    func regex(_ pattern: String) -> NSRegularExpression {
+        guard let reg = try? NSRegularExpression.init(pattern: pattern, options: []) else {
+            fatalError("VEditorKit Fatal Error: \(pattern) is invalid regex pattern")
+        }
+        return reg
     }
 }
