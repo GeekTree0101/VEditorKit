@@ -1,9 +1,15 @@
 //
 //  MockService.swift
-//  VEditorKit_Example
+//  VEditorKit
 //
-//  Created by Vingle on 07/01/2019.
-//  Copyright © 2019 CocoaPods. All rights reserved.
+//  Created by Geektree0101 on 01/02/19.
+//  Copyright © 2019 Geektree0101. All rights reserved.
 //
 
 import Foundation
+import RxSwift
+import RxCocoa
+
+struct MockService {
+    
+}

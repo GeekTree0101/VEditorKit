@@ -87,6 +87,8 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
             self.layoutIfNeeded()
             self.invalidateCalculatedLayout()
         }
+        
+        self.textStorage?.replaceAttributeWithRegexPattenIfNeeds(self)
     }
     
     public func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
@@ -96,13 +98,11 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     public func editableTextNode(_ editableTextNode: ASEditableTextNode,
                                  shouldChangeTextIn range: NSRange,
                                  replacementText text: String) -> Bool {
-        
         if (text == "\n" || text == " "),
             self.automaticallyGenerateLinkPreview,
             let context = self.textStorage?.automaticallyApplyLinkAttribute(self) {
             self.generateLinkPreviewRelay.accept(context)
         }
-        
         return true
     }
     
@@ -111,12 +111,12 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
                                                    toSelectedRange: NSRange,
                                                    dueToEditing: Bool) {
         if !dueToEditing {
-            // move cursor and pick attribute on cursor
+            // NOTE: Move cursor and pick attribute on cursor
             let attributes = self.textStorage?
                 .attributes(at: max(toSelectedRange.location - 1, 0),
                             effectiveRange: nil)
             
-            // block current location attributes during drag-selection
+            // NOTE: Block current location attributes during drag-selection
             guard fromSelectedRange.length < 1 else { return }
             
             guard let xmlTags = attributes?[VEditorAttributeKey] as? [String] else {
