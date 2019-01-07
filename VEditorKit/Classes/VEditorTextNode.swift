@@ -27,18 +27,17 @@ extension Reactive where Base: VEditorTextNode {
 
 public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
-    public var isEdit: Bool = true
-    
     public var textStorage: VEditorTextStorage? {
         return self.textView.textStorage as? VEditorTextStorage
     }
-    
     public var currentTypingAttribute: [NSAttributedString.Key: Any] = [:] {
         didSet {
             self.typingAttributes = currentTypingAttribute.typingAttribute()
             self.textStorage?.currentTypingAttribute = currentTypingAttribute
         }
     }
+    public var isEdit: Bool = true
+    public weak var regexDelegate: VEditorRegexApplierDelegate!
     
     private let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
@@ -100,6 +99,8 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
                 return
             }
             self.currentLocationXMLTagsRelay.accept(xmlTags)
+            // TBD: role needs
+            self.textStorage?.triggerTouchEventIfNeeds(self)
         } else {
             guard let textPostion: UITextPosition = editableTextNode.textView.selectedTextRange?.end else {
                 return
