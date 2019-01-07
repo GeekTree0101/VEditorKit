@@ -98,7 +98,7 @@ extension VEditorTextStorage {
                                              attribute: VEditorStyleAttribute,
                                              isBlock: Bool) {
         if isBlock {
-            let blockRange = self.paragraphStyleRange(textNode.selectedRange)
+            let blockRange = self.paragraphBlockRange(textNode.selectedRange)
             self.status = .paste
             self.setAttributes(attribute, range: blockRange)
             self.replaceAttributeWithRegexPattenIfNeeds(textNode, customRange: blockRange)
@@ -118,7 +118,7 @@ extension VEditorTextStorage {
                            range: textNode.selectedRange)
     }
     
-    public func paragraphStyleRange(_ range: NSRange) -> NSRange {
+    public func paragraphBlockRange(_ range: NSRange) -> NSRange {
         return NSString(string: self.internalAttributedString.string)
             .paragraphRange(for: range)
     }
@@ -142,6 +142,44 @@ extension VEditorTextStorage {
                 regexDelegate.handlePatternTouchEvent(key.rawValue, value: value)
             }
         }
+    }
+    
+    public func automaticallyApplyLinkAttribute(_ textNode: VEditorTextNode) -> (URL, Int)? {
+        let pattern: String = "((?:http|https)://)?(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
+        guard let regex = try? NSRegularExpression.init(pattern: pattern, options: []) else { return nil }
+        let blockRange = self.paragraphBlockRange(textNode.selectedRange)
+        let text: String = self.internalAttributedString.string
+        
+        for match in regex.matches(in: text, options: [], range: blockRange) {
+            
+            guard let strRange = Range(match.range, in: text) else {
+                // NOTE: Match not found or failed to generate stringRange
+                continue
+            }
+            
+            guard textNode.selectedRange.location == match.range.location + match.range.length else {
+                // NOTE: is not last link
+                continue
+            }
+            
+            guard case let urlString = String(text[strRange]), let url = URL(string: urlString) else {
+                // NOTE: Failed to convert URL from string
+                continue
+            }
+            
+            if let linkXML = textNode.rule.linkStyleXMLTag,
+                let linkStyle = textNode.rule.paragraphStyle(linkXML, attributes: [:]) {
+                let linkAttribute = linkStyle
+                    .byAdding([.link(url)])
+                    .byAdding([.extraAttributes([VEditorAttributeKey: [linkXML] as Any])])
+                    .attributes
+                self.internalAttributedString.setAttributes(linkAttribute, range: match.range)
+            }
+            
+            return (url, textNode.selectedRange.location)
+        }
+        
+        return nil
     }
 }
 

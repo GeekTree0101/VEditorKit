@@ -63,6 +63,7 @@ extension EditorNodeController {
                                                    attributedText: text,
                                                    rule: self.node.editorRule)
                 cellNode.textNode.regexDelegate = self
+                cellNode.textNode.automaticallyGenerateLinkPreview = true
                 
                 return cellNode
             case let imageNode as VImageContent:

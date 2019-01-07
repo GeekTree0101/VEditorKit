@@ -23,6 +23,10 @@ extension Reactive where Base: VEditorTextNode {
             .distinctUntilChanged()
             .throttle(0.1, scheduler: MainScheduler.instance)
     }
+    
+    internal var generateLinkPreview: Observable<(URL, Int)> {
+        return base.generateLinkPreviewRelay.asObservable()
+    }
 }
 
 public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
@@ -36,12 +40,15 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
             self.textStorage?.currentTypingAttribute = currentTypingAttribute
         }
     }
+    
     public var isEdit: Bool = true
     public weak var regexDelegate: VEditorRegexApplierDelegate!
+    public var automaticallyGenerateLinkPreview: Bool = false
     
-    private let rule: VEditorRule
+    internal let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
     internal let caretRectRelay = PublishRelay<CGRect>()
+    internal let generateLinkPreviewRelay = PublishRelay<(URL, Int)>()
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
@@ -66,20 +73,37 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     override public func didLoad() {
         super.didLoad()
         self.currentTypingAttribute = rule.defaultAttribute()
-        self.supernode?.setNeedsLayout()
-        self.setNeedsLayout()
+        if let linkXML = rule.linkStyleXMLTag,
+            let attrStyle = rule.paragraphStyle(linkXML, attributes: [:]) {
+            self.textView.linkTextAttributes = attrStyle.attributes
+        }
+        
+        if self.isNodeLoaded {
+            self.supernode?.setNeedsLayout()
+            self.setNeedsLayout()
+        } else {
+            self.supernode?.layoutIfNeeded()
+            self.supernode?.invalidateCalculatedLayout()
+            self.layoutIfNeeded()
+            self.invalidateCalculatedLayout()
+        }
     }
     
     public func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
         return self.isEdit
     }
     
-    public func editableTextNodeDidBeginEditing(_ editableTextNode: ASEditableTextNode) {
-  
-    }
-    
-    public func editableTextNodeDidFinishEditing(_ editableTextNode: ASEditableTextNode) {
-     
+    public func editableTextNode(_ editableTextNode: ASEditableTextNode,
+                                 shouldChangeTextIn range: NSRange,
+                                 replacementText text: String) -> Bool {
+        
+        if (text == "\n" || text == " "),
+            self.automaticallyGenerateLinkPreview,
+            let context = self.textStorage?.automaticallyApplyLinkAttribute(self) {
+            self.generateLinkPreviewRelay.accept(context)
+        }
+        
+        return true
     }
     
     public func editableTextNodeDidChangeSelection(_ editableTextNode: ASEditableTextNode,
@@ -99,7 +123,6 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
                 return
             }
             self.currentLocationXMLTagsRelay.accept(xmlTags)
-            // TBD: role needs
             self.textStorage?.triggerTouchEventIfNeeds(self)
         } else {
             guard let textPostion: UITextPosition = editableTextNode.textView.selectedTextRange?.end else {
