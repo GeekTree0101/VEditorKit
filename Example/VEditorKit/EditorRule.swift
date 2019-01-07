@@ -28,6 +28,10 @@ struct EditorRule: VEditorRule {
         return XML.paragraph.rawValue
     }
     
+    var linkStyleXMLTag: String? {
+        return XML.article.rawValue
+    }
+    
     var allXML: [String] {
         return XML.allCases.map({ $0.rawValue })
     }
@@ -63,9 +67,10 @@ struct EditorRule: VEditorRule {
         case .article:
             let style: VEditorStyle = .init([.font(UIFont.systemFont(ofSize: 16)),
                                              .minimumLineHeight(26.0),
-                                             .color(.black)])
+                                             .color(.black),
+                                             .underline(.single, .black)])
             if let url = URL(string: attributes["href"] ?? "") {
-                return style.byAdding([.underline(.single, .black), .link(url)])
+                return style.byAdding([.link(url)])
             } else {
                 return style
             }
@@ -178,6 +183,7 @@ class VImageContent: VEdiorMediaContent {
 }
 
 class VVideoContent: VEdiorMediaContent {
+    
     
     var xmlTag: String
     

@@ -19,6 +19,8 @@
 		9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1921DF030300391EC9 /* XMLViewController.swift */; };
 		9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
 		9B88A6AB21DCDEC300EF3CC8 /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
+		9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
+		9BE5C47F21E32168009EF52B /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */; };
 		C191B86EDFC34EB0AF1131BD /* Pods_VEditorKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48D26DEF356E2D9A26CBD914 /* Pods_VEditorKit_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +55,8 @@
 		9B457E1921DF030300391EC9 /* XMLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLViewController.swift; sourceTree = "<group>"; };
 		9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorControlAreaNode.swift; sourceTree = "<group>"; };
 		9B88A6AA21DCDEC300EF3CC8 /* content.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = content.xml; sourceTree = "<group>"; };
+		9BE5C47A21E310D5009EF52B /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockService.swift; sourceTree = "<group>"; };
+		9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorOpenGraphPlaceholder.swift; sourceTree = "<group>"; };
 		C3E3AB57DFE5DE8299572A7A /* Pods-VEditorKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Tests/Pods-VEditorKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		D262A91D97AC2BCBF155C159 /* Pods-VEditorKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Tests/Pods-VEditorKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		D47C1AE2E83656FF20DAB7F4 /* Pods-VEditorKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Example/Pods-VEditorKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -120,6 +124,8 @@
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
 				9B457E1921DF030300391EC9 /* XMLViewController.swift */,
+				9BE5C47A21E310D5009EF52B /* MockService.swift */,
+				9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */,
 			);
 			name = "Example for VEditorKit";
 			path = VEditorKit;
@@ -400,9 +406,11 @@
 			files = (
 				607FACD81AFB9204008FA782 /* EditorNodeController.swift in Sources */,
 				9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */,
+				9BE5C47F21E32168009EF52B /* EditorOpenGraphPlaceholder.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				9B457E1121DE063400391EC9 /* EditorRule.swift in Sources */,
 				9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */,
+				9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
