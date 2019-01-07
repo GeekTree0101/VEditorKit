@@ -125,7 +125,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             let content = self.editorContents[indexPath.row]
             
             if let placeholderContent = content as? VEditorPlaceholderContent {
-                guard let cellNode = self.delegate.placeholderCellNode(placeholderContent) else {
+                guard let cellNode = self.delegate.placeholderCellNode(placeholderContent, indexPath: indexPath) else {
                     return ASCellNode()
                 }
                 
@@ -148,7 +148,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 
                 return cellNode
             } else {
-                return self.delegate.contentCellNode(content) ?? ASCellNode()
+                return self.delegate.contentCellNode(content, indexPath: indexPath) ?? ASCellNode()
             }
         }
     }

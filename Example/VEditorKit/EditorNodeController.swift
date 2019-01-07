@@ -62,7 +62,7 @@ extension EditorNodeController: VEditorNodeDelegate {
         return controlAreaNode.dismissNode
     }
     
-    func placeholderCellNode(_ content: VEditorPlaceholderContent) -> VEditorMediaPlaceholderNode? {
+    func placeholderCellNode(_ content: VEditorPlaceholderContent, indexPath: IndexPath) -> VEditorMediaPlaceholderNode? {
         guard let xml = EditorRule.XML.init(rawValue: content.xmlTag) else { return nil }
     
         switch xml {
@@ -76,7 +76,7 @@ extension EditorNodeController: VEditorNodeDelegate {
         return nil
     }
     
-    func contentCellNode(_ content: VEditorContent) -> ASCellNode? {
+    func contentCellNode(_ content: VEditorContent, indexPath: IndexPath) -> ASCellNode? {
         switch content {
         case let text as NSAttributedString:
             let cellNode = VEditorTextCellNode(isEdit: isEditMode,

@@ -69,8 +69,10 @@ public protocol VEditorNodeDelegate: class {
     
     func getRegisterTypingControls() -> [VEditorTypingControlNode]?
     func dismissKeyboardNode() -> ASControlNode?
-    func placeholderCellNode(_ content: VEditorPlaceholderContent) -> VEditorMediaPlaceholderNode?
-    func contentCellNode(_ content: VEditorContent) -> ASCellNode?
+    func placeholderCellNode(_ content: VEditorPlaceholderContent,
+                             indexPath: IndexPath) -> VEditorMediaPlaceholderNode?
+    func contentCellNode(_ content: VEditorContent,
+                         indexPath: IndexPath) -> ASCellNode?
 }
 
 // MARK: - VEditor Regex Text Atttribute Apply Delegate
