@@ -26,8 +26,6 @@ extension Reactive where Base: VEditorNode {
 
 public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     
-    public typealias ContentFactory = (VEditorContent) -> ASCellNode?
-    
     public enum Status {
         case loading
         case some
@@ -53,7 +51,7 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     public var editorContents: [VEditorContent] = []
     public let editorStatusRelay = PublishRelay<Status>()
     public let disposeBag = DisposeBag()
-    public var editorContentFactory: (ContentFactory)? = nil
+    public weak var delegate: VEditorNodeDelegate!
     
     public var activeTextNode: VEditorTextNode? {
         didSet {
@@ -75,25 +73,20 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.backgroundColor = .white
     }
     
-    /**
-     Setup editor content factory
-     
-     - important: Recommend read reference
-     
-     - parameters:
-     - factory: you will got VEditorContent and than return optional ASCellNode
-     */
-    public func setEditorContentFactory(_ factory: @escaping ContentFactory) {
-        self.editorContentFactory = factory
-        self.tableNode.reloadData()
-    }
-    
     public override func didLoad() {
         super.didLoad()
         self.tableNode.view.separatorStyle = .none
         self.tableNode.view.showsVerticalScrollIndicator = false
         self.tableNode.view.showsHorizontalScrollIndicator = false
         self.rxInitParser()
+        
+        if let typingControls = self.delegate.getRegisterTypingControls() {
+            self.registerTypingContols(typingControls)
+        }
+        
+        if let dismissKeyboardNode = self.delegate.dismissKeyboardNode() {
+            self.observeKeyboardEvent(dismissKeyboardNode)
+        }
     }
     
     public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
@@ -128,9 +121,35 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     public func tableNode(_ tableNode: ASTableNode,
                           nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         return {
-            guard indexPath.row < self.editorContents.count,
-                let factory = self.editorContentFactory else { return ASCellNode() }
-            return factory(self.editorContents[indexPath.row]) ?? ASCellNode()
+            guard indexPath.row < self.editorContents.count else { return ASCellNode() }
+            let content = self.editorContents[indexPath.row]
+            
+            if let placeholderContent = content as? VEditorPlaceholderContent {
+                guard let cellNode = self.delegate.placeholderCellNode(placeholderContent) else {
+                    return ASCellNode()
+                }
+                
+                cellNode.rx.success
+                    .observeOn(MainScheduler.instance)
+                    .subscribe(onNext: { [weak self] context in
+                        let (replaceContent, indexPath) = context
+                        self?.editorContents[indexPath.row] = replaceContent
+                        self?.tableNode.reloadRows(at: [indexPath], with: .automatic)
+                    })
+                    .disposed(by: cellNode.disposeBag)
+                
+                cellNode.rx.failed
+                    .observeOn(MainScheduler.instance)
+                    .subscribe(onNext: { [weak self] indexPath in
+                        self?.editorContents.remove(at: indexPath.row)
+                        self?.tableNode.deleteRows(at: [indexPath], with: .automatic)
+                    })
+                    .disposed(by: cellNode.disposeBag)
+                
+                return cellNode
+            } else {
+                return self.delegate.contentCellNode(content) ?? ASCellNode()
+            }
         }
     }
 }
@@ -158,6 +177,8 @@ extension VEditorNode {
     
     /**
      Load already active(firstResponder) textNode from cells
+     
+     - returns: ActiveTextNode from first responder cellNode
      */
     public func loadActiveTextNode() -> VEditorTextNode? {
         guard let aciveTextCellNode: VEditorTextCellNode? =
@@ -170,6 +191,23 @@ extension VEditorNode {
         }
         self.activeTextNode = textNode
         return textNode
+    }
+    
+    /**
+     Load already active(firstResponder) textNode indexPath from cells
+     
+     - returns: indexPath of activeTextNode
+     */
+    public func loadActiveTextNodeIndexPath() -> IndexPath? {
+        guard let aciveTextCellNode: VEditorTextCellNode? =
+            self.tableNode.visibleNodes
+                .map({ $0 as? VEditorTextCellNode })
+                .filter({ $0?.textNode.isFirstResponder() ?? false })
+                .first else {
+                    return nil
+        }
+        
+        return aciveTextCellNode?.indexPath
     }
     
     internal func observeActiveTextNode() {
@@ -188,6 +226,11 @@ extension VEditorNode {
         activeTextNode?.rx.caretRect
             .subscribe(onNext: { [weak self] rect in
                 self?.scrollToCursor(rect)
+            }).disposed(by: activeTextDisposeBag)
+        
+        activeTextNode?.rx.generateLinkPreview
+            .subscribe(onNext: { [weak self] link, index in
+                self?.generateLinkPreview(link, splitIndex: index)
             }).disposed(by: activeTextDisposeBag)
     }
     
@@ -298,9 +341,148 @@ extension VEditorNode {
         (self.tableNode.view as UIScrollView)
             .scrollRectToVisible(visibleRect, animated: false)
     }
+    
+    private func generateLinkPreview(_ url: URL, splitIndex: Int) {
+        guard let tag = self.editorRule.linkStyleXMLTag else { return }
+        self.insertContent(VEditorPlaceholderContent.init(xmlTag: tag, model: url as Any),
+                           splitIndex: splitIndex)
+    }
 }
 
-// MARK - Editor XML Parser & Builder
+// MARK: - Editor Content Management
+extension VEditorNode {
+    
+    /**
+     Insertion Content
+     - important: Do not pass NSAttributedString on content parameter
+     - parameters:
+     - content: placeholder or media content
+     - indexPath: insert indexPath
+     */
+    public func insertContent(_ content: VEditorContent,
+                              indexPath: IndexPath,
+                              scrollPosition: UITableView.ScrollPosition = .bottom,
+                              animated: Bool = true) {
+        guard !(content is NSAttributedString) else {
+            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
+        }
+        
+        if editorContents.count == indexPath.row + 1 {
+            self.editorContents.append(content)
+        } else{
+            self.editorContents.insert(content, at: indexPath.row + 1)
+        }
+        
+        let contentIndexPath: IndexPath = .init(row: indexPath.row + 1, section: indexPath.section)
+        
+        self.tableNode.performBatchUpdates({
+            self.tableNode.insertRows(at: [contentIndexPath],
+                                      with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin else { return }
+            self.tableNode.scrollToRow(at: contentIndexPath,
+                                       at: scrollPosition,
+                                       animated: animated)
+        })
+    }
+    
+    /**
+     Insertion Content Array
+     
+     - important: Do not pass NSAttributedString on content parameter
+     - parameters:
+     - contents: Array of placeholder or media content
+     - indexPath: IndexPath
+     */
+    public func insertContent(_ contents: [VEditorContent],
+                              indexPath: IndexPath,
+                              scrollPosition: UITableView.ScrollPosition = .bottom,
+                              animated: Bool = true) {
+        guard !contents.contains(where: { $0 is NSAttributedString }) else {
+            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
+        }
+        
+        if editorContents.count == indexPath.row + 1 {
+            self.editorContents.append(contentsOf: contents)
+        } else{
+            self.editorContents.insert(contentsOf: contents, at: indexPath.row + 1)
+        }
+        
+        let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
+            return .init(row: indexPath.row + 1 + index, section: indexPath.section)
+        })
+        
+        self.tableNode.performBatchUpdates({
+            self.tableNode.insertRows(at: contentIndexPaths,
+                                      with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin, let lastIndexPath = contentIndexPaths.last else { return }
+            self.tableNode.scrollToRow(at: lastIndexPath,
+                                       at: scrollPosition,
+                                       animated: animated)
+        })
+    }
+    
+    /**
+     Insertion Content with Text Split Index
+     
+     - important: Do not pass NSAttributedString on content parameter
+     - parameters:
+     - content: placeholder or media content
+     - splitIndex: SplitIndex on textNode
+     */
+    public func insertContent(_ content: VEditorContent,
+                              splitIndex: Int,
+                              scrollPosition: UITableView.ScrollPosition = .bottom,
+                              animated: Bool = true) {
+        guard !(content is NSAttributedString) else {
+            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
+        }
+        
+        guard let indexPath = self.loadActiveTextNodeIndexPath(),
+            let attrText = self.activeTextNode?.textStorage?.internalAttributedString else { return }
+        
+        // STEP1: Split textStorage with replaceTextStorage
+        let length: Int = attrText.length
+        let prefixRange: NSRange = .init(location: 0, length: splitIndex)
+        let tailRange: NSRange = .init(location: splitIndex, length: length - splitIndex)
+        
+        let prefixAttrText = attrText.attributedSubstring(from: prefixRange)
+        let tailAttrText = attrText.attributedSubstring(from: tailRange)
+        
+        self.activeTextNode?.textStorage?.setAttributedString(prefixAttrText)
+        
+        // STEP2: Get VEditorContent with prepare update editor
+        let insertItems: [VEditorContent] = [content, tailAttrText]
+        
+        if editorContents.count == indexPath.row + 1 {
+            self.editorContents.append(contentsOf: insertItems)
+        } else{
+            self.editorContents.insert(contentsOf: insertItems, at: indexPath.row + 1)
+        }
+        
+        let contentIndexPath: IndexPath = .init(row: indexPath.row + 1, section: indexPath.section)
+        let splitedTextIndexPath: IndexPath = .init(row: indexPath.row + 2, section: indexPath.section)
+        
+        // STEP3: Fetch Placeholder or MediaContent with splitted text
+        self.tableNode.performBatchUpdates({
+            self.tableNode.insertRows(at: [contentIndexPath, splitedTextIndexPath],
+                                      with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin else { return }
+            if let cellNode = self.tableNode.nodeForRow(at: splitedTextIndexPath) as? VEditorTextCellNode {
+                self.activeTextNode?.resignFirstResponder()
+                self.activeTextNode = cellNode.textNode
+                self.activeTextNode?.becomeFirstResponder()
+            }
+            self.tableNode.scrollToRow(at: splitedTextIndexPath,
+                                       at: scrollPosition,
+                                       animated: animated)
+        })
+    }
+}
+
+// MARK: - Editor XML Parser & Builder
 extension VEditorNode {
     
     /**

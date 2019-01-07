@@ -184,6 +184,7 @@ class VImageContent: VEdiorMediaContent {
 
 class VVideoContent: VEdiorMediaContent {
     
+    
     var xmlTag: String
     
     var url: URL?

@@ -7,14 +7,19 @@
 //
 
 import BonMot
+import RxSwift
+import AsyncDisplayKit
 
 public typealias VEditorStyleAttribute = BonMot.StyleAttributes
 public typealias VEditorStyle = BonMot.StringStyle
 
+// MARK: - VEditor Parser Scope
 public enum VEditorParserResultScope {
     case error(Error?)
     case success([VEditorContent])
 }
+
+// MARK: - VEditor Unit Content
 
 extension NSAttributedString: VEditorContent { }
 public let VEditorAttributeKey: NSAttributedString.Key = .init(rawValue: "VEditorKit.AttributeKey")
@@ -23,6 +28,11 @@ public protocol VEdiorMediaContent: VEditorContent {
     var xmlTag: String { get }
     init(_ xmlTag: String, attributes: [String: String])
     func parseAttributeToXML() -> [String: String] // parseto xml attribute from media content
+}
+
+public struct VEditorPlaceholderContent: VEditorContent {
+    public var xmlTag: String
+    public var model: Any
 }
 
 // MARK: - VEditorKit Editor Rule
@@ -48,6 +58,15 @@ extension VEditorRule {
         }
         return attr.attributes
     }
+}
+
+// MARK: VEditotKit EditorNodeDelegate
+public protocol VEditorNodeDelegate: class {
+    
+    func getRegisterTypingControls() -> [VEditorTypingControlNode]?
+    func dismissKeyboardNode() -> ASControlNode?
+    func placeholderCellNode(_ content: VEditorPlaceholderContent) -> VEditorMediaPlaceholderNode?
+    func contentCellNode(_ content: VEditorContent) -> ASCellNode?
 }
 
 // MARK: - VEditor Regex Text Atttribute Apply Delegate

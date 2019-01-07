@@ -20,8 +20,7 @@ final public class VEditorTextStorage: NSTextStorage {
     
     internal var status: TypingStstus = .none
     internal var currentTypingAttribute: [NSAttributedString.Key: Any] = [:]
-    
-    private var internalAttributedString: NSMutableAttributedString = .init()
+    internal var internalAttributedString: NSMutableAttributedString = .init()
     private var prevCursorLocation: Int = 0
     
     override public var string: String {

@@ -34,6 +34,7 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     public var textStorage: VEditorTextStorage? {
         return self.textView.textStorage as? VEditorTextStorage
     }
+    
     public var currentTypingAttribute: [NSAttributedString.Key: Any] = [:] {
         didSet {
             self.typingAttributes = currentTypingAttribute.typingAttribute()
@@ -78,16 +79,8 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
             self.textView.linkTextAttributes = attrStyle.attributes
         }
         
-        if self.isNodeLoaded {
-            self.supernode?.setNeedsLayout()
-            self.setNeedsLayout()
-        } else {
-            self.supernode?.layoutIfNeeded()
-            self.supernode?.invalidateCalculatedLayout()
-            self.layoutIfNeeded()
-            self.invalidateCalculatedLayout()
-        }
-        
+        self.supernode?.setNeedsLayout()
+        self.setNeedsLayout()
         self.textStorage?.replaceAttributeWithRegexPattenIfNeeds(self)
     }
     
