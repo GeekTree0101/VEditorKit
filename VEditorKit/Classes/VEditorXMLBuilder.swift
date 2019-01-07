@@ -9,7 +9,7 @@
 import Foundation
 import BonMot
 
-public class VEditorXMLBuilder {
+public final class VEditorXMLBuilder {
     
     public static let shared: VEditorXMLBuilder = .init()
     
@@ -21,7 +21,7 @@ public class VEditorXMLBuilder {
         
         for content in contents {
             switch content {
-            case let mediaContent as VEdiorMediaContent:
+            case let mediaContent as VEditorMediaContent:
                 let tag = mediaContent.xmlTag
                 let attributes = mediaContent.parseAttributeToXML()
                 xmlString += self.generateXMLTag(tag, scope: .selfClosing(attributes))

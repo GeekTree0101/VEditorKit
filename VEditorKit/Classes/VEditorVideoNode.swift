@@ -13,11 +13,15 @@ import RxCocoa
 
 extension Reactive where Base: VEditorVideoNode {
     
+    /**
+     Delete imageNode event
+     */
     public var didTapDelete: Observable<Void> {
         return base.deleteControlNode.rx.didTapDelete
     }
 }
-public class VEditorVideoNode: ASCellNode {
+
+open class VEditorVideoNode: ASCellNode {
     
     public lazy var videoNode: ASVideoNode = {
         let node = ASVideoNode()
@@ -26,41 +30,70 @@ public class VEditorVideoNode: ASCellNode {
         return node
     }()
     
-    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil)
+    public lazy var deleteControlNode: VEditorDeleteMediaNode =
+        .init(.red, deleteIconImage: nil)
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
-    public let ratio: CGFloat
-    public let videoSrcURL: URL?
-    public let posterURL: URL?
-    public let disposeBag = DisposeBag()
+    public var ratio: CGFloat = 1.0
+    public var assetURL: URL?
+    public var posterURL: URL?
     public var videoAsset: AVAsset? {
-        guard let url = videoSrcURL else { return nil }
+        guard let url = assetURL else { return nil }
         return AVURLAsset(url: url)
     }
-    public required init(_ insets: UIEdgeInsets,
-                         isEdit: Bool,
-                         ratio: CGFloat,
-                         source: URL?,
-                         poster: URL?) {
-        self.insets = insets
+    public let disposeBag = DisposeBag()
+    
+    public required init(isEdit: Bool) {
         self.isEdit = isEdit
-        self.ratio = ratio
-        self.posterURL = poster
-        self.videoSrcURL = source
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
-        self.videoNode.setURL(self.posterURL, resetToDefault: true)
+        self.videoNode.backgroundColor = .lightGray
+        self.videoNode.placeholderColor = .lightGray
     }
     
-    override public func didLoad() {
+    @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
+        self.insets = insets
+        return self
+    }
+    
+    @discardableResult open func setPreviewURL(_ url: URL?) -> Self {
+        self.videoNode.setURL(url, resetToDefault: true)
+        return self
+    }
+    
+    @discardableResult open func setAssetURL(_ url: URL?) -> Self {
+        self.assetURL = url
+        return self
+    }
+    
+    @discardableResult open func setVideoRatio(_ ratio: CGFloat) -> Self {
+        self.ratio = ratio
+        return self
+    }
+    
+    @discardableResult open func setPlaceholderColor(_ color: UIColor) -> Self {
+        self.videoNode.placeholderColor = color
+        return self
+    }
+    
+    @discardableResult open func setBackgroundColor(_ color: UIColor) -> Self {
+        self.videoNode.backgroundColor = color
+        return self
+    }
+    
+    override open func didLoad() {
         super.didLoad()
         self.videoNode.asset = self.videoAsset
         guard self.isEdit else { return }
         self.deleteControlNode.isHidden = true
-        videoNode.addTarget(self, action: #selector(didTapVideo), forControlEvents: .touchUpInside)
-        deleteControlNode.addTarget(self, action: #selector(didTapVideo), forControlEvents: .touchUpInside)
+        videoNode.addTarget(self,
+                            action: #selector(didTapVideo),
+                            forControlEvents: .touchUpInside)
+        deleteControlNode.addTarget(self,
+                                    action: #selector(didTapVideo),
+                                    forControlEvents: .touchUpInside)
     }
     
     @objc public func didTapVideo() {
@@ -74,14 +107,18 @@ public class VEditorVideoNode: ASCellNode {
         self.setNeedsLayout()
     }
     
-    override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+        
         let ratioLayout = ASRatioLayoutSpec(ratio: ratio, child: videoNode)
         if isEdit {
-            let deleteOverlayLayout = ASOverlayLayoutSpec(child: ratioLayout,
-                                                          overlay: deleteControlNode)
-            return ASInsetLayoutSpec(insets: insets, child: deleteOverlayLayout)
+            let deleteOverlayLayout =
+                ASOverlayLayoutSpec(child: ratioLayout,
+                                    overlay: deleteControlNode)
+            return ASInsetLayoutSpec(insets: insets,
+                                     child: deleteOverlayLayout)
         } else {
-            return ASInsetLayoutSpec(insets: insets, child: ratioLayout)
+            return ASInsetLayoutSpec(insets: insets,
+                                     child: ratioLayout)
         }
     }
 }

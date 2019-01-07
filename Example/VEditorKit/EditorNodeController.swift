@@ -20,6 +20,9 @@ class EditorNodeController: ASViewController<VEditorNode> {
             .init(top: 15.0, left: 5.0, bottom: 15.0, right: 5.0)
         static let ogObjectContainerInsets: UIEdgeInsets =
             .init(top: 10.0, left: 10.0, bottom: 10.0, right: 10.0)
+        static let placeholderTextStyle: VEditorStyle = .init([.font(UIFont.systemFont(ofSize: 16)),
+                                                               .minimumLineHeight(24.0),
+                                                               .color(.lightGray)])
     }
     let controlAreaNode: EditorControlAreaNode
     let disposeBag = DisposeBag()
@@ -32,7 +35,7 @@ class EditorNodeController: ASViewController<VEditorNode> {
         self.isEditMode = isEditMode
         self.xmlString = xmlString
         super.init(node: .init(editorRule: rule, controlAreaNode: controlAreaNode))
-        self.title = "Editor"
+        self.title = isEditMode ? "Editor": "Preview"
         self.node.delegate = self
         self.controlAreaNode.isHidden = !isEditMode
     }
@@ -76,20 +79,24 @@ extension EditorNodeController: VEditorNodeDelegate {
     func contentCellNode(_ content: VEditorContent) -> ASCellNode? {
         switch content {
         case let text as NSAttributedString:
-            let cellNode = VEditorTextCellNode(Const.defaultContentInsets,
-                                               isEdit: isEditMode,
-                                               placeholderText: nil,
+            let cellNode = VEditorTextCellNode(isEdit: isEditMode,
+                                               placeholderText: "Insert text..."
+                                                .styled(with: Const.placeholderTextStyle),
                                                attributedText: text,
                                                rule: self.node.editorRule)
+                .setContentInsets(Const.defaultContentInsets)
+            
             cellNode.textNode.regexDelegate = self
             cellNode.textNode.automaticallyGenerateLinkPreview = true
             
             return cellNode
         case let imageNode as VImageContent:
-            let cellNode = VEditorImageNode(Const.defaultContentInsets,
-                                            isEdit: isEditMode,
-                                            url: imageNode.url,
-                                            ratio: imageNode.ratio)
+            let cellNode = VEditorImageNode(isEdit: isEditMode)
+                .setContentInsets(Const.defaultContentInsets)
+                .setURL(imageNode.url)
+                .setImageRatio(imageNode.ratio)
+                .setPlaceholderColor(.lightGray)
+                .setBackgroundColor(.lightGray)
             
             cellNode.rx.didTapDelete
                 .map({ [weak cellNode] () -> IndexPath? in
@@ -100,11 +107,13 @@ extension EditorNodeController: VEditorNodeDelegate {
             
             return cellNode
         case let videoNode as VVideoContent:
-            let cellNode = VEditorVideoNode(Const.defaultContentInsets,
-                                            isEdit: isEditMode,
-                                            ratio: videoNode.ratio,
-                                            source: videoNode.url,
-                                            poster: videoNode.posterURL)
+            let cellNode = VEditorVideoNode(isEdit: isEditMode)
+                .setContentInsets(Const.defaultContentInsets)
+                .setAssetURL(videoNode.url)
+                .setPreviewURL(videoNode.posterURL)
+                .setVideoRatio(videoNode.ratio)
+                .setPlaceholderColor(.lightGray)
+                .setBackgroundColor(.black)
             
             cellNode.rx.didTapDelete
                 .map({ [weak cellNode] () -> IndexPath? in
@@ -115,24 +124,24 @@ extension EditorNodeController: VEditorNodeDelegate {
             
             return cellNode
         case let ogObjectNode as VOpenGraphContent:
-            let cellNode = VEditorOpenGraphNode(Const.defaultContentInsets,
-                                                isEdit: isEditMode,
-                                                title: ogObjectNode.title,
-                                                desc: ogObjectNode.desc,
-                                                url: ogObjectNode.url,
-                                                imageURL: ogObjectNode.posterURL,
-                                                containerInsets: Const.ogObjectContainerInsets)
-                .setTitleAttribute(.init([.font(UIFont.systemFont(ofSize: 16, weight: .bold)),
-                                          .minimumLineHeight(25.0),
-                                          .color(.black)]))
-                .setDescAttribute(.init([.font(UIFont.systemFont(ofSize: 13)),
-                                         .minimumLineHeight(22.0),
-                                         .color(.black)]))
-                .setSourceAttribute(.init([.font(UIFont.systemFont(ofSize: 12)),
-                                           .minimumLineHeight(21.0),
-                                           .color(.gray),
-                                           .underline(.single, .gray)]))
-                .setPreviewImageSize(.init(width: 100.0, height: 100.0))
+            let cellNode = VEditorOpenGraphNode(isEdit: isEditMode)
+                .setContentInsets(Const.ogObjectContainerInsets)
+                .setContainerInsets(Const.ogObjectContainerInsets)
+                .setPreviewImageURL(ogObjectNode.posterURL)
+                .setPreviewImageSize(.init(width: 100.0, height: 100.0), cornerRadius: 5.0)
+                .setTitleAttribute(ogObjectNode.title,
+                                   attrStyle: .init([.font(UIFont.systemFont(ofSize: 16, weight: .bold)),
+                                                     .minimumLineHeight(25.0),
+                                                     .color(.black)]))
+                .setDescAttribute(ogObjectNode.desc,
+                                  attrStyle: .init([.font(UIFont.systemFont(ofSize: 13)),
+                                                    .minimumLineHeight(22.0),
+                                                    .color(.black)]))
+                .setSourceAttribute(ogObjectNode.url,
+                                    attrStyle: .init([.font(UIFont.systemFont(ofSize: 12)),
+                                                      .minimumLineHeight(21.0),
+                                                      .color(.gray),
+                                                      .underline(.single, .gray)]))
             
             cellNode.rx.didTapDelete
                 .map({ [weak cellNode] () -> IndexPath? in

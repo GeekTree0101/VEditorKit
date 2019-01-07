@@ -80,7 +80,7 @@ struct EditorRule: VEditorRule {
         }
     }
     
-    func build(_ xmlTag: String, attributes: [String : String]) -> VEdiorMediaContent? {
+    func build(_ xmlTag: String, attributes: [String : String]) -> VEditorMediaContent? {
         guard let xml = XML.init(rawValue: xmlTag) else { return nil }
         
         switch xml {
@@ -156,7 +156,7 @@ struct EditorRule: VEditorRule {
     }
 }
 
-class VImageContent: VEdiorMediaContent {
+class VImageContent: VEditorMediaContent {
     
     var xmlTag: String
     
@@ -182,7 +182,7 @@ class VImageContent: VEdiorMediaContent {
     }
 }
 
-class VVideoContent: VEdiorMediaContent {
+class VVideoContent: VEditorMediaContent {
     
     
     var xmlTag: String
@@ -212,7 +212,7 @@ class VVideoContent: VEdiorMediaContent {
     }
 }
 
-class VOpenGraphContent: VEdiorMediaContent {
+class VOpenGraphContent: VEditorMediaContent {
     
     var xmlTag: String
     

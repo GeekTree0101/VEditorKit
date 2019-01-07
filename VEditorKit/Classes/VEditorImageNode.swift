@@ -13,42 +13,69 @@ import RxSwift
 
 extension Reactive where Base: VEditorImageNode {
     
+    /**
+     Delete imageNode event
+     */
     public var didTapDelete: Observable<Void> {
         return base.deleteControlNode.rx.didTapDelete
     }
 }
 
-public class VEditorImageNode: ASCellNode {
+open class VEditorImageNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
+    public var ratio: CGFloat = 1.0
     public let disposeBag = DisposeBag()
     
-    private let ratio: CGFloat
-    
-    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil)
+    public lazy var deleteControlNode: VEditorDeleteMediaNode =
+        .init(.red, deleteIconImage: nil)
     lazy var imageNode = ASNetworkImageNode()
     
-    public required init(_ insets: UIEdgeInsets,
-                         isEdit: Bool,
-                         url: URL?,
-                         ratio: CGFloat) {
-        self.insets = insets
+    public required init(isEdit: Bool) {
         self.isEdit = isEdit
-        self.ratio = ratio
         super.init()
         self.imageNode.backgroundColor = .lightGray
-        self.imageNode.setURL(url, resetToDefault: true)
+        self.imageNode.placeholderColor = .lightGray
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
     }
     
-    override public func didLoad() {
+    @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
+        self.insets = insets
+        return self
+    }
+    
+    @discardableResult open func setURL(_ url: URL?) -> Self {
+        self.imageNode.setURL(url, resetToDefault: true)
+        return self
+    }
+    
+    @discardableResult open func setImageRatio(_ ratio: CGFloat) -> Self {
+        self.ratio = ratio
+        return self
+    }
+    
+    @discardableResult open func setPlaceholderColor(_ color: UIColor) -> Self {
+        self.imageNode.placeholderColor = color
+        return self
+    }
+    
+    @discardableResult open func setBackgroundColor(_ color: UIColor) -> Self {
+        self.imageNode.backgroundColor = color
+        return self
+    }
+    
+    override open func didLoad() {
         super.didLoad()
         guard self.isEdit else { return }
         self.deleteControlNode.isHidden = true
-        imageNode.addTarget(self, action: #selector(didTapImage), forControlEvents: .touchUpInside)
-        deleteControlNode.addTarget(self, action: #selector(didTapImage), forControlEvents: .touchUpInside)
+        imageNode.addTarget(self,
+                            action: #selector(didTapImage),
+                            forControlEvents: .touchUpInside)
+        deleteControlNode.addTarget(self,
+                                    action: #selector(didTapImage),
+                                    forControlEvents: .touchUpInside)
     }
     
     @objc public func didTapImage() {
@@ -57,14 +84,17 @@ public class VEditorImageNode: ASCellNode {
         self.setNeedsLayout()
     }
     
-    override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let ratioLayout = ASRatioLayoutSpec(ratio: ratio, child: imageNode)
         if isEdit {
-            let deleteOverlayLayout = ASOverlayLayoutSpec(child: ratioLayout,
-                                                          overlay: deleteControlNode)
-            return ASInsetLayoutSpec(insets: insets, child: deleteOverlayLayout)
+            let deleteOverlayLayout =
+                ASOverlayLayoutSpec(child: ratioLayout,
+                                    overlay: deleteControlNode)
+            return ASInsetLayoutSpec(insets: insets,
+                                     child: deleteOverlayLayout)
         } else {
-            return ASInsetLayoutSpec(insets: insets, child: ratioLayout)
+            return ASInsetLayoutSpec(insets: insets,
+                                     child: ratioLayout)
         }
     }
 }

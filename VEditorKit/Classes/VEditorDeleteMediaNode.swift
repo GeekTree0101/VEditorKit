@@ -9,7 +9,7 @@ extension Reactive where Base: VEditorDeleteMediaNode {
     }
 }
 
-public class VEditorDeleteMediaNode: ASControlNode {
+open class VEditorDeleteMediaNode: ASControlNode {
     
     lazy var deleteButtonNode: ASControlNode = {
         let node = ASControlNode()
@@ -41,25 +41,25 @@ public class VEditorDeleteMediaNode: ASControlNode {
         self.automaticallyManagesSubnodes = true
     }
     
-    override public func didLoad() {
+    override open func didLoad() {
         super.didLoad()
         deleteButtonNode.addTarget(self,
                                    action: #selector(didTapDeleteButton),
                                    forControlEvents: .touchUpInside)
     }
     
-    @objc public func didTapDeleteButton() {
+    @objc open func didTapDeleteButton() {
         self.didTapDeleteRelay.accept(())
     }
     
-    override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         return ASRelativeLayoutSpec(horizontalPosition: .end,
                                     verticalPosition: .start,
                                     sizingOption: [],
                                     child: deleteButtonLayoutSpec())
     }
     
-    private func deleteButtonLayoutSpec() -> ASLayoutSpec {
+    open func deleteButtonLayoutSpec() -> ASLayoutSpec {
         let centerLayout = ASCenterLayoutSpec(centeringOptions: .XY,
                                               sizingOptions: [],
                                               child: closeIconNode)
