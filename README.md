@@ -24,16 +24,6 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
 ## Example
 </br>
 <table>
-  <tr>
-    <td align="center">XML Parse & Build</td>
-    <td align="center">Delete Media Content & Merge TextViews</td>
-  </tr>
-  <tr>
-    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test4.gif"></th>
-    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test3.gif"></th>
-  </tr>
-</table>
-<table>
    <tr>
     <td align="center">Bi-direction attribute binding</td>
     <td align="center">Combined Words TypingAttribute</td>
@@ -43,6 +33,18 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
     <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/english.gif"></th>
     <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/korean.gif"></th>
     <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/regexAttributeTyping.gif">       </th> 
+</table>
+<table>
+  <tr>
+    <td align="center">XML Parse & Build</td>
+    <td align="center">Delete Media Content & Merge TextViews</td>
+    <td align="center"> Auto-generate Link Preview </td>
+  </tr>
+  <tr>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test4.gif"></th>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/test3.gif"></th>
+    <th rowspan="9"><img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/placeholder.gif"></th>
+  </tr>
 </table>
 
 ## Usage
