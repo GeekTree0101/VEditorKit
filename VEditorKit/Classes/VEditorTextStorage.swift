@@ -101,6 +101,7 @@ extension VEditorTextStorage {
             let blockRange = self.paragraphStyleRange(textNode.selectedRange)
             self.status = .paste
             self.setAttributes(attribute, range: blockRange)
+            self.replaceAttributeWithRegexPattenIfNeeds(textNode, customRange: blockRange)
             textNode.setNeedsLayout()
         } else {
             self.setAttributes(attribute, range: textNode.selectedRange)
@@ -146,10 +147,10 @@ extension VEditorTextStorage {
 
 extension VEditorTextStorage {
 
-    private func replaceAttributeWithRegexPattenIfNeeds(_ textNode: VEditorTextNode) {
+    private func replaceAttributeWithRegexPattenIfNeeds(_ textNode: VEditorTextNode, customRange: NSRange? = nil) {
         guard let regexDelegate = textNode.regexDelegate else { return }
         let regexs = regexDelegate.allPattern.map({ regexDelegate.regex($0) })
-        let range: NSRange = .init(location: 0, length: self.internalAttributedString.length)
+        let range: NSRange = customRange ?? .init(location: 0, length: self.internalAttributedString.length)
         let text: String = self.internalAttributedString.string
         
         for regex in regexs {
