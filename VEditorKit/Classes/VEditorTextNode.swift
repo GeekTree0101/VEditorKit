@@ -93,6 +93,9 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
                 .attributes(at: max(toSelectedRange.location - 1, 0),
                             effectiveRange: nil)
             
+            // block current location attributes during drag-selection
+            guard fromSelectedRange.length < 1 else { return }
+            
             guard let xmlTags = attributes?[VEditorAttributeKey] as? [String] else {
                 return
             }
