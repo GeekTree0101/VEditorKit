@@ -178,9 +178,24 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 
                 return cellNode
             } else {
-                return self.delegate
+                guard let cellNode = self.delegate
                     .contentCellNode(content,
-                                     indexPath: indexPath) ?? ASCellNode()
+                                     indexPath: indexPath) else {
+                                        return ASCellNode()
+                }
+                
+                if let textCellNode = cellNode as? VEditorTextCellNode,
+                    textCellNode.isEdit {
+                    
+                    textCellNode.rx.becomeActive
+                        .subscribe(onNext: { [weak self, weak textCellNode] _ in
+                            guard let node = textCellNode else { return }
+                            self?.fetchNewActiveTextNode(node)
+                        })
+                        .disposed(by: textCellNode.disposeBag)
+                }
+                
+                return cellNode
             }
         }
     }
@@ -242,6 +257,8 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - node: new active textNode
      */
     open func fetchNewActiveTextNode(_ node: VEditorTextCellNode) {
+        // NOTE: filter duplicated
+        guard self.activeTextContainCellNode != node else { return }
         self.activeTextNode?.resignFirstResponder()
         self.activeTextContainCellNode = node
         node.textNode.becomeFirstResponder()
@@ -397,6 +414,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                                       with: animated ? .automatic: .none)
         }, completion: { fin in
             guard fin else { return }
+            self.activeTextNode?.setNeedsLayout()
             if let cellNode = self.tableNode.nodeForRow(at: splitedTextIndexPath) as? VEditorTextCellNode {
                 self.fetchNewActiveTextNode(cellNode)
             }
@@ -588,8 +606,8 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      Dismiss Keyboard from ActiveTextNode
      */
     @objc open func keyboardDismissIfNeeds() {
-        guard let textNode = self.loadActiveTextCellNode() else { return }
-        textNode.resignFirstResponder()
+        guard let cellNode = self.loadActiveTextCellNode() else { return }
+        cellNode.textNode.resignFirstResponder()
         self.activeTextContainCellNode = nil
     }
     

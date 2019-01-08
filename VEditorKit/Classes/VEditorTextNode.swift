@@ -18,6 +18,10 @@ extension Reactive where Base: VEditorTextNode {
             .throttle(0.1, scheduler: MainScheduler.instance)
     }
     
+    public var becomeActive: Observable<Void> {
+        return base.becomeActiveRelay.asObservable()
+    }
+    
     internal var caretRect: Observable<CGRect> {
         return base.caretRectRelay
             .distinctUntilChanged()
@@ -49,12 +53,14 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     open var isEdit: Bool = true
     open weak var regexDelegate: VEditorRegexApplierDelegate!
     open var automaticallyGenerateLinkPreview: Bool = false
+    open let becomeActiveRelay = PublishRelay<Void>()
     
     internal let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
     internal let caretRectRelay = PublishRelay<CGRect>()
     internal let generateLinkPreviewRelay = PublishRelay<(URL, Int)>()
     internal let textEmptiedRelay = PublishRelay<Void>()
+    
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
@@ -104,6 +110,10 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     open func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
         return self.isEdit
+    }
+    
+    open func editableTextNodeDidBeginEditing(_ editableTextNode: ASEditableTextNode) {
+        self.becomeActiveRelay.accept(())
     }
     
     open func editableTextNode(_ editableTextNode: ASEditableTextNode,
