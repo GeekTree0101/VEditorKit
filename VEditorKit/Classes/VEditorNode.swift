@@ -50,6 +50,11 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         case location
     }
     
+    private enum ContentFetchIndexScope {
+        case indexPath(IndexPath)
+        case splitIndex(Int)
+    }
+    
     open lazy var tableNode: ASTableNode = {
         let node = ASTableNode()
         node.delegate = self
@@ -533,19 +538,27 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         
         guard let targetNode = tableNode.nodeForRow(at: target) as? VEditorTextCellNode,
             let sourceNode = tableNode.nodeForRow(at: to) as? VEditorTextCellNode,
-            let targetAttributedText = targetNode.textNode.attributedText else {
+            let targetAttributedText = targetNode.textNode
+                .textStorage?
+                .internalAttributedString,
+            let sourceAttributedText = sourceNode.textNode
+                .textStorage?
+                .internalAttributedString else {
                 return
         }
         
+        // NOTE: make merged attributedText
         var mutableAttrText = NSMutableAttributedString(attributedString: targetAttributedText)
         var newlineAttribute = self.editorRule.defaultAttribute()
         newlineAttribute[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
         mutableAttrText.append(NSAttributedString.init(string: "\n",
                                                        attributes: newlineAttribute))
+        mutableAttrText.append(sourceAttributedText)
         
+        // NOTE: update editor
         self.editorContents.remove(at: target.row)
         self.tableNode.deleteRows(at: [target], with: animated ? .automatic: .none)
-        sourceNode.textNode.textStorage?.insert(mutableAttrText, at: 0)
+        sourceNode.textNode.textStorage?.setAttributedString(mutableAttrText)
         sourceNode.textNode.setNeedsLayout()
     }
     
@@ -562,12 +575,14 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.tableNode.performBatch(animated: animated, updates: {
             self.tableNode.deleteRows(at: [indexPath], with: animated ? .automatic: .none)
         }, completion: { fin in
-            guard fin,
-                indexPath.row < self.editorContents.count,
-                indexPath.row - 1 >= 0 else { return }
+            guard fin else { return }
+            let beforeIndex: Int = indexPath.row - 1
+            
+            guard indexPath.row < self.editorContents.count,
+                beforeIndex >= 0 else { return }
             
             let beforeCell = self.tableNode
-                .nodeForRow(at: .init(row: indexPath.row - 1,
+                .nodeForRow(at: .init(row: beforeIndex,
                                       section: indexPath.section)) as? VEditorTextCellNode
             let currentCell = self.tableNode
                 .nodeForRow(at: .init(row: indexPath.row,
@@ -577,7 +592,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 let to = currentCell?.indexPath else {
                 return
             }
-            self.mergeTextContents(target: target, to: to, animated: animated)
+            
+            self.mergeTextContents(target: target,
+                                   to: to,
+                                   animated: animated)
         })
     }
     
@@ -645,12 +663,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
 extension VEditorNode {
     
     internal func observeActiveTextNode() {
-        // NOTE: dispose prev activeText observers
         self.activeTextDisposeBag = DisposeBag()
         
         activeTextNode?.rx.currentLocationXMLTags
             .subscribe(onNext: { [weak self] activeXMLs in
-                // NOTE: reset control status before fetch current attribute
                 self?.enableAllOfTypingControls()
                 self?.currentAttributeFetch(.location,
                                             activeXMLs: activeXMLs,
@@ -671,6 +687,8 @@ extension VEditorNode {
             .subscribe(onNext: { [weak self] () in
                 self?.deleteUnnecessaryEditableTextIfNeeds()
             }).disposed(by: activeTextDisposeBag)
+        
+        activeTextNode?.forceFetchCurrentLocationAttribute()
     }
     
     @objc private func didTapTypingControl(_ sender: VEditorTypingControlNode) {
@@ -802,11 +820,6 @@ extension VEditorNode {
                     self?.editorStatusRelay.accept(.error(error))
                 }
             }).disposed(by: disposeBag)
-    }
-    
-    private enum ContentFetchIndexScope {
-        case indexPath(IndexPath)
-        case splitIndex(Int)
     }
     
     private func getContentFetchIndexPath(_ scope: MeidaAppendScope,
