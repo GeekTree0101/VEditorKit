@@ -22,6 +22,12 @@ extension Reactive where Base: VEditorNode {
             vc.deleteTargetContent(indexPath, animated: animated)
         }
     }
+    
+    public func insertText(with: UITableView.RowAnimation = .automatic) -> Binder<IndexPath> {
+        return Binder(base) { vc, indexPath in
+            vc.insertEditableTextIfNeeds(indexPath, with: with)
+        }
+    }
 }
 
 open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
@@ -231,6 +237,11 @@ extension VEditorNode {
         activeTextNode?.rx.generateLinkPreview
             .subscribe(onNext: { [weak self] link, index in
                 self?.generateLinkPreview(link, splitIndex: index)
+            }).disposed(by: activeTextDisposeBag)
+        
+        activeTextNode?.rx.textEmptied
+            .subscribe(onNext: { [weak self] () in
+                self?.deleteUnnecessaryEditableTextIfNeeds()
             }).disposed(by: activeTextDisposeBag)
     }
     
@@ -479,6 +490,49 @@ extension VEditorNode {
                                        at: scrollPosition,
                                        animated: animated)
         })
+    }
+    
+    /**
+     Editable textView insertion if needs
+     
+     - parameters:
+     - indexPath: insert target indexPath
+     - with: UITableView rowAnimation, default is automatic
+     */
+    open func insertEditableTextIfNeeds(_ indexPath: IndexPath,
+                                        with: UITableView.RowAnimation = .automatic) {
+        let beforeIndex: Int = max(0, indexPath.row - 1)
+        guard !(self.editorContents[beforeIndex] is NSAttributedString) else { return }
+        var defaultAttributes = self.editorRule.defaultAttribute()
+        defaultAttributes[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
+        let emptyAttributedText = NSAttributedString(string: "",
+                                                     attributes: defaultAttributes)
+        
+        self.editorContents.insert(emptyAttributedText, at: indexPath.row)
+        let targetIndexPath: IndexPath =
+            .init(row: indexPath.row, section: indexPath.section)
+        
+        self.tableNode.performBatch(animated: with != .none, updates: {
+            self.tableNode.insertRows(at: [targetIndexPath], with: with)
+        }, completion: { fin in
+            guard fin else { return }
+            guard let cellNode = self.tableNode
+                .nodeForRow(at: targetIndexPath) as? VEditorTextCellNode else {
+                return
+            }
+            self.activeTextNode?.resignFirstResponder()
+            cellNode.textNode.becomeFirstResponder()
+            self.activeTextNode = cellNode.textNode
+        })
+    }
+    
+    private func deleteUnnecessaryEditableTextIfNeeds(with: UITableView.RowAnimation = .automatic) {
+        guard let indexPath = self.loadActiveTextNodeIndexPath() else { return }
+        
+        self.activeTextNode?.resignFirstResponder()
+        self.activeTextNode = nil
+        self.editorContents.remove(at: indexPath.row)
+        self.tableNode.deleteRows(at: [indexPath], with: with)
     }
 }
 

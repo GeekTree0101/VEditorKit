@@ -27,6 +27,10 @@ extension Reactive where Base: VEditorTextNode {
     internal var generateLinkPreview: Observable<(URL, Int)> {
         return base.generateLinkPreviewRelay.asObservable()
     }
+    
+    internal var textEmptied: Observable<Void> {
+        return base.textEmptiedRelay.asObservable()
+    }
 }
 
 open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
@@ -50,6 +54,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
     internal let caretRectRelay = PublishRelay<CGRect>()
     internal let generateLinkPreviewRelay = PublishRelay<(URL, Int)>()
+    internal let textEmptiedRelay = PublishRelay<Void>()
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
@@ -94,6 +99,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     open func editableTextNode(_ editableTextNode: ASEditableTextNode,
                                shouldChangeTextIn range: NSRange,
                                replacementText text: String) -> Bool {
+        
         if (text == "\n" || text == " "),
             let context = self.textStorage?
                 .automaticallyApplyLinkAttribute(self) {
@@ -134,6 +140,8 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     open func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
         self.textStorage?.didUpdateText(self)
+        guard self.isDisplayingPlaceholder() else { return }
+        self.textEmptiedRelay.accept(())
     }
     
     open func updateCurrentTypingAttribute(_ attribute: VEditorStyleAttribute,

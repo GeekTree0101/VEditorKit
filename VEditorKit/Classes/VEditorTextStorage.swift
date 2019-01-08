@@ -154,7 +154,7 @@ extension VEditorTextStorage {
     }
     
     internal func automaticallyApplyLinkAttribute(_ textNode: VEditorTextNode) -> (URL, Int)? {
-        let pattern: String = "((?:http|https)://)?(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
+        let pattern: String = "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
         guard let regex = try? NSRegularExpression.init(pattern: pattern, options: []) else { return nil }
         let blockRange = self.paragraphBlockRange(textNode.selectedRange)
         let text: String = self.internalAttributedString.string

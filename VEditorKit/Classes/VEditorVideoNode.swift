@@ -19,6 +19,13 @@ extension Reactive where Base: VEditorVideoNode {
     public var didTapDelete: Observable<Void> {
         return base.deleteControlNode.rx.didTapDelete
     }
+    
+    /**
+     Text insertion event
+    */
+    public var didTapTextInsert: Observable<IndexPath> {
+        return base.textInsertionRelay.asObservable()
+    }
 }
 
 open class VEditorVideoNode: ASCellNode {
@@ -30,9 +37,17 @@ open class VEditorVideoNode: ASCellNode {
         return node
     }()
     
+    public lazy var textInsertionNode: ASControlNode = {
+        let node = ASControlNode()
+        node.backgroundColor = .clear
+        node.style.height = .init(unit: .points, value: 5.0)
+        return node
+    }()
+    
     public lazy var deleteControlNode: VEditorDeleteMediaNode =
         .init(.red, deleteIconImage: nil)
     
+    public let textInsertionRelay = PublishRelay<IndexPath>()
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
     public var ratio: CGFloat = 1.0
@@ -55,6 +70,11 @@ open class VEditorVideoNode: ASCellNode {
     
     @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
         self.insets = insets
+        return self
+    }
+    
+    @discardableResult open func setTextInsertionHeight(_ height: CGFloat) -> Self {
+        self.textInsertionNode.style.height = .init(unit: .points, value: height)
         return self
     }
     
@@ -94,6 +114,9 @@ open class VEditorVideoNode: ASCellNode {
         deleteControlNode.addTarget(self,
                                     action: #selector(didTapVideo),
                                     forControlEvents: .touchUpInside)
+        textInsertionNode.addTarget(self,
+                                    action: #selector(didTapTextInsertion),
+                                    forControlEvents: .touchUpInside)
     }
     
     @objc public func didTapVideo() {
@@ -107,18 +130,30 @@ open class VEditorVideoNode: ASCellNode {
         self.setNeedsLayout()
     }
     
+    @objc public func didTapTextInsertion() {
+        guard let indexPath = self.indexPath else { return }
+        self.textInsertionRelay.accept(indexPath)
+    }
+    
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+        let videoRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: videoNode)
+        let mediaContentWithTextInsertionLayout =
+            ASStackLayoutSpec(direction: .vertical,
+                              spacing: 0.0,
+                              justifyContent: .start,
+                              alignItems: .stretch,
+                              children: [textInsertionNode,
+                                         videoRatioLayout])
         
-        let ratioLayout = ASRatioLayoutSpec(ratio: ratio, child: videoNode)
         if isEdit {
             let deleteOverlayLayout =
-                ASOverlayLayoutSpec(child: ratioLayout,
+                ASOverlayLayoutSpec(child: mediaContentWithTextInsertionLayout,
                                     overlay: deleteControlNode)
             return ASInsetLayoutSpec(insets: insets,
                                      child: deleteOverlayLayout)
         } else {
             return ASInsetLayoutSpec(insets: insets,
-                                     child: ratioLayout)
+                                     child: mediaContentWithTextInsertionLayout)
         }
     }
 }

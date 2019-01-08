@@ -79,9 +79,10 @@ extension EditorNodeController: VEditorNodeDelegate {
     func contentCellNode(_ content: VEditorContent, indexPath: IndexPath) -> ASCellNode? {
         switch content {
         case let text as NSAttributedString:
+            let placeholderText: NSAttributedString? =
+                indexPath.row == 0 ? "Insert text...".styled(with: Const.placeholderTextStyle): nil
             let cellNode = VEditorTextCellNode(isEdit: isEditMode,
-                                               placeholderText: "Insert text..."
-                                                .styled(with: Const.placeholderTextStyle),
+                                               placeholderText: placeholderText,
                                                attributedText: text,
                                                rule: self.node.editorRule)
                 .setContentInsets(Const.defaultContentInsets)
@@ -93,6 +94,7 @@ extension EditorNodeController: VEditorNodeDelegate {
         case let imageNode as VImageContent:
             let cellNode = VEditorImageNode(isEdit: isEditMode)
                 .setContentInsets(Const.defaultContentInsets)
+                .setTextInsertionHeight(16.0)
                 .setURL(imageNode.url)
                 .setImageRatio(imageNode.ratio)
                 .setPlaceholderColor(.lightGray)
@@ -105,10 +107,15 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .bind(to: self.node.rx.deleteContent(animated: true))
                 .disposed(by: cellNode.disposeBag)
             
+            cellNode.rx.didTapTextInsert
+                .bind(to: self.node.rx.insertText())
+                .disposed(by: cellNode.disposeBag)
+            
             return cellNode
         case let videoNode as VVideoContent:
             let cellNode = VEditorVideoNode(isEdit: isEditMode)
                 .setContentInsets(Const.defaultContentInsets)
+                .setTextInsertionHeight(16.0)
                 .setAssetURL(videoNode.url)
                 .setPreviewURL(videoNode.posterURL)
                 .setVideoRatio(videoNode.ratio)
@@ -120,6 +127,10 @@ extension EditorNodeController: VEditorNodeDelegate {
                     return cellNode?.indexPath
                 })
                 .bind(to: self.node.rx.deleteContent(animated: true))
+                .disposed(by: cellNode.disposeBag)
+            
+            cellNode.rx.didTapTextInsert
+                .bind(to: self.node.rx.insertText())
                 .disposed(by: cellNode.disposeBag)
             
             return cellNode
