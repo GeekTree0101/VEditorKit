@@ -363,6 +363,35 @@ extension VEditorNode {
 // MARK: - Editor Content Management
 extension VEditorNode {
     
+    
+    /**
+     append Content
+     - important: Do not pass NSAttributedString on content parameter
+     - parameters:
+     - content: placeholder or media content
+     */
+    open func appendContent(_ content: VEditorContent,
+                            section: Int = 0,
+                            scrollPosition: UITableView.ScrollPosition = .bottom,
+                            animated: Bool = true) {
+        let indexPath = IndexPath(row: max(0, self.editorContents.count - 1), section: section)
+        self.insertContent(content, indexPath: indexPath)
+    }
+    
+    /**
+     append Contents
+     - important: Do not pass NSAttributedString on content parameter
+     - parameters:
+     - content: placeholder or media content
+     */
+    open func appendContent(_ contents: [VEditorContent],
+                            section: Int = 0,
+                            scrollPosition: UITableView.ScrollPosition = .bottom,
+                            animated: Bool = true) {
+        let indexPath = IndexPath(row: max(0, self.editorContents.count - 1), section: section)
+        self.insertContent(contents, indexPath: indexPath)
+    }
+    
     /**
      Insertion Content
      - important: Do not pass NSAttributedString on content parameter

@@ -136,24 +136,32 @@ open class VEditorVideoNode: ASCellNode {
     }
     
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        let videoRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: videoNode)
-        let mediaContentWithTextInsertionLayout =
-            ASStackLayoutSpec(direction: .vertical,
-                              spacing: 0.0,
-                              justifyContent: .start,
-                              alignItems: .stretch,
-                              children: [textInsertionNode,
-                                         videoRatioLayout])
+        let mediaRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: videoNode)
+        
+        let mediaContentLayout: ASLayoutElement
         
         if isEdit {
-            let deleteOverlayLayout =
-                ASOverlayLayoutSpec(child: mediaContentWithTextInsertionLayout,
-                                    overlay: deleteControlNode)
-            return ASInsetLayoutSpec(insets: insets,
-                                     child: deleteOverlayLayout)
+            mediaContentLayout = ASOverlayLayoutSpec(child: mediaRatioLayout,
+                                                     overlay: deleteControlNode)
         } else {
-            return ASInsetLayoutSpec(insets: insets,
-                                     child: mediaContentWithTextInsertionLayout)
+            mediaContentLayout = mediaRatioLayout
         }
+        
+        let videoNodeLayout: ASLayoutElement
+        
+        if isEdit {
+            videoNodeLayout =
+                ASStackLayoutSpec(direction: .vertical,
+                                  spacing: 0.0,
+                                  justifyContent: .start,
+                                  alignItems: .stretch,
+                                  children: [textInsertionNode,
+                                             mediaContentLayout])
+        } else {
+            videoNodeLayout = mediaContentLayout
+        }
+        
+        return ASInsetLayoutSpec(insets: insets,
+                                 child: videoNodeLayout)
     }
 }
