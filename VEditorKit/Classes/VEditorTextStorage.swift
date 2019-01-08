@@ -18,6 +18,11 @@ final public class VEditorTextStorage: NSTextStorage {
         case none
     }
     
+    internal struct Const {
+        static let urlPattern: String =
+        "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
+    }
+    
     internal var status: TypingStstus = .none
     internal var currentTypingAttribute: [NSAttributedString.Key: Any] = [:]
     internal var internalAttributedString: NSMutableAttributedString = .init()
@@ -154,8 +159,8 @@ extension VEditorTextStorage {
     }
     
     internal func automaticallyApplyLinkAttribute(_ textNode: VEditorTextNode) -> (URL, Int)? {
-        let pattern: String = "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
-        guard let regex = try? NSRegularExpression.init(pattern: pattern, options: []) else { return nil }
+        guard let regex = try? NSRegularExpression(pattern: Const.urlPattern,
+                                                   options: []) else { return nil }
         let blockRange = self.paragraphBlockRange(textNode.selectedRange)
         let text: String = self.internalAttributedString.string
         
@@ -203,7 +208,8 @@ extension VEditorTextStorage {
     public func replaceAttributeWithRegexPattenIfNeeds(_ textNode: VEditorTextNode, customRange: NSRange? = nil) {
         guard let regexDelegate = textNode.regexDelegate else { return }
         let regexs = regexDelegate.allPattern.map({ regexDelegate.regex($0) })
-        let range: NSRange = customRange ?? .init(location: 0, length: self.internalAttributedString.length)
+        let range: NSRange = customRange ?? .init(location: 0,
+                                                  length: self.internalAttributedString.length)
         let text: String = self.internalAttributedString.string
         
         for regex in regexs {
