@@ -216,6 +216,18 @@ extension VEditorNode {
         return aciveTextCellNode?.indexPath
     }
     
+    /**
+     Convenience link insert on active text node selectedRange
+     
+     - parameters:
+     - url: Link URL
+     */
+    open func insertLinkOnActiveTextSelectedRange(_ url: URL) {
+        guard let range = self.activeTextNode?.selectedRange,
+            let attr = self.editorRule.linkAttribute(url)  else { return }
+        self.activeTextNode?.textStorage?.setAttributes(attr, range: range)
+    }
+    
     internal func observeActiveTextNode() {
         // dispose prev activeText observers
         self.activeTextDisposeBag = DisposeBag()
@@ -716,7 +728,7 @@ extension VEditorNode {
         }
         self.keyboardHeight = keyboardSize.height
         self.enableAllOfTypingControls()
-        self.activeTextNode = self.loadActiveTextNode()
+        self.activeTextNode = self.loadActiveTextNode() ?? self.activeTextNode
         self.transitionLayout(withAnimation: true,
                               shouldMeasureAsync: false,
                               measurementCompletion: nil)

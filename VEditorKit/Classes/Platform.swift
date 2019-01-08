@@ -56,11 +56,17 @@ public protocol VEditorRule {
 
 extension VEditorRule {
     
-    func defaultAttribute() -> [NSAttributedString.Key: Any] {
+    public func defaultAttribute() -> [NSAttributedString.Key: Any] {
         guard let attr = self.paragraphStyle(self.defaultStyleXMLTag, attributes: [:]) else {
             fatalError("Please setup default:\(self.defaultStyleXMLTag) xml tag style")
         }
-        return attr.attributes
+        return attr.byAdding([.extraAttributes([VEditorAttributeKey: [self.defaultStyleXMLTag]])]).attributes
+    }
+    
+    public func linkAttribute(_ url: URL) -> [NSAttributedString.Key: Any]? {
+        guard let xml = self.linkStyleXMLTag,
+            let attr = self.paragraphStyle(xml, attributes: [:]) else { return nil }
+        return attr.byAdding([.link(url), .extraAttributes([VEditorAttributeKey: [xml]])]).attributes
     }
 }
 

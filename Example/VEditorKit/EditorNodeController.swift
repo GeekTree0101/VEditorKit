@@ -45,6 +45,7 @@ class EditorNodeController: ASViewController<VEditorNode> {
         self.setupNavigationBarButtonItem()
         self.loadXMLContent()
         self.rxAlbumAccess()
+        self.rxLinkInsert()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -263,6 +264,38 @@ extension EditorNodeController {
             let vc = EditorNodeController(isEditMode: false, xmlString: xmlString)
             self?.navigationController?.pushViewController(vc, animated: true)
         }
+    }
+}
+
+extension EditorNodeController {
+    
+    private func rxLinkInsert() {
+        self.controlAreaNode.linkInsertNode
+            .addTarget(self,
+                       action: #selector(didTapLinkInsert),
+                       forControlEvents: .touchUpInside)
+    }
+    
+    @objc private func didTapLinkInsert() {
+        let vc = UIAlertController.init(title: "Link Insert", message: nil, preferredStyle: .alert)
+        vc.addTextField(configurationHandler: { field in
+            field.placeholder = "Link Insert..."
+            return
+        })
+        vc.addAction(.init(title: "Confirm", style: .default, handler: { [weak self] action in
+            guard let `self` = self else { return }
+            
+            guard let field: UITextField = vc.textFields?.first,
+                let text = field.text,
+                !text.isEmpty,
+                let url = URL(string: text) else { return }
+            
+            self.node.insertLinkOnActiveTextSelectedRange(url)
+            vc.dismiss(animated: true, completion: nil)
+        }))
+        vc.addAction(.init(title: "Cancel", style: .cancel, handler: nil))
+        
+        self.present(vc, animated: true, completion: nil)
     }
 }
 
