@@ -177,11 +177,7 @@ extension VEditorTextStorage {
             }
             
             if let linkXML = textNode.rule.linkStyleXMLTag,
-                let linkStyle = textNode.rule.paragraphStyle(linkXML, attributes: [:]) {
-                let linkAttribute = linkStyle
-                    .byAdding([.link(url)])
-                    .byAdding([.extraAttributes([VEditorAttributeKey: [linkXML] as Any])])
-                    .attributes
+                let linkAttribute = textNode.rule.linkAttribute(url) {
                 self.internalAttributedString.setAttributes(linkAttribute, range: match.range)
             }
             
