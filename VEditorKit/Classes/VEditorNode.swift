@@ -38,6 +38,18 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         case error(Error?)
     }
     
+    public enum MeidaAppendScope {
+        case automatic
+        case last
+        case first
+        case insert(IndexPath)
+    }
+    
+    internal enum VEditorAttributeControlScope {
+        case controlTap(Bool, String)
+        case location
+    }
+    
     open lazy var tableNode: ASTableNode = {
         let node = ASTableNode()
         node.delegate = self
@@ -52,19 +64,27 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
+    open var activeTextContainCellNode: VEditorTextCellNode? {
+        didSet {
+            self.observeActiveTextNode()
+        }
+    }
+    
+    open var activeTextIndexPath: IndexPath? {
+        return activeTextContainCellNode?.indexPath
+    }
+    
+    open var activeTextNode: VEditorTextNode? {
+        return activeTextContainCellNode?.textNode
+    }
+    
     open let parser: VEditorParser
     open let editorRule: VEditorRule
     open var editorContents: [VEditorContent] = []
     open let editorStatusRelay = PublishRelay<Status>()
     open let disposeBag = DisposeBag()
     open weak var delegate: VEditorNodeDelegate!
-    
-    open var activeTextNode: VEditorTextNode? {
-        didSet {
-            self.observeActiveTextNode()
-        }
-    }
-    
+
     private var typingControls: [VEditorTypingControlNode] = []
     private var keyboardHeight: CGFloat = 0.0
     private var activeTextDisposeBag = DisposeBag()
@@ -103,11 +123,13 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                                             child: tableNode)
         
         if let node = controlAreaNode {
-            var controlAreaInsets: UIEdgeInsets = .init(top: .infinity, left: 0.0, bottom: 0.0, right: 0.0)
+            var controlAreaInsets: UIEdgeInsets =
+                .init(top: .infinity, left: 0.0, bottom: 0.0, right: 0.0)
             controlAreaInsets.bottom = keyboardHeight
             let controlLayout = ASInsetLayoutSpec(insets: controlAreaInsets,
                                                   child: node)
-            return ASOverlayLayoutSpec(child: tableLayout, overlay: controlLayout)
+            return ASOverlayLayoutSpec(child: tableLayout,
+                                       overlay: controlLayout)
         } else {
             return tableLayout
         }
@@ -131,7 +153,9 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             let content = self.editorContents[indexPath.row]
             
             if let placeholderContent = content as? VEditorPlaceholderContent {
-                guard let cellNode = self.delegate.placeholderCellNode(placeholderContent, indexPath: indexPath) else {
+                guard let cellNode = self.delegate
+                    .placeholderCellNode(placeholderContent,
+                                         indexPath: indexPath) else {
                     return ASCellNode()
                 }
                 
@@ -154,14 +178,27 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 
                 return cellNode
             } else {
-                return self.delegate.contentCellNode(content, indexPath: indexPath) ?? ASCellNode()
+                guard let cellNode = self.delegate
+                    .contentCellNode(content,
+                                     indexPath: indexPath) else {
+                                        return ASCellNode()
+                }
+                
+                if let textCellNode = cellNode as? VEditorTextCellNode,
+                    textCellNode.isEdit {
+                    
+                    textCellNode.rx.becomeActive
+                        .subscribe(onNext: { [weak self, weak textCellNode] _ in
+                            guard let node = textCellNode else { return }
+                            self?.fetchNewActiveTextNode(node)
+                        })
+                        .disposed(by: textCellNode.disposeBag)
+                }
+                
+                return cellNode
             }
         }
     }
-}
-
-// MARK: - Editor Text Control
-extension VEditorNode {
     
     /**
      Register Typing Control Nodes
@@ -186,34 +223,19 @@ extension VEditorNode {
      
      - returns: ActiveTextNode from first responder cellNode
      */
-    open func loadActiveTextNode() -> VEditorTextNode? {
-        guard let aciveTextCellNode: VEditorTextCellNode? =
-            self.tableNode.visibleNodes
-                .map({ $0 as? VEditorTextCellNode })
-                .filter({ $0?.textNode.isFirstResponder() ?? false })
-                .first,
-            let textNode = aciveTextCellNode?.textNode else {
-                return nil
+    open func loadActiveTextCellNode() -> VEditorTextCellNode? {
+        guard self.activeTextContainCellNode == nil else {
+            return self.activeTextContainCellNode
         }
-        self.activeTextNode = textNode
-        return textNode
-    }
-    
-    /**
-     Load already active(firstResponder) textNode indexPath from cells
-     
-     - returns: indexPath of activeTextNode
-     */
-    open func loadActiveTextNodeIndexPath() -> IndexPath? {
+        
         guard let aciveTextCellNode: VEditorTextCellNode? =
             self.tableNode.visibleNodes
                 .map({ $0 as? VEditorTextCellNode })
                 .filter({ $0?.textNode.isFirstResponder() ?? false })
                 .first else {
-                    return nil
+                return nil
         }
-        
-        return aciveTextCellNode?.indexPath
+        return aciveTextCellNode
     }
     
     /**
@@ -228,17 +250,411 @@ extension VEditorNode {
         self.activeTextNode?.textStorage?.setAttributes(attr, range: range)
     }
     
+    /**
+     Fetch new activeTextNode with resign before activeTextNode
+     
+     - parameters:
+     - node: new active textNode
+     */
+    open func fetchNewActiveTextNode(_ node: VEditorTextCellNode) {
+        // NOTE: filter duplicated
+        guard self.activeTextContainCellNode != node else { return }
+        self.activeTextNode?.resignFirstResponder()
+        self.activeTextContainCellNode = node
+        node.textNode.becomeFirstResponder()
+    }
+    
+    /**
+     resign current activeTextNode
+     */
+    open func resignActiveTextNode() {
+        self.activeTextNode?.resignFirstResponder()
+        self.activeTextContainCellNode = nil
+    }
+    
+    /**
+     Convenience fetch new content
+     
+     - important: If you use automatic scope than work split text or append last
+     
+     - parameters:
+     - content: placeholder or media content etc
+     - scope: VEditorContent (insert, last, first, automatic)
+     - section: default is zero(0)
+     - scrollPosition: default is bottom
+     - animated: Animation, if you set false than doesn't work all of animation
+     */
+    open func fetchNewContent(_ content: VEditorContent,
+                              scope: MeidaAppendScope,
+                              section: Int = 0,
+                              scrollPosition: UITableView.ScrollPosition = .bottom,
+                              animated: Bool = true) {
+        self.fetchNewContents([content],
+                              scope: scope,
+                              section: section,
+                              scrollPosition: scrollPosition,
+                              animated: animated)
+    }
+    
+    /**
+     Convenience fetch new contents
+     
+     - important: If you use automatic scope than work split text or append last
+     
+     - parameters:
+     - contents: Array of placeholder or media content etc
+     - scope: VEditorContent (insert, last, first, automatic)
+     - section: default is zero(0)
+     - scrollPosition: default is bottom
+     - animated: Animation, if you set false than doesn't work all of animation
+     */
+    open func fetchNewContents(_ contents: [VEditorContent],
+                               scope: MeidaAppendScope,
+                               section: Int = 0,
+                               scrollPosition: UITableView.ScrollPosition = .bottom,
+                               animated: Bool = true) {
+        switch getContentFetchIndexPath(scope, section: section) {
+        case .indexPath(let indexPath):
+            self.insertContents(contents,
+                                indexPath: indexPath,
+                                scrollPosition: scrollPosition,
+                                animated: animated)
+        case .splitIndex(let index):
+            self.insertContents(contents,
+                                splitIndex: index,
+                                scrollPosition: scrollPosition,
+                                animated: animated)
+        }
+    }
+    
+    /**
+     Insertion Content Array
+     
+     - important: Do not pass NSAttributedString on content parameter
+     
+     - parameters:
+     - contents: Array of placeholder or media content
+     - indexPath: IndexPath
+     */
+    open func insertContents(_ contents: [VEditorContent],
+                             indexPath: IndexPath,
+                             scrollPosition: UITableView.ScrollPosition = .bottom,
+                             animated: Bool = true) {
+        guard self.isContentFetchAvailable(contents) else {
+            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
+        }
+        
+        if editorContents.count == indexPath.row + 1 {
+            self.editorContents.append(contentsOf: contents)
+        } else{
+            self.editorContents.insert(contentsOf: contents, at: indexPath.row + 1)
+        }
+        
+        let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
+            return .init(row: indexPath.row + 1 + index, section: indexPath.section)
+        })
+        
+        self.tableNode.performBatchUpdates({
+            self.tableNode.insertRows(at: contentIndexPaths,
+                                      with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin, let lastIndexPath = contentIndexPaths.last else { return }
+            self.tableNode.scrollToRow(at: lastIndexPath,
+                                       at: scrollPosition,
+                                       animated: animated)
+        })
+    }
+    
+    /**
+     Insertion Content with Text Split Index
+     
+     - important: Do not pass NSAttributedString on content parameter
+     
+     - parameters:
+     - content: Array of placeholder or media content
+     - splitIndex: SplitIndex on textNode
+     */
+    open func insertContents(_ contents: [VEditorContent],
+                             splitIndex: Int,
+                             scrollPosition: UITableView.ScrollPosition = .bottom,
+                             animated: Bool = true) {
+        guard self.isContentFetchAvailable(contents) else {
+            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
+        }
+        guard let indexPath = self.activeTextIndexPath,
+            let attrText = self.activeTextNode?.textStorage?.internalAttributedString else { return }
+        
+        // STEP1: Split textStorage with replaceTextStorage
+        let length: Int = attrText.length
+        let prefixRange: NSRange = .init(location: 0, length: splitIndex)
+        let tailRange: NSRange = .init(location: splitIndex, length: length - splitIndex)
+        
+        let prefixAttrText = attrText.attributedSubstring(from: prefixRange)
+        let tailAttrText = attrText.attributedSubstring(from: tailRange)
+        
+        self.activeTextNode?.textStorage?.setAttributedString(prefixAttrText)
+        
+        // STEP2: Get VEditorContent with prepare update editor
+        let insertItems: [VEditorContent] = contents + [tailAttrText]
+        
+        if editorContents.count == indexPath.row + 1 {
+            self.editorContents.append(contentsOf: insertItems)
+        } else{
+            self.editorContents.insert(contentsOf: insertItems, at: indexPath.row + 1)
+        }
+        
+        let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
+            return .init(row: indexPath.row + 1 + index, section: indexPath.section)
+        })
+        let splitedTextIndexPath: IndexPath = .init(row: indexPath.row + 2, section: indexPath.section)
+        
+        // STEP3: Fetch Placeholder or MediaContent with splitted text
+        self.tableNode.performBatchUpdates({
+            self.tableNode.insertRows(at: contentIndexPaths + [splitedTextIndexPath],
+                                      with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin else { return }
+            self.activeTextNode?.setNeedsLayout()
+            if let cellNode = self.tableNode.nodeForRow(at: splitedTextIndexPath) as? VEditorTextCellNode {
+                self.fetchNewActiveTextNode(cellNode)
+            }
+            self.tableNode.scrollToRow(at: splitedTextIndexPath,
+                                       at: scrollPosition,
+                                       animated: animated)
+        })
+    }
+    
+    /**
+     Editable textView insertion if needs
+     
+     - parameters:
+     - indexPath: insert target indexPath
+     - with: UITableView rowAnimation, default is automatic
+     */
+    open func insertEditableTextIfNeeds(_ indexPath: IndexPath,
+                                        with: UITableView.RowAnimation = .automatic) {
+        let beforeIndex: Int = max(0, indexPath.row - 1)
+        guard !(self.editorContents[beforeIndex] is NSAttributedString) else { return }
+        var defaultAttributes = self.editorRule.defaultAttribute()
+        defaultAttributes[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
+        let emptyAttributedText = NSAttributedString(string: "",
+                                                     attributes: defaultAttributes)
+        
+        self.editorContents.insert(emptyAttributedText, at: indexPath.row)
+        let targetIndexPath: IndexPath =
+            .init(row: indexPath.row, section: indexPath.section)
+        
+        self.tableNode.performBatch(animated: with != .none, updates: {
+            self.tableNode.insertRows(at: [targetIndexPath], with: with)
+        }, completion: { fin in
+            guard fin else { return }
+            guard let cellNode = self.tableNode
+                .nodeForRow(at: targetIndexPath) as? VEditorTextCellNode else {
+                return
+            }
+            self.fetchNewActiveTextNode(cellNode)
+        })
+    }
+    
+    /**
+     Parse XML string to Contents
+     
+     - parameters:
+     - xlmString: XML String
+     */
+    open func parseXMLString(_ xmlString: String) {
+        self.editorStatusRelay.accept(.loading)
+        self.parser.parseXML(xmlString)
+    }
+    
+    /**
+     Build content to XML string
+     
+     - important: package tag means capsule tag. eg: <PACKAGE>...output...</PACKAGE>
+     
+     - parameters:
+     - customRule: if you set customReule params than default rule will ignore
+     - packageTag: capsule tag for output xml content string
+     */
+    open func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
+        return VEditorXMLBuilder.shared
+            .buildXML(self.editorContents,
+                      rule: customRule ?? editorRule,
+                      packageTag: packageTag)
+    }
+    
+    /**
+     Synchronize contents fetching
+     
+     - important: You can use this method before make & save editor draft
+     
+     - parameters:
+     - section: editor target section
+     - complate: complate syncronize callback
+     */
+    open func synchronizeFetchContents(in section: Int = 0,
+                                         _ complate: @escaping () -> Void) {
+        let numberOfSection = self.tableNode.numberOfSections
+        guard section >= 0, section < numberOfSection else {
+            fatalError("Invalid access section \(section) in \(numberOfSection)")
+        }
+        
+        let nodeCount = tableNode.numberOfRows(inSection: section)
+        let nodes = (0 ..< nodeCount)
+            .map({ IndexPath.init(row: $0, section: section) })
+            .map({ tableNode.nodeForRow(at: $0) })
+            .map({ $0 as? VEditorTextCellNode })
+            .filter({ $0 != nil })
+            .map({ $0! })
+        
+        for node in nodes {
+            guard let index = node.indexPath?.row,
+                let currentAttributedText = node.textNode.textStorage?
+                    .attributedString() else { return }
+            self.editorContents[index] = currentAttributedText
+        }
+        
+        complate()
+    }
+    
+    /**
+     merge two text content
+     
+     - important: when you remove media content between text nodes than it should be run
+     
+     - parameters:
+     - target: remove target indexPath
+     - to: attach text node indexPath
+     - animated: remove node animation
+     */
+    open func mergeTextContents(target: IndexPath,
+                                  to: IndexPath,
+                                  animated: Bool) {
+        
+        guard let targetNode = tableNode.nodeForRow(at: target) as? VEditorTextCellNode,
+            let sourceNode = tableNode.nodeForRow(at: to) as? VEditorTextCellNode,
+            let targetAttributedText = targetNode.textNode.attributedText else {
+                return
+        }
+        
+        var mutableAttrText = NSMutableAttributedString(attributedString: targetAttributedText)
+        var newlineAttribute = self.editorRule.defaultAttribute()
+        newlineAttribute[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
+        mutableAttrText.append(NSAttributedString.init(string: "\n",
+                                                       attributes: newlineAttribute))
+        
+        self.editorContents.remove(at: target.row)
+        self.tableNode.deleteRows(at: [target], with: animated ? .automatic: .none)
+        sourceNode.textNode.textStorage?.insert(mutableAttrText, at: 0)
+        sourceNode.textNode.setNeedsLayout()
+    }
+    
+    /**
+     delete target content indexPath
+     
+     - parameters:
+     - indexPath: delete target indexPath
+     */
+    open func deleteTargetContent(_ indexPath: IndexPath?, animated: Bool) {
+        guard let indexPath = indexPath,
+            indexPath.row < self.editorContents.count else { return }
+        self.editorContents.remove(at: indexPath.row)
+        self.tableNode.performBatch(animated: animated, updates: {
+            self.tableNode.deleteRows(at: [indexPath], with: animated ? .automatic: .none)
+        }, completion: { fin in
+            guard fin,
+                indexPath.row < self.editorContents.count,
+                indexPath.row - 1 >= 0 else { return }
+            
+            let beforeCell = self.tableNode
+                .nodeForRow(at: .init(row: indexPath.row - 1,
+                                      section: indexPath.section)) as? VEditorTextCellNode
+            let currentCell = self.tableNode
+                .nodeForRow(at: .init(row: indexPath.row,
+                                      section: indexPath.section)) as? VEditorTextCellNode
+            
+            guard let target = beforeCell?.indexPath,
+                let to = currentCell?.indexPath else {
+                return
+            }
+            self.mergeTextContents(target: target, to: to, animated: animated)
+        })
+    }
+    
+    /**
+     Observe keyboard event and observe dismiss node touchUpInside event.
+     
+     - parameters:
+     - node: Dismiss keyboard button node
+     */
+    @discardableResult open func observeKeyboardEvent(_ node: ASControlNode?) -> Self {
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(VEditorNode.keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(VEditorNode.keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification,
+                                               object: nil)
+        node?.addTarget(self,
+                        action: #selector(keyboardDismissIfNeeds),
+                        forControlEvents: .touchUpInside)
+        return self
+    }
+    
+    /**
+     Dismiss Keyboard from ActiveTextNode
+     */
+    @objc open func keyboardDismissIfNeeds() {
+        guard let cellNode = self.loadActiveTextCellNode() else { return }
+        cellNode.textNode.resignFirstResponder()
+        self.activeTextContainCellNode = nil
+    }
+    
+    /**
+     Keyboard will show
+     */
+    @objc open func keyboardWillShow(notification: Notification) {
+        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
+            return
+        }
+        self.keyboardHeight = keyboardSize.height
+        self.enableAllOfTypingControls()
+        
+        if let cellNode = self.loadActiveTextCellNode() {
+            self.activeTextContainCellNode = cellNode
+        }
+        
+        self.transitionLayout(withAnimation: true,
+                              shouldMeasureAsync: false,
+                              measurementCompletion: nil)
+    }
+    
+    /**
+     Keyboard will show
+     */
+    @objc open func keyboardWillHide(notification: Notification) {
+        self.keyboardHeight = 0.0
+        self.disableAllOfTypingControls()
+        self.transitionLayout(withAnimation: true,
+                              shouldMeasureAsync: false,
+                              measurementCompletion: nil)
+    }
+}
+
+extension VEditorNode {
+    
     internal func observeActiveTextNode() {
-        // dispose prev activeText observers
+        // NOTE: dispose prev activeText observers
         self.activeTextDisposeBag = DisposeBag()
         
         activeTextNode?.rx.currentLocationXMLTags
             .subscribe(onNext: { [weak self] activeXMLs in
-                // reset control status before fetch current attribute
+                // NOTE: reset control status before fetch current attribute
                 self?.enableAllOfTypingControls()
                 self?.currentAttributeFetch(.location,
-                                           activeXMLs: activeXMLs,
-                                           isBlockStyle: false)
+                                            activeXMLs: activeXMLs,
+                                            isBlockStyle: false)
             }).disposed(by: activeTextDisposeBag)
         
         activeTextNode?.rx.caretRect
@@ -257,14 +673,9 @@ extension VEditorNode {
             }).disposed(by: activeTextDisposeBag)
     }
     
-    internal enum VEditorAttributeControlScope {
-        case controlTap(Bool, String)
-        case location
-    }
-    
     @objc private func didTapTypingControl(_ sender: VEditorTypingControlNode) {
         guard !sender.isExternalHandler else { return }
-        guard let activeTextNode = self.loadActiveTextNode() else { return }
+        guard let activeTextNode = self.loadActiveTextCellNode() else { return }
         
         let isActive: Bool = sender.isSelected
         let currentXMLTag: String = sender.xmlTag
@@ -300,6 +711,7 @@ extension VEditorNode {
                 inactiveXMLs.append(contentsOf: editorRule.inactiveTypingXMLs(currentXMLTag) ?? [])
             }
         case .location:
+            // NODE: current cursor location chagned
             break
         }
         
@@ -367,244 +779,15 @@ extension VEditorNode {
     
     private func generateLinkPreview(_ url: URL, splitIndex: Int) {
         guard let tag = self.editorRule.linkStyleXMLTag else { return }
-        self.insertContent(VEditorPlaceholderContent.init(xmlTag: tag, model: url as Any),
-                           splitIndex: splitIndex)
-    }
-}
-
-// MARK: - Editor Content Management
-extension VEditorNode {
-    
-    
-    /**
-     append Content
-     - important: Do not pass NSAttributedString on content parameter
-     - parameters:
-     - content: placeholder or media content
-     */
-    open func appendContent(_ content: VEditorContent,
-                            section: Int = 0,
-                            scrollPosition: UITableView.ScrollPosition = .bottom,
-                            animated: Bool = true) {
-        let indexPath = IndexPath(row: max(0, self.editorContents.count - 1), section: section)
-        self.insertContent(content, indexPath: indexPath)
-    }
-    
-    /**
-     append Contents
-     - important: Do not pass NSAttributedString on content parameter
-     - parameters:
-     - content: placeholder or media content
-     */
-    open func appendContent(_ contents: [VEditorContent],
-                            section: Int = 0,
-                            scrollPosition: UITableView.ScrollPosition = .bottom,
-                            animated: Bool = true) {
-        let indexPath = IndexPath(row: max(0, self.editorContents.count - 1), section: section)
-        self.insertContent(contents, indexPath: indexPath)
-    }
-    
-    /**
-     Insertion Content
-     - important: Do not pass NSAttributedString on content parameter
-     - parameters:
-     - content: placeholder or media content
-     - indexPath: insert indexPath
-     */
-    open func insertContent(_ content: VEditorContent,
-                              indexPath: IndexPath,
-                              scrollPosition: UITableView.ScrollPosition = .bottom,
-                              animated: Bool = true) {
-        guard !(content is NSAttributedString) else {
-            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
-        }
-        
-        if editorContents.count == indexPath.row + 1 {
-            self.editorContents.append(content)
-        } else{
-            self.editorContents.insert(content, at: indexPath.row + 1)
-        }
-        
-        let contentIndexPath: IndexPath = .init(row: indexPath.row + 1, section: indexPath.section)
-        
-        self.tableNode.performBatchUpdates({
-            self.tableNode.insertRows(at: [contentIndexPath],
-                                      with: animated ? .automatic: .none)
-        }, completion: { fin in
-            guard fin else { return }
-            self.tableNode.scrollToRow(at: contentIndexPath,
-                                       at: scrollPosition,
-                                       animated: animated)
-        })
-    }
-    
-    /**
-     Insertion Content Array
-     
-     - important: Do not pass NSAttributedString on content parameter
-     - parameters:
-     - contents: Array of placeholder or media content
-     - indexPath: IndexPath
-     */
-    open func insertContent(_ contents: [VEditorContent],
-                              indexPath: IndexPath,
-                              scrollPosition: UITableView.ScrollPosition = .bottom,
-                              animated: Bool = true) {
-        guard !contents.contains(where: { $0 is NSAttributedString }) else {
-            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
-        }
-        
-        if editorContents.count == indexPath.row + 1 {
-            self.editorContents.append(contentsOf: contents)
-        } else{
-            self.editorContents.insert(contentsOf: contents, at: indexPath.row + 1)
-        }
-        
-        let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
-            return .init(row: indexPath.row + 1 + index, section: indexPath.section)
-        })
-        
-        self.tableNode.performBatchUpdates({
-            self.tableNode.insertRows(at: contentIndexPaths,
-                                      with: animated ? .automatic: .none)
-        }, completion: { fin in
-            guard fin, let lastIndexPath = contentIndexPaths.last else { return }
-            self.tableNode.scrollToRow(at: lastIndexPath,
-                                       at: scrollPosition,
-                                       animated: animated)
-        })
-    }
-    
-    /**
-     Insertion Content with Text Split Index
-     
-     - important: Do not pass NSAttributedString on content parameter
-     - parameters:
-     - content: placeholder or media content
-     - splitIndex: SplitIndex on textNode
-     */
-    open func insertContent(_ content: VEditorContent,
-                              splitIndex: Int,
-                              scrollPosition: UITableView.ScrollPosition = .bottom,
-                              animated: Bool = true) {
-        guard !(content is NSAttributedString) else {
-            fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
-        }
-        
-        guard let indexPath = self.loadActiveTextNodeIndexPath(),
-            let attrText = self.activeTextNode?.textStorage?.internalAttributedString else { return }
-        
-        // STEP1: Split textStorage with replaceTextStorage
-        let length: Int = attrText.length
-        let prefixRange: NSRange = .init(location: 0, length: splitIndex)
-        let tailRange: NSRange = .init(location: splitIndex, length: length - splitIndex)
-        
-        let prefixAttrText = attrText.attributedSubstring(from: prefixRange)
-        let tailAttrText = attrText.attributedSubstring(from: tailRange)
-        
-        self.activeTextNode?.textStorage?.setAttributedString(prefixAttrText)
-        
-        // STEP2: Get VEditorContent with prepare update editor
-        let insertItems: [VEditorContent] = [content, tailAttrText]
-        
-        if editorContents.count == indexPath.row + 1 {
-            self.editorContents.append(contentsOf: insertItems)
-        } else{
-            self.editorContents.insert(contentsOf: insertItems, at: indexPath.row + 1)
-        }
-        
-        let contentIndexPath: IndexPath = .init(row: indexPath.row + 1, section: indexPath.section)
-        let splitedTextIndexPath: IndexPath = .init(row: indexPath.row + 2, section: indexPath.section)
-        
-        // STEP3: Fetch Placeholder or MediaContent with splitted text
-        self.tableNode.performBatchUpdates({
-            self.tableNode.insertRows(at: [contentIndexPath, splitedTextIndexPath],
-                                      with: animated ? .automatic: .none)
-        }, completion: { fin in
-            guard fin else { return }
-            if let cellNode = self.tableNode.nodeForRow(at: splitedTextIndexPath) as? VEditorTextCellNode {
-                self.activeTextNode?.resignFirstResponder()
-                self.activeTextNode = cellNode.textNode
-                self.activeTextNode?.becomeFirstResponder()
-            }
-            self.tableNode.scrollToRow(at: splitedTextIndexPath,
-                                       at: scrollPosition,
-                                       animated: animated)
-        })
-    }
-    
-    /**
-     Editable textView insertion if needs
-     
-     - parameters:
-     - indexPath: insert target indexPath
-     - with: UITableView rowAnimation, default is automatic
-     */
-    open func insertEditableTextIfNeeds(_ indexPath: IndexPath,
-                                        with: UITableView.RowAnimation = .automatic) {
-        let beforeIndex: Int = max(0, indexPath.row - 1)
-        guard !(self.editorContents[beforeIndex] is NSAttributedString) else { return }
-        var defaultAttributes = self.editorRule.defaultAttribute()
-        defaultAttributes[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
-        let emptyAttributedText = NSAttributedString(string: "",
-                                                     attributes: defaultAttributes)
-        
-        self.editorContents.insert(emptyAttributedText, at: indexPath.row)
-        let targetIndexPath: IndexPath =
-            .init(row: indexPath.row, section: indexPath.section)
-        
-        self.tableNode.performBatch(animated: with != .none, updates: {
-            self.tableNode.insertRows(at: [targetIndexPath], with: with)
-        }, completion: { fin in
-            guard fin else { return }
-            guard let cellNode = self.tableNode
-                .nodeForRow(at: targetIndexPath) as? VEditorTextCellNode else {
-                return
-            }
-            self.activeTextNode?.resignFirstResponder()
-            cellNode.textNode.becomeFirstResponder()
-            self.activeTextNode = cellNode.textNode
-        })
+        let content = VEditorPlaceholderContent(xmlTag: tag, model: url as Any)
+        self.insertContents([content], splitIndex: splitIndex)
     }
     
     private func deleteUnnecessaryEditableTextIfNeeds(with: UITableView.RowAnimation = .automatic) {
-        guard let indexPath = self.loadActiveTextNodeIndexPath() else { return }
-        
-        self.activeTextNode?.resignFirstResponder()
-        self.activeTextNode = nil
+        guard let indexPath = self.activeTextIndexPath else { return }
+        self.resignActiveTextNode()
         self.editorContents.remove(at: indexPath.row)
         self.tableNode.deleteRows(at: [indexPath], with: with)
-    }
-}
-
-// MARK: - Editor XML Parser & Builder
-extension VEditorNode {
-    
-    /**
-     Parse XML string to Contents
-     
-     - parameters:
-     - xlmString: XML String
-     */
-    open func parseXMLString(_ xmlString: String) {
-        self.editorStatusRelay.accept(.loading)
-        self.parser.parseXML(xmlString)
-    }
-    
-    /**
-     Build content to XML string
-     
-     - important: package tag means capsule tag. eg: <PACKAGE>...output...</PACKAGE>
-     
-     - parameters:
-     - customRule: if you set customReule params than default rule will ignore
-     - packageTag: capsule tag for output xml content string
-     */
-    open func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
-        return VEditorXMLBuilder.shared
-            .buildXML(self.editorContents,
-                      rule: customRule ?? editorRule,
-                      packageTag: packageTag)
     }
     
     private func rxInitParser() {
@@ -621,153 +804,32 @@ extension VEditorNode {
             }).disposed(by: disposeBag)
     }
     
-    /**
-     Synchronize contents fetching
-     
-     - important: You can use this method before make & save editor draft
-     - parameters:
-     - section: editor target section
-     - complate: complate syncronize callback
-     */
-    open func synchronizeFetchContents(in section: Int = 0,
-                                         _ complate: @escaping () -> Void) {
-        let numberOfSection = self.tableNode.numberOfSections
-        guard section >= 0, section < numberOfSection else {
-            fatalError("Invalid access section \(section) in \(numberOfSection)")
-        }
-        
-        let nodeCount = tableNode.numberOfRows(inSection: section)
-        let nodes = (0 ..< nodeCount)
-            .map({ IndexPath.init(row: $0, section: section) })
-            .map({ tableNode.nodeForRow(at: $0) })
-            .map({ $0 as? VEditorTextCellNode })
-            .filter({ $0 != nil })
-            .map({ $0! })
-        
-        for node in nodes {
-            guard let index = node.indexPath?.row,
-                let currentAttributedText = node.textNode.textStorage?
-                    .attributedString() else { return }
-            self.editorContents[index] = currentAttributedText
-        }
-        
-        complate()
+    private enum ContentFetchIndexScope {
+        case indexPath(IndexPath)
+        case splitIndex(Int)
     }
     
-    /**
-     merge two text content
-     
-     - important: when you remove media content between text nodes than it should be run
-     - parameters:
-     - target: remove target indexPath
-     - to: attach text node indexPath
-     - animated: remove node animation
-     */
-    open func mergeTextContents(target: IndexPath,
-                                  to: IndexPath,
-                                  animated: Bool) {
-        
-        guard let targetNode = tableNode.nodeForRow(at: target) as? VEditorTextCellNode,
-            let sourceNode = tableNode.nodeForRow(at: to) as? VEditorTextCellNode,
-            let targetAttributedText = targetNode.textNode.attributedText else {
-                return
-        }
-        
-        var mutableAttrText = NSMutableAttributedString(attributedString: targetAttributedText)
-        var newlineAttribute = self.editorRule.defaultAttribute()
-        newlineAttribute[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
-        mutableAttrText.append(NSAttributedString.init(string: "\n",
-                                                       attributes: newlineAttribute))
-        
-        self.editorContents.remove(at: target.row)
-        self.tableNode.deleteRows(at: [target], with: animated ? .automatic: .none)
-        sourceNode.textNode.textStorage?.insert(mutableAttrText, at: 0)
-        sourceNode.textNode.setNeedsLayout()
-    }
-    
-    /**
-     delete target content indexPath
-     
-     - parameters:
-     - indexPath: delete target indexPath
-     */
-    open func deleteTargetContent(_ indexPath: IndexPath?, animated: Bool) {
-        guard let indexPath = indexPath,
-            indexPath.row < self.editorContents.count else { return }
-        self.editorContents.remove(at: indexPath.row)
-        self.tableNode.performBatch(animated: animated, updates: {
-            self.tableNode.deleteRows(at: [indexPath], with: animated ? .automatic: .none)
-        }, completion: { fin in
-            guard fin,
-                indexPath.row < self.editorContents.count,
-                indexPath.row - 1 >= 0 else { return }
-            // merge if needs
-            
-            let beforeCell = self.tableNode
-                .nodeForRow(at: .init(row: indexPath.row - 1,
-                                      section: indexPath.section)) as? VEditorTextCellNode
-            let currentCell = self.tableNode
-                .nodeForRow(at: .init(row: indexPath.row,
-                                      section: indexPath.section)) as? VEditorTextCellNode
-            
-            guard let target = beforeCell?.indexPath,
-                let to = currentCell?.indexPath else {
-                return
+    private func getContentFetchIndexPath(_ scope: MeidaAppendScope,
+                                          section: Int) -> ContentFetchIndexScope {
+        switch scope {
+        case .automatic:
+            if let activeTextNode = self.activeTextNode {
+                return .splitIndex(activeTextNode.selectedRange.location)
+            } else {
+                let lastIndex: Int = max(0, self.editorContents.count - 1)
+                return .indexPath(.init(row: lastIndex, section: section))
             }
-            self.mergeTextContents(target: target, to: to, animated: animated)
-        })
-    }
-}
-
-// MARK: - observe Keyboard
-extension VEditorNode {
-    
-    /**
-     Observe keyboard event and observe dismiss node touchUpInside event.
-     
-     - parameters:
-     - node: Dismiss keyboard button node
-     */
-    @discardableResult open func observeKeyboardEvent(_ node: ASControlNode?) -> Self {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(VEditorNode.keyboardWillShow),
-                                               name: UIResponder.keyboardWillShowNotification,
-                                               object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(VEditorNode.keyboardWillHide),
-                                               name: UIResponder.keyboardWillHideNotification,
-                                               object: nil)
-        node?.addTarget(self,
-                        action: #selector(keyboardDismissIfNeeds),
-                        forControlEvents: .touchUpInside)
-        return self
-    }
-    
-    /**
-     Dismiss Keyboard from ActiveTextNode
-     */
-    @objc open func keyboardDismissIfNeeds() {
-        guard let textNode = self.loadActiveTextNode() else { return }
-        textNode.resignFirstResponder()
-    }
-    
-    @objc func keyboardWillShow(notification: Notification) {
-        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
-            return
+        case .first:
+            return .indexPath(.init(row: 0, section: section))
+        case .last:
+            let lastIndex: Int = max(0, self.editorContents.count - 1)
+            return .indexPath(.init(row: lastIndex, section: section))
+        case .insert(let indexPath):
+            return .indexPath(indexPath)
         }
-        self.keyboardHeight = keyboardSize.height
-        self.enableAllOfTypingControls()
-        self.activeTextNode = self.loadActiveTextNode() ?? self.activeTextNode
-        self.transitionLayout(withAnimation: true,
-                              shouldMeasureAsync: false,
-                              measurementCompletion: nil)
     }
     
-    @objc func keyboardWillHide(notification: Notification) {
-        self.keyboardHeight = 0.0
-        self.disableAllOfTypingControls()
-        self.transitionLayout(withAnimation: true,
-                              shouldMeasureAsync: false,
-                              measurementCompletion: nil)
+    private func isContentFetchAvailable(_ contents: [VEditorContent]) -> Bool {
+        return !contents.contains(where: { $0 is NSAttributedString })
     }
 }

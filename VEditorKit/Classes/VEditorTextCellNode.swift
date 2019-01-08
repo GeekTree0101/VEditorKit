@@ -11,6 +11,13 @@ import AsyncDisplayKit
 import RxSwift
 import RxCocoa
 
+extension Reactive where Base: VEditorTextCellNode {
+    
+    var becomeActive: Observable<Void> {
+        return base.textNode.rx.becomeActive.asObservable()
+    }
+}
+
 open class VEditorTextCellNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
