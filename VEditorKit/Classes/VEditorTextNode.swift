@@ -87,9 +87,19 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
             self.textView.linkTextAttributes = attrStyle.attributes
         }
         
-        self.supernode?.setNeedsLayout()
-        self.setNeedsLayout()
         self.textStorage?.replaceAttributeWithRegexPattenIfNeeds(self)
+    }
+    
+    override open func calculatedLayoutDidChange() {
+        super.calculatedLayoutDidChange()
+        guard let expectedHeight = self.textStorage?
+            .internalAttributedString.size().height,
+            expectedHeight > self.frame.height else {
+                // NOTE: pass setNeedsLayout
+                return
+        }
+        // NOTE: Unsyncronized frame height between storage with viewFrame
+        self.setNeedsLayout()
     }
     
     open func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
