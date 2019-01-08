@@ -19,7 +19,7 @@ extension Reactive where Base: VEditorOpenGraphNode {
     }
 }
 
-public class VEditorOpenGraphNode: ASCellNode {
+open class VEditorOpenGraphNode: ASCellNode {
     
     lazy var imageNode: ASNetworkImageNode = {
         let node = ASNetworkImageNode()
@@ -50,7 +50,7 @@ public class VEditorOpenGraphNode: ASCellNode {
         let node = ASControlNode()
         node.automaticallyManagesSubnodes = true
         node.borderWidth = 1.0
-        node.borderColor = UIColor.gray.cgColor
+        node.borderColor = UIColor.lightGray.cgColor
         node.cornerRadius = 10.0
         return node
     }()
@@ -58,38 +58,25 @@ public class VEditorOpenGraphNode: ASCellNode {
     public lazy var deleteControlNode: VEditorDeleteMediaNode =
         .init(.red, deleteIconImage: nil)
     
-    public var title: String?
-    public var desc: String?
-    public var sourceURL: URL?
     public var insets: UIEdgeInsets = .zero
-    public var containerInsets: UIEdgeInsets
+    public var containerInsets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
-    
+    public var imageRatio: CGFloat?
+    public var contentSpacing: CGFloat = 5.0
+    public var imageWithContentSpacing: CGFloat = 5.0
     public var disposeBag = DisposeBag()
     
-    public required init(_ insets: UIEdgeInsets,
-                         isEdit: Bool,
-                         title: String?,
-                         desc: String?,
-                         url: URL?,
-                         imageURL: URL?,
-                         containerInsets: UIEdgeInsets) {
-        self.insets = insets
+    public required init(isEdit: Bool) {
         self.isEdit = isEdit
-        self.title = title
-        self.desc = desc
-        self.sourceURL = url
-        self.containerInsets = containerInsets
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
-        self.imageNode.setURL(imageURL, resetToDefault: true)
         self.containerNode.layoutSpecBlock = { [weak self] (_, _) -> ASLayoutSpec in
             return self?.containerLayoutSpec() ?? ASLayoutSpec()
         }
     }
     
-    override public func didLoad() {
+    override open func didLoad() {
         super.didLoad()
         guard self.isEdit else { return }
         self.deleteControlNode.isHidden = true
@@ -103,29 +90,60 @@ public class VEditorOpenGraphNode: ASCellNode {
         self.containerNode.setNeedsLayout()
     }
     
-    @discardableResult public func setTitleAttribute(_ attrStyle: VEditorStyle) -> Self {
-        self.titleNode.attributedText = title?.styled(with: attrStyle)
+    @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
+        self.insets = insets
         return self
     }
     
-    @discardableResult public func setDescAttribute(_ attrStyle: VEditorStyle) -> Self {
-        self.descNode.attributedText = desc?.styled(with: attrStyle)
+    @discardableResult open func setContainerInsets(_ insets: UIEdgeInsets) -> Self {
+        self.containerInsets = insets
         return self
     }
     
-    @discardableResult public func setSourceAttribute(_ attrStyle: VEditorStyle) -> Self {
-        guard let url = sourceURL else { return self }
-        self.sourceNode.attributedText = url.absoluteString
-            .styled(with: attrStyle.byAdding([.link(url)]))
+    @discardableResult open func setPreviewImageRatio(_ ratio: CGFloat) -> Self {
+        self.imageRatio = ratio
         return self
     }
     
-    @discardableResult public func setPreviewImageSize(_ size: CGSize) -> Self {
+    @discardableResult open func setPreviewImageSize(_ size: CGSize,
+                                                     cornerRadius: CGFloat) -> Self {
         self.imageNode.style.preferredSize = size
+        self.imageNode.cornerRadius = cornerRadius
+        self.imageRatio = nil
         return self
     }
     
-    override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+    @discardableResult open func setPreviewImageURL(_ url: URL?) -> Self {
+        self.imageNode.setURL(url, resetToDefault: true)
+        return self
+    }
+    
+    @discardableResult open func setPlaceholderColor(_ color: UIColor) -> Self {
+        self.imageNode.placeholderColor = color
+        return self
+    }
+    
+    @discardableResult open func setTitleAttribute(_ text: String?,
+                                                   attrStyle: VEditorStyle) -> Self {
+        self.titleNode.attributedText = text?.styled(with: attrStyle)
+        return self
+    }
+    
+    @discardableResult open func setDescAttribute(_ text: String?,
+                                                  attrStyle: VEditorStyle) -> Self {
+        self.descNode.attributedText = text?.styled(with: attrStyle)
+        return self
+    }
+    
+    @discardableResult open func setSourceAttribute(_ url: URL?,
+                                                    attrStyle: VEditorStyle) -> Self {
+        guard let url = url else { return self }
+        self.sourceNode.attributedText =
+            url.absoluteString.styled(with: attrStyle.byAdding([.link(url)]))
+        return self
+    }
+    
+    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         if isEdit {
             let overlayLayout = ASOverlayLayoutSpec(child: containerNode,
                                                     overlay: deleteControlNode)
@@ -135,23 +153,23 @@ public class VEditorOpenGraphNode: ASCellNode {
         }
     }
     
-    public func containerLayoutSpec() -> ASLayoutSpec {
+    open func containerLayoutSpec() -> ASLayoutSpec {
         var elements: [ASLayoutElement] = []
         
-        if title != nil {
+        if titleNode.attributedText?.length ?? 0 > 0 {
             elements.append(titleNode)
         }
         
-        if desc != nil {
+        if descNode.attributedText?.length ?? 0 > 0 {
             elements.append(descNode)
         }
         
-        if sourceURL != nil {
+        if sourceNode.attributedText?.length ?? 0 > 0 {
             elements.append(sourceNode)
         }
         
         let contentAreaLayout = ASStackLayoutSpec(direction: .vertical,
-                                                  spacing: 5.0,
+                                                  spacing: contentSpacing,
                                                   justifyContent: .start,
                                                   alignItems: .stretch,
                                                   children: elements)
@@ -161,11 +179,13 @@ public class VEditorOpenGraphNode: ASCellNode {
         imageNode.style.flexGrow = 0.0
 
         let openGraphLayout = ASStackLayoutSpec(direction: .horizontal,
-                                                spacing: 5.0,
+                                                spacing: imageWithContentSpacing,
                                                 justifyContent: .spaceBetween,
                                                 alignItems: .center,
-                                                children: [contentAreaLayout, imageNode])
+                                                children: [contentAreaLayout,
+                                                           imageNode])
         
-        return ASInsetLayoutSpec(insets: containerInsets, child: openGraphLayout)
+        return ASInsetLayoutSpec(insets: containerInsets,
+                                 child: openGraphLayout)
     }
 }

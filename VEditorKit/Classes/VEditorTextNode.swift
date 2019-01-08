@@ -13,7 +13,7 @@ import RxSwift
 
 extension Reactive where Base: VEditorTextNode {
     
-    internal var currentLocationXMLTags: Observable<[String]> {
+    public var currentLocationXMLTags: Observable<[String]> {
         return base.currentLocationXMLTagsRelay
             .throttle(0.1, scheduler: MainScheduler.instance)
     }
@@ -29,22 +29,22 @@ extension Reactive where Base: VEditorTextNode {
     }
 }
 
-public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
+open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
-    public var textStorage: VEditorTextStorage? {
+    open var textStorage: VEditorTextStorage? {
         return self.textView.textStorage as? VEditorTextStorage
     }
     
-    public var currentTypingAttribute: [NSAttributedString.Key: Any] = [:] {
+    open var currentTypingAttribute: [NSAttributedString.Key: Any] = [:] {
         didSet {
             self.typingAttributes = currentTypingAttribute.typingAttribute()
             self.textStorage?.currentTypingAttribute = currentTypingAttribute
         }
     }
     
-    public var isEdit: Bool = true
-    public weak var regexDelegate: VEditorRegexApplierDelegate!
-    public var automaticallyGenerateLinkPreview: Bool = false
+    open var isEdit: Bool = true
+    open weak var regexDelegate: VEditorRegexApplierDelegate!
+    open var automaticallyGenerateLinkPreview: Bool = false
     
     internal let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
@@ -53,25 +53,28 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
-                         placeholderText: String?,
+                         placeholderText: NSAttributedString?,
                          attributedText: NSAttributedString) {
         self.isEdit = isEdit
         self.rule = rule
+        
         let textStorage = VEditorTextStorage.init()
         textStorage.setAttributedString(attributedText)
         let textKitComponents: ASTextKitComponents =
             .init(textStorage: textStorage,
                   textContainerSize: .zero,
                   layoutManager: .init())
+        
         let placeholderTextKit: ASTextKitComponents =
-            .init(attributedSeedString: nil,
+            .init(attributedSeedString: placeholderText,
                   textContainerSize: .zero)
+        
         super.init(textKitComponents: textKitComponents,
                    placeholderTextKitComponents: placeholderTextKit)
         super.delegate = self
     }
     
-    override public func didLoad() {
+    override open func didLoad() {
         super.didLoad()
         self.currentTypingAttribute = rule.defaultAttribute()
         if let linkXML = rule.linkStyleXMLTag,
@@ -84,25 +87,27 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         self.textStorage?.replaceAttributeWithRegexPattenIfNeeds(self)
     }
     
-    public func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
+    open func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
         return self.isEdit
     }
     
-    public func editableTextNode(_ editableTextNode: ASEditableTextNode,
-                                 shouldChangeTextIn range: NSRange,
-                                 replacementText text: String) -> Bool {
+    open func editableTextNode(_ editableTextNode: ASEditableTextNode,
+                               shouldChangeTextIn range: NSRange,
+                               replacementText text: String) -> Bool {
         if (text == "\n" || text == " "),
-            self.automaticallyGenerateLinkPreview,
-            let context = self.textStorage?.automaticallyApplyLinkAttribute(self) {
+            let context = self.textStorage?
+                .automaticallyApplyLinkAttribute(self) {
+            guard self.automaticallyGenerateLinkPreview else { return true }
             self.generateLinkPreviewRelay.accept(context)
+            return false
         }
         return true
     }
     
-    public func editableTextNodeDidChangeSelection(_ editableTextNode: ASEditableTextNode,
-                                                   fromSelectedRange: NSRange,
-                                                   toSelectedRange: NSRange,
-                                                   dueToEditing: Bool) {
+    open func editableTextNodeDidChangeSelection(_ editableTextNode: ASEditableTextNode,
+                                                 fromSelectedRange: NSRange,
+                                                 toSelectedRange: NSRange,
+                                                 dueToEditing: Bool) {
         if !dueToEditing {
             // NOTE: Move cursor and pick attribute on cursor
             let attributes = self.textStorage?
@@ -118,7 +123,8 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
             self.currentLocationXMLTagsRelay.accept(xmlTags)
             self.textStorage?.triggerTouchEventIfNeeds(self)
         } else {
-            guard let textPostion: UITextPosition = editableTextNode.textView.selectedTextRange?.end else {
+            guard let textPostion: UITextPosition =
+                editableTextNode.textView.selectedTextRange?.end else {
                 return
             }
             let caretRect: CGRect = editableTextNode.textView.caretRect(for: textPostion)
@@ -126,11 +132,15 @@ public class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         }
     }
     
-    public func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
+    open func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
         self.textStorage?.didUpdateText(self)
     }
     
-    public func updateCurrentTypingAttribute(_ attribute: VEditorStyleAttribute, isBlock: Bool) {
-        self.textStorage?.updateCurrentTypingAttribute(self, attribute: attribute, isBlock: isBlock)
+    open func updateCurrentTypingAttribute(_ attribute: VEditorStyleAttribute,
+                                           isBlock: Bool) {
+        self.textStorage?
+            .updateCurrentTypingAttribute(self,
+                                          attribute: attribute,
+                                          isBlock: isBlock)
     }
 }

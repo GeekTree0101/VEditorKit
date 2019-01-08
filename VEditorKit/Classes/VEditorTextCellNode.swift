@@ -11,19 +11,17 @@ import AsyncDisplayKit
 import RxSwift
 import RxCocoa
 
-public class VEditorTextCellNode: ASCellNode {
+open class VEditorTextCellNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true
     public var textNode: VEditorTextNode
     public let disposeBag = DisposeBag()
     
-    public required init(_ insets: UIEdgeInsets,
-                         isEdit: Bool,
-                         placeholderText: String?,
+    public required init(isEdit: Bool,
+                         placeholderText: NSAttributedString?,
                          attributedText: NSAttributedString,
                          rule: VEditorRule) {
-        self.insets = insets
         self.isEdit = isEdit
         self.textNode = VEditorTextNode(rule,
                                         isEdit: isEdit,
@@ -34,7 +32,12 @@ public class VEditorTextCellNode: ASCellNode {
         self.selectionStyle = .none
     }
     
-    override public func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+    @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
+        self.insets = insets
+        return self
+    }
+    
+    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         return ASInsetLayoutSpec(insets: insets, child: self.textNode)
     }
 }

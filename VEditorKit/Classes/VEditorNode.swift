@@ -24,7 +24,7 @@ extension Reactive where Base: VEditorNode {
     }
 }
 
-public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
+open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     
     public enum Status {
         case loading
@@ -32,7 +32,7 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         case error(Error?)
     }
     
-    public lazy var tableNode: ASTableNode = {
+    open lazy var tableNode: ASTableNode = {
         let node = ASTableNode()
         node.delegate = self
         node.dataSource = self
@@ -40,20 +40,20 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         return node
     }()
     
-    public var controlAreaNode: ASDisplayNode? {
+    open var controlAreaNode: ASDisplayNode? {
         didSet {
             self.setNeedsLayout()
         }
     }
     
-    public let parser: VEditorParser
-    public let editorRule: VEditorRule
-    public var editorContents: [VEditorContent] = []
-    public let editorStatusRelay = PublishRelay<Status>()
-    public let disposeBag = DisposeBag()
-    public weak var delegate: VEditorNodeDelegate!
+    open let parser: VEditorParser
+    open let editorRule: VEditorRule
+    open var editorContents: [VEditorContent] = []
+    open let editorStatusRelay = PublishRelay<Status>()
+    open let disposeBag = DisposeBag()
+    open weak var delegate: VEditorNodeDelegate!
     
-    public var activeTextNode: VEditorTextNode? {
+    open var activeTextNode: VEditorTextNode? {
         didSet {
             self.observeActiveTextNode()
         }
@@ -73,7 +73,7 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.backgroundColor = .white
     }
     
-    public override func didLoad() {
+    open override func didLoad() {
         super.didLoad()
         self.tableNode.view.separatorStyle = .none
         self.tableNode.view.showsVerticalScrollIndicator = false
@@ -89,7 +89,7 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
-    public override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+    open override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         var tableNodeInsets: UIEdgeInsets = .zero
         tableNodeInsets.bottom = keyboardHeight
         
@@ -107,25 +107,25 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
-    override public func layout() {
+    override open func layout() {
         super.layout()
         guard let height = controlAreaNode?.frame.height else { return }
         self.tableNode.contentInset.bottom = height
     }
     
-    public func tableNode(_ tableNode: ASTableNode,
+    open func tableNode(_ tableNode: ASTableNode,
                           numberOfRowsInSection section: Int) -> Int {
         return self.editorContents.count
     }
     
-    public func tableNode(_ tableNode: ASTableNode,
+    open func tableNode(_ tableNode: ASTableNode,
                           nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         return {
             guard indexPath.row < self.editorContents.count else { return ASCellNode() }
             let content = self.editorContents[indexPath.row]
             
             if let placeholderContent = content as? VEditorPlaceholderContent {
-                guard let cellNode = self.delegate.placeholderCellNode(placeholderContent) else {
+                guard let cellNode = self.delegate.placeholderCellNode(placeholderContent, indexPath: indexPath) else {
                     return ASCellNode()
                 }
                 
@@ -148,7 +148,7 @@ public class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 
                 return cellNode
             } else {
-                return self.delegate.contentCellNode(content) ?? ASCellNode()
+                return self.delegate.contentCellNode(content, indexPath: indexPath) ?? ASCellNode()
             }
         }
     }
@@ -163,7 +163,7 @@ extension VEditorNode {
      - parameters:
      - controls: Array of VEditorTypingControlNode
      */
-    @discardableResult public func registerTypingContols(_ controls: [VEditorTypingControlNode]) -> Self {
+    @discardableResult open func registerTypingContols(_ controls: [VEditorTypingControlNode]) -> Self {
         guard self.typingControls.isEmpty else {
             fatalError("VEditorKit Error: Already registed typing controls")
         }
@@ -180,7 +180,7 @@ extension VEditorNode {
      
      - returns: ActiveTextNode from first responder cellNode
      */
-    public func loadActiveTextNode() -> VEditorTextNode? {
+    open func loadActiveTextNode() -> VEditorTextNode? {
         guard let aciveTextCellNode: VEditorTextCellNode? =
             self.tableNode.visibleNodes
                 .map({ $0 as? VEditorTextCellNode })
@@ -198,7 +198,7 @@ extension VEditorNode {
      
      - returns: indexPath of activeTextNode
      */
-    public func loadActiveTextNodeIndexPath() -> IndexPath? {
+    open func loadActiveTextNodeIndexPath() -> IndexPath? {
         guard let aciveTextCellNode: VEditorTextCellNode? =
             self.tableNode.visibleNodes
                 .map({ $0 as? VEditorTextCellNode })
@@ -359,7 +359,7 @@ extension VEditorNode {
      - content: placeholder or media content
      - indexPath: insert indexPath
      */
-    public func insertContent(_ content: VEditorContent,
+    open func insertContent(_ content: VEditorContent,
                               indexPath: IndexPath,
                               scrollPosition: UITableView.ScrollPosition = .bottom,
                               animated: Bool = true) {
@@ -394,7 +394,7 @@ extension VEditorNode {
      - contents: Array of placeholder or media content
      - indexPath: IndexPath
      */
-    public func insertContent(_ contents: [VEditorContent],
+    open func insertContent(_ contents: [VEditorContent],
                               indexPath: IndexPath,
                               scrollPosition: UITableView.ScrollPosition = .bottom,
                               animated: Bool = true) {
@@ -431,7 +431,7 @@ extension VEditorNode {
      - content: placeholder or media content
      - splitIndex: SplitIndex on textNode
      */
-    public func insertContent(_ content: VEditorContent,
+    open func insertContent(_ content: VEditorContent,
                               splitIndex: Int,
                               scrollPosition: UITableView.ScrollPosition = .bottom,
                               animated: Bool = true) {
@@ -491,7 +491,7 @@ extension VEditorNode {
      - parameters:
      - xlmString: XML String
      */
-    public func parseXMLString(_ xmlString: String) {
+    open func parseXMLString(_ xmlString: String) {
         self.editorStatusRelay.accept(.loading)
         self.parser.parseXML(xmlString)
     }
@@ -505,7 +505,7 @@ extension VEditorNode {
      - customRule: if you set customReule params than default rule will ignore
      - packageTag: capsule tag for output xml content string
      */
-    public func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
+    open func buildXML(_ customRule: VEditorRule? = nil, packageTag: String) -> String? {
         return VEditorXMLBuilder.shared
             .buildXML(self.editorContents,
                       rule: customRule ?? editorRule,
@@ -534,7 +534,7 @@ extension VEditorNode {
      - section: editor target section
      - complate: complate syncronize callback
      */
-    public func synchronizeFetchContents(in section: Int = 0,
+    open func synchronizeFetchContents(in section: Int = 0,
                                          _ complate: @escaping () -> Void) {
         let numberOfSection = self.tableNode.numberOfSections
         guard section >= 0, section < numberOfSection else {
@@ -568,7 +568,7 @@ extension VEditorNode {
      - to: attach text node indexPath
      - animated: remove node animation
      */
-    public func mergeTextContents(target: IndexPath,
+    open func mergeTextContents(target: IndexPath,
                                   to: IndexPath,
                                   animated: Bool) {
         
@@ -596,7 +596,7 @@ extension VEditorNode {
      - parameters:
      - indexPath: delete target indexPath
      */
-    public func deleteTargetContent(_ indexPath: IndexPath?, animated: Bool) {
+    open func deleteTargetContent(_ indexPath: IndexPath?, animated: Bool) {
         guard let indexPath = indexPath,
             indexPath.row < self.editorContents.count else { return }
         self.editorContents.remove(at: indexPath.row)
@@ -633,7 +633,7 @@ extension VEditorNode {
      - parameters:
      - node: Dismiss keyboard button node
      */
-    @discardableResult public func observeKeyboardEvent(_ node: ASControlNode?) -> Self {
+    @discardableResult open func observeKeyboardEvent(_ node: ASControlNode?) -> Self {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(VEditorNode.keyboardWillShow),
                                                name: UIResponder.keyboardWillShowNotification,
@@ -651,7 +651,7 @@ extension VEditorNode {
     /**
      Dismiss Keyboard from ActiveTextNode
      */
-    @objc public func keyboardDismissIfNeeds() {
+    @objc open func keyboardDismissIfNeeds() {
         guard let textNode = self.loadActiveTextNode() else { return }
         textNode.resignFirstResponder()
     }

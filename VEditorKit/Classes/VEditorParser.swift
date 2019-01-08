@@ -21,7 +21,7 @@ public extension Reactive where Base: VEditorParser {
     }
 }
 
-public class VEditorParser: NSObject, XMLStyler {
+public final class VEditorParser: NSObject, XMLStyler {
     
     private let parserRule: VEditorRule
     private let styleRules: [XMLStyleRule]
@@ -126,7 +126,7 @@ public class VEditorParser: NSObject, XMLStyler {
  xml: <content><p>hello <b>world</b></p><img src="~~~~" /><p>done></p></content>
  will convert to
  - [0]: <p>hello <b>world</b></p>
- - [1]: VEdiorMediaContent
+ - [1]: VEditorMediaContent
  - [2]: <p>done></p>
  */
 internal class VEditorContentParser: NSObject, XMLParserDelegate {

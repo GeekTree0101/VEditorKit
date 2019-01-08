@@ -15,6 +15,7 @@ public typealias VEditorStyle = BonMot.StringStyle
 
 // MARK: - VEditor Parser Scope
 public enum VEditorParserResultScope {
+    
     case error(Error?)
     case success([VEditorContent])
 }
@@ -22,9 +23,11 @@ public enum VEditorParserResultScope {
 // MARK: - VEditor Unit Content
 
 extension NSAttributedString: VEditorContent { }
+
 public let VEditorAttributeKey: NSAttributedString.Key = .init(rawValue: "VEditorKit.AttributeKey")
 
-public protocol VEdiorMediaContent: VEditorContent {
+public protocol VEditorMediaContent: VEditorContent {
+    
     var xmlTag: String { get }
     init(_ xmlTag: String, attributes: [String: String])
     func parseAttributeToXML() -> [String: String] // parseto xml attribute from media content
@@ -37,11 +40,12 @@ public struct VEditorPlaceholderContent: VEditorContent {
 
 // MARK: - VEditorKit Editor Rule
 public protocol VEditorRule {
+    
     var allXML: [String] { get }
     var defaultStyleXMLTag: String { get }
     var linkStyleXMLTag: String? { get }
     func paragraphStyle(_ xmlTag: String, attributes: [String: String]) -> VEditorStyle?
-    func build(_ xmlTag: String, attributes: [String: String]) -> VEdiorMediaContent?
+    func build(_ xmlTag: String, attributes: [String: String]) -> VEditorMediaContent?
     func parseAttributeToXML(_ xmlTag: String, attributes: [NSAttributedString.Key: Any]) -> [String: String]?
     
     func enableTypingXMLs(_ inActiveXML: String) -> [String]?
@@ -65,8 +69,10 @@ public protocol VEditorNodeDelegate: class {
     
     func getRegisterTypingControls() -> [VEditorTypingControlNode]?
     func dismissKeyboardNode() -> ASControlNode?
-    func placeholderCellNode(_ content: VEditorPlaceholderContent) -> VEditorMediaPlaceholderNode?
-    func contentCellNode(_ content: VEditorContent) -> ASCellNode?
+    func placeholderCellNode(_ content: VEditorPlaceholderContent,
+                             indexPath: IndexPath) -> VEditorMediaPlaceholderNode?
+    func contentCellNode(_ content: VEditorContent,
+                         indexPath: IndexPath) -> ASCellNode?
 }
 
 // MARK: - VEditor Regex Text Atttribute Apply Delegate
