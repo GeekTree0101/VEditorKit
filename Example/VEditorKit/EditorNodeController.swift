@@ -357,7 +357,7 @@ extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationCon
             content.url = videoURL
             content.height = size.height
             content.width = size.width
-            self.node.appendContent(content)
+            self.node.fetchNewContent(content, scope: .automatic)
             picker.dismiss(animated: true, completion: nil)
             return
         }
@@ -372,7 +372,7 @@ extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationCon
                 content.url = imageURL
                 content.height = imageSize.height
                 content.width = imageSize.width
-                self.node.appendContent(content)
+                self.node.fetchNewContent(content, scope: .automatic)
                 picker.dismiss(animated: true, completion: nil)
                 return
             }
