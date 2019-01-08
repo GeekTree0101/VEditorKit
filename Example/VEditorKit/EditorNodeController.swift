@@ -349,10 +349,37 @@ extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationCon
     func imagePickerController(_ picker: UIImagePickerController,
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
-        if let mediaURL = info[.referenceURL] as? URL {
-            print("DEBUG* \(mediaURL.absoluteString)")
+        if let videoURL = info[.mediaURL] as? URL,
+            case let asset = AVAsset.init(url: videoURL),
+            let size = asset.tracks.map({ $0.naturalSize }).filter({ $0 != .zero }).first {
+            
+            let content = VVideoContent.init(EditorRule.XML.video.rawValue, attributes: [:])
+            content.url = videoURL
+            content.height = size.height
+            content.width = size.width
+            self.node.appendContent(content)
+            picker.dismiss(animated: true, completion: nil)
+            return
         }
         
-        picker.dismiss(animated: true, completion: nil)
+        if #available(iOS 11.0, *) {
+            if let imageURL = info[.imageURL] as? URL,
+                let imageData = try? Data(contentsOf: imageURL, options: []),
+                let image = UIImage(data: imageData) {
+                let imageSize = image.size
+                
+                let content = VImageContent.init(EditorRule.XML.image.rawValue, attributes: [:])
+                content.url = imageURL
+                content.height = imageSize.height
+                content.width = imageSize.width
+                self.node.appendContent(content)
+                picker.dismiss(animated: true, completion: nil)
+                return
+            }
+        } else {
+            // :( i don't care
+            picker.dismiss(animated: true, completion: nil)
+        }
+        
     }
 }

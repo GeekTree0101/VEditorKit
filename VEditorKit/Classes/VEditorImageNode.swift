@@ -68,7 +68,14 @@ open class VEditorImageNode: ASCellNode {
     }
     
     @discardableResult open func setURL(_ url: URL?) -> Self {
-        self.imageNode.setURL(url, resetToDefault: true)
+        if url?.isFileURL ?? false {
+            guard let imageFileURL = url,
+                let imageData = try? Data(contentsOf: imageFileURL,
+                                          options: []) else { return self }
+            self.imageNode.image = UIImage(data: imageData)
+        } else {
+            self.imageNode.setURL(url, resetToDefault: true)
+        }
         return self
     }
     
@@ -115,23 +122,31 @@ open class VEditorImageNode: ASCellNode {
     
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let mediaRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: imageNode)
-        let mediaContentWithTextInsertionLayout =
-            ASStackLayoutSpec(direction: .vertical,
-                              spacing: 0.0,
-                              justifyContent: .start,
-                              alignItems: .stretch,
-                              children: [textInsertionNode,
-                                         mediaRatioLayout])
+        
+        let mediaContentLayout: ASLayoutElement
         
         if isEdit {
-            let deleteOverlayLayout =
-                ASOverlayLayoutSpec(child: mediaContentWithTextInsertionLayout,
-                                    overlay: deleteControlNode)
-            return ASInsetLayoutSpec(insets: insets,
-                                     child: deleteOverlayLayout)
+            mediaContentLayout = ASOverlayLayoutSpec(child: mediaRatioLayout,
+                                                     overlay: deleteControlNode)
         } else {
-            return ASInsetLayoutSpec(insets: insets,
-                                     child: mediaContentWithTextInsertionLayout)
+            mediaContentLayout = mediaRatioLayout
         }
+        
+        let imageNodeLayout: ASLayoutElement
+        
+        if isEdit {
+            imageNodeLayout =
+                ASStackLayoutSpec(direction: .vertical,
+                                  spacing: 0.0,
+                                  justifyContent: .start,
+                                  alignItems: .stretch,
+                                  children: [textInsertionNode,
+                                             mediaContentLayout])
+        } else {
+            imageNodeLayout = mediaContentLayout
+        }
+        
+        return ASInsetLayoutSpec(insets: insets,
+                                 child: imageNodeLayout)
     }
 }
