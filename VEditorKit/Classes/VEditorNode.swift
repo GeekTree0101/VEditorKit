@@ -178,6 +178,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                     .subscribe(onNext: { [weak self] indexPath in
                         self?.editorContents.remove(at: indexPath.row)
                         self?.tableNode.deleteRows(at: [indexPath], with: .automatic)
+                        self?.mergeTextContents(target: .init(row: indexPath.row - 1,
+                                                              section: indexPath.section),
+                                                to: indexPath,
+                                                animated: false)
                     })
                     .disposed(by: cellNode.disposeBag)
                 
