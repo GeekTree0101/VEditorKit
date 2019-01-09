@@ -95,7 +95,7 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .setContentInsets(Const.defaultContentInsets)
                 .setTextInsertionHeight(16.0)
                 .setURL(imageNode.url)
-                .setImageRatio(imageNode.ratio)
+                .setMediaRatio(imageNode.ratio)
                 .setPlaceholderColor(.lightGray)
                 .setBackgroundColor(.lightGray)
             
@@ -105,7 +105,7 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .setTextInsertionHeight(16.0)
                 .setAssetURL(videoNode.url)
                 .setPreviewURL(videoNode.posterURL)
-                .setVideoRatio(videoNode.ratio)
+                .setMediaRatio(videoNode.ratio)
                 .setPlaceholderColor(.lightGray)
                 .setBackgroundColor(.black)
             
