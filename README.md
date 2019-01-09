@@ -47,6 +47,9 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
   </tr>
 </table>
 
+### Memory usage (approximately 18000 chars)
+<img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/memory_usage.png"/>
+
 ## Usage
 - Wiki: https://github.com/GeekTree0101/VEditorKit/wiki
 
