@@ -24,6 +24,7 @@
 		9B7CEE8621E5C62800CA328E /* VEditorImageNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8521E5C62800CA328E /* VEditorImageNodeSpec.swift */; };
 		9B7CEE8821E5C67000CA328E /* VEditorMediaNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */; };
 		9B7CEE8A21E5CDA200CA328E /* VEditorTextStorageSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8921E5CDA200CA328E /* VEditorTextStorageSpec.swift */; };
+		9B7CEE8C21E5D70500CA328E /* VEditorTextNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8B21E5D70500CA328E /* VEditorTextNodeSpec.swift */; };
 		9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
 		9B88A6AB21DCDEC300EF3CC8 /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
 		9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
@@ -67,6 +68,7 @@
 		9B7CEE8521E5C62800CA328E /* VEditorImageNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorImageNodeSpec.swift; sourceTree = "<group>"; };
 		9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorMediaNodeSpec.swift; sourceTree = "<group>"; };
 		9B7CEE8921E5CDA200CA328E /* VEditorTextStorageSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTextStorageSpec.swift; sourceTree = "<group>"; };
+		9B7CEE8B21E5D70500CA328E /* VEditorTextNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTextNodeSpec.swift; sourceTree = "<group>"; };
 		9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorControlAreaNode.swift; sourceTree = "<group>"; };
 		9B88A6AA21DCDEC300EF3CC8 /* content.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = content.xml; sourceTree = "<group>"; };
 		9BE5C47A21E310D5009EF52B /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockService.swift; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 				9B7CEE8521E5C62800CA328E /* VEditorImageNodeSpec.swift */,
 				9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */,
 				9B7CEE8921E5CDA200CA328E /* VEditorTextStorageSpec.swift */,
+				9B7CEE8B21E5D70500CA328E /* VEditorTextNodeSpec.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -442,6 +445,7 @@
 				9B457E1221DE0C5C00391EC9 /* EditorRule.swift in Sources */,
 				9B7CEE8421E5C42800CA328E /* VEditorVideoNodeSpec.swift in Sources */,
 				9B7CEE8221E5C22200CA328E /* VEditorTypingControlNodeSpec.swift in Sources */,
+				9B7CEE8C21E5D70500CA328E /* VEditorTextNodeSpec.swift in Sources */,
 				9B7CEE7E21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift in Sources */,
 				9B7CEE8021E5C08600CA328E /* VEditorTextCellNodeSpec.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* VEditorParserSpec.swift in Sources */,

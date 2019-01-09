@@ -1,7 +1,14 @@
+//
+//  VEditorDeleteMediaNode.swift
+//  VEditorKit
+//
+//  Created by Geektree0101 on 01/02/19.
+//  Copyright © 2019 Geektree0101. All rights reserved.
+//
+
 import AsyncDisplayKit
 import RxCocoa
 import RxSwift
-
 
 open class VEditorDeleteMediaNode: ASControlNode {
     

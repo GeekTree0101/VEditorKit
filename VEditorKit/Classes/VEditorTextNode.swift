@@ -170,14 +170,15 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         }
     }
     
-    open func forceFetchCurrentLocationAttribute() {
+    @discardableResult open func forceFetchCurrentLocationAttribute() -> [String]? {
         let attributes = self.textStorage?
             .attributes(at: max(self.selectedRange.location - 1, 0),
                         effectiveRange: nil)
         guard let xmlTags = attributes?[VEditorAttributeKey] as? [String] else {
-            return
+            return nil
         }
         self.currentLocationXMLTagsRelay.accept(xmlTags)
+        return xmlTags
     }
     
     open func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
