@@ -11,142 +11,62 @@ import AsyncDisplayKit
 import RxCocoa
 import RxSwift
 
-extension Reactive where Base: VEditorImageNode {
-    
-    /**
-     Delete imageNode event
-     */
-    public var didTapDelete: Observable<Void> {
-        return base.deleteControlNode.rx.didTapDelete
-    }
-    
-    /**
-     Text insertion event
-     */
-    public var didTapTextInsert: Observable<IndexPath> {
-        return base.textInsertionRelay.asObservable()
-    }
-}
-
-open class VEditorImageNode: ASCellNode {
-    
-    public lazy var imageNode = ASNetworkImageNode()
-    
-    public lazy var textInsertionNode: ASControlNode = {
-        let node = ASControlNode()
-        node.backgroundColor = .clear
-        node.style.height = .init(unit: .points, value: 5.0)
-        return node
-    }()
-    
-    public lazy var deleteControlNode: VEditorDeleteMediaNode =
-        .init(.red, deleteIconImage: nil)
-    
-    public let textInsertionRelay = PublishRelay<IndexPath>()
-    public var insets: UIEdgeInsets = .zero
-    public var isEdit: Bool = true
-    public var ratio: CGFloat = 1.0
-    public let disposeBag = DisposeBag()
+open class VEditorImageNode: VEditorMediaNode<ASNetworkImageNode> {
     
     public required init(isEdit: Bool) {
-        self.isEdit = isEdit
-        super.init()
-        self.imageNode.backgroundColor = .lightGray
-        self.imageNode.placeholderColor = .lightGray
+        super.init(node: .init(), isEdit: isEdit)
+        self.node.backgroundColor = .lightGray
+        self.node.placeholderColor = .lightGray
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
     }
     
-    @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
-        self.insets = insets
-        return self
+    public required init(node: ASNetworkImageNode, isEdit: Bool) {
+        fatalError("init(node:isEdit:) has not been implemented")
     }
     
-    @discardableResult open func setTextInsertionHeight(_ height: CGFloat) -> Self {
-        self.textInsertionNode.style.height = .init(unit: .points, value: height)
-        return self
-    }
-    
+    /**
+     Set image url
+     
+     - important: If you set filePath url than will load data from filepath with make image
+     
+     - parameters:
+     - url: image network url or filepath local url
+     - returns: self (VEditorImageNode)
+     */
     @discardableResult open func setURL(_ url: URL?) -> Self {
         if url?.isFileURL ?? false {
             guard let imageFileURL = url,
                 let imageData = try? Data(contentsOf: imageFileURL,
                                           options: []) else { return self }
-            self.imageNode.image = UIImage(data: imageData)
+            self.node.image = UIImage(data: imageData)
         } else {
-            self.imageNode.setURL(url, resetToDefault: true)
+            self.node.setURL(url, resetToDefault: true)
         }
         return self
     }
     
-    @discardableResult open func setImageRatio(_ ratio: CGFloat) -> Self {
-        self.ratio = ratio
-        return self
-    }
-    
+    /**
+     Set imageNode placeholder color
+     
+     - parameters:
+     - color: placeholder color, default is lightGray
+     - returns: self (VEditorImageNode)
+     */
     @discardableResult open func setPlaceholderColor(_ color: UIColor) -> Self {
-        self.imageNode.placeholderColor = color
+        self.node.placeholderColor = color
         return self
     }
     
+    /**
+     Set imageNode background color
+     
+     - parameters:
+     - color: background color, default is lightGray
+     - returns: self (VEditorImageNode)
+     */
     @discardableResult open func setBackgroundColor(_ color: UIColor) -> Self {
-        self.imageNode.backgroundColor = color
+        self.node.backgroundColor = color
         return self
-    }
-    
-    override open func didLoad() {
-        super.didLoad()
-        guard self.isEdit else { return }
-        self.deleteControlNode.isHidden = true
-        imageNode.addTarget(self,
-                            action: #selector(didTapImage),
-                            forControlEvents: .touchUpInside)
-        deleteControlNode.addTarget(self,
-                                    action: #selector(didTapImage),
-                                    forControlEvents: .touchUpInside)
-        textInsertionNode.addTarget(self,
-                                    action: #selector(didTapTextInsertion),
-                                    forControlEvents: .touchUpInside)
-    }
-    
-    @objc public func didTapTextInsertion() {
-        guard let indexPath = self.indexPath else { return }
-        self.textInsertionRelay.accept(indexPath)
-    }
-    
-    @objc public func didTapImage() {
-        guard self.isEdit else { return }
-        self.deleteControlNode.isHidden = !self.deleteControlNode.isHidden
-        self.setNeedsLayout()
-    }
-    
-    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        let mediaRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: imageNode)
-        
-        let mediaContentLayout: ASLayoutElement
-        
-        if isEdit {
-            mediaContentLayout = ASOverlayLayoutSpec(child: mediaRatioLayout,
-                                                     overlay: deleteControlNode)
-        } else {
-            mediaContentLayout = mediaRatioLayout
-        }
-        
-        let imageNodeLayout: ASLayoutElement
-        
-        if isEdit {
-            imageNodeLayout =
-                ASStackLayoutSpec(direction: .vertical,
-                                  spacing: 0.0,
-                                  justifyContent: .start,
-                                  alignItems: .stretch,
-                                  children: [textInsertionNode,
-                                             mediaContentLayout])
-        } else {
-            imageNodeLayout = mediaContentLayout
-        }
-        
-        return ASInsetLayoutSpec(insets: insets,
-                                 child: imageNodeLayout)
     }
 }

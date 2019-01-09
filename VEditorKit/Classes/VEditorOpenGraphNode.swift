@@ -14,8 +14,8 @@ import RxCocoa
 
 extension Reactive where Base: VEditorOpenGraphNode {
 
-    public var didTapDelete: Observable<Void> {
-        return base.deleteControlNode.rx.didTapDelete
+    public var didTapDelete: Observable<IndexPath> {
+        return base.didTapDeleteRelay.asObservable()
     }
 }
 
@@ -65,6 +65,7 @@ open class VEditorOpenGraphNode: ASCellNode {
     public var contentSpacing: CGFloat = 5.0
     public var imageWithContentSpacing: CGFloat = 5.0
     public var disposeBag = DisposeBag()
+    public let didTapDeleteRelay = PublishRelay<IndexPath>()
     
     public required init(isEdit: Bool) {
         self.isEdit = isEdit
@@ -82,6 +83,15 @@ open class VEditorOpenGraphNode: ASCellNode {
         self.deleteControlNode.isHidden = true
         containerNode.addTarget(self, action: #selector(didTapOpengraph), forControlEvents: .touchUpInside)
         deleteControlNode.addTarget(self, action: #selector(didTapOpengraph), forControlEvents: .touchUpInside)
+        deleteControlNode.deleteButtonNode
+            .addTarget(self,
+                       action: #selector(didTapDelete),
+                       forControlEvents: .touchUpInside)
+    }
+    
+    @objc func didTapDelete() {
+        guard let indexPath = self.indexPath else { return }
+        self.didTapDeleteRelay.accept(indexPath)
     }
     
     @objc public func didTapOpengraph() {

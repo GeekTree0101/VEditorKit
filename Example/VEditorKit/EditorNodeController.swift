@@ -82,18 +82,16 @@ extension EditorNodeController: VEditorNodeDelegate {
         case let text as NSAttributedString:
             let placeholderText: NSAttributedString? =
                 indexPath.row == 0 ? "Insert text...".styled(with: Const.placeholderTextStyle): nil
-            let cellNode = VEditorTextCellNode(isEdit: isEditMode,
-                                               placeholderText: placeholderText,
-                                               attributedText: text,
-                                               rule: self.node.editorRule)
+            return VEditorTextCellNode(isEdit: isEditMode,
+                                       placeholderText: placeholderText,
+                                       attributedText: text,
+                                       rule: self.node.editorRule,
+                                       regexDelegate: self,
+                                       automaticallyGenerateLinkPreview: true)
                 .setContentInsets(Const.defaultContentInsets)
             
-            cellNode.textNode.regexDelegate = self
-            cellNode.textNode.automaticallyGenerateLinkPreview = true
-            
-            return cellNode
         case let imageNode as VImageContent:
-            let cellNode = VEditorImageNode(isEdit: isEditMode)
+            return VEditorImageNode(isEdit: isEditMode)
                 .setContentInsets(Const.defaultContentInsets)
                 .setTextInsertionHeight(16.0)
                 .setURL(imageNode.url)
@@ -101,20 +99,8 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .setPlaceholderColor(.lightGray)
                 .setBackgroundColor(.lightGray)
             
-            cellNode.rx.didTapDelete
-                .map({ [weak cellNode] () -> IndexPath? in
-                    return cellNode?.indexPath
-                })
-                .bind(to: self.node.rx.deleteContent(animated: true))
-                .disposed(by: cellNode.disposeBag)
-            
-            cellNode.rx.didTapTextInsert
-                .bind(to: self.node.rx.insertText())
-                .disposed(by: cellNode.disposeBag)
-            
-            return cellNode
         case let videoNode as VVideoContent:
-            let cellNode = VEditorVideoNode(isEdit: isEditMode)
+            return VEditorVideoNode(isEdit: isEditMode)
                 .setContentInsets(Const.defaultContentInsets)
                 .setTextInsertionHeight(16.0)
                 .setAssetURL(videoNode.url)
@@ -123,19 +109,8 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .setPlaceholderColor(.lightGray)
                 .setBackgroundColor(.black)
             
-            cellNode.rx.didTapDelete
-                .map({ [weak cellNode] () -> IndexPath? in
-                    return cellNode?.indexPath
-                })
-                .bind(to: self.node.rx.deleteContent(animated: true))
-                .disposed(by: cellNode.disposeBag)
-            
-            cellNode.rx.didTapTextInsert
-                .bind(to: self.node.rx.insertText())
-                .disposed(by: cellNode.disposeBag)
-            
-            return cellNode
         case let ogObjectNode as VOpenGraphContent:
+            // custom media content example
             let cellNode = VEditorOpenGraphNode(isEdit: isEditMode)
                 .setContentInsets(Const.ogObjectContainerInsets)
                 .setContainerInsets(Const.ogObjectContainerInsets)
@@ -156,9 +131,6 @@ extension EditorNodeController: VEditorNodeDelegate {
                                                       .underline(.single, .gray)]))
             
             cellNode.rx.didTapDelete
-                .map({ [weak cellNode] () -> IndexPath? in
-                    return cellNode?.indexPath
-                })
                 .bind(to: self.node.rx.deleteContent(animated: true))
                 .disposed(by: cellNode.disposeBag)
             
@@ -357,8 +329,9 @@ extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationCon
             content.url = videoURL
             content.height = size.height
             content.width = size.width
-            self.node.fetchNewContent(content, scope: .automatic)
-            picker.dismiss(animated: true, completion: nil)
+            picker.dismiss(animated: true, completion: {
+                self.node.fetchNewContent(content, scope: .automatic)
+            })
             return
         }
         
@@ -372,8 +345,9 @@ extension EditorNodeController: UIImagePickerControllerDelegate, UINavigationCon
                 content.url = imageURL
                 content.height = imageSize.height
                 content.width = imageSize.width
-                self.node.fetchNewContent(content, scope: .automatic)
-                picker.dismiss(animated: true, completion: nil)
+                picker.dismiss(animated: true, completion: {
+                    self.node.fetchNewContent(content, scope: .automatic)
+                })
                 return
             }
         } else {

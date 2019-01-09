@@ -2,16 +2,10 @@ import AsyncDisplayKit
 import RxCocoa
 import RxSwift
 
-extension Reactive where Base: VEditorDeleteMediaNode {
-    
-    public var didTapDelete: Observable<Void> {
-        return base.didTapDeleteRelay.asObservable()
-    }
-}
 
 open class VEditorDeleteMediaNode: ASControlNode {
     
-    lazy var deleteButtonNode: ASControlNode = {
+    open lazy var deleteButtonNode: ASControlNode = {
         let node = ASControlNode()
         node.cornerRadius = 5.0
         node.backgroundColor = self.deleteColor
@@ -19,7 +13,7 @@ open class VEditorDeleteMediaNode: ASControlNode {
         return node
     }()
     
-    lazy var closeIconNode: ASImageNode = {
+    open lazy var closeIconNode: ASImageNode = {
         let node = ASImageNode()
         node.isUserInteractionEnabled = false
         node.backgroundColor = .white
@@ -28,9 +22,8 @@ open class VEditorDeleteMediaNode: ASControlNode {
         return node
     }()
     
-    private let deleteColor: UIColor
-    private let deleteIconImage: UIImage?
-    internal let didTapDeleteRelay = PublishRelay<Void>()
+    open let deleteColor: UIColor
+    open let deleteIconImage: UIImage?
     
     public init(_ color: UIColor, deleteIconImage: UIImage?) {
         self.deleteColor = color
@@ -39,17 +32,6 @@ open class VEditorDeleteMediaNode: ASControlNode {
         self.borderWidth = 5.0
         self.borderColor = deleteColor.cgColor
         self.automaticallyManagesSubnodes = true
-    }
-    
-    override open func didLoad() {
-        super.didLoad()
-        deleteButtonNode.addTarget(self,
-                                   action: #selector(didTapDeleteButton),
-                                   forControlEvents: .touchUpInside)
-    }
-    
-    @objc open func didTapDeleteButton() {
-        self.didTapDeleteRelay.accept(())
     }
     
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {

@@ -55,12 +55,22 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     open var automaticallyGenerateLinkPreview: Bool = false
     open let becomeActiveRelay = PublishRelay<Void>()
     
+    open var linkRegexPattern: String? {
+        // default: "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
+        get {
+            return self.textStorage?.urlPattern
+        }
+        set(pattern) {
+            guard let pattern = pattern else { return }
+            self.textStorage?.urlPattern = pattern
+        }
+    }
+    
     internal let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
     internal let caretRectRelay = PublishRelay<CGRect>()
     internal let generateLinkPreviewRelay = PublishRelay<(URL, Int)>()
     internal let textEmptiedRelay = PublishRelay<Void>()
-    
     
     public required init(_ rule: VEditorRule,
                          isEdit: Bool,
@@ -106,6 +116,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         }
         // NOTE: Unsyncronized frame height between storage with viewFrame
         self.setNeedsLayout()
+        self.supernode?.setNeedsLayout()
     }
     
     open func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
@@ -127,6 +138,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
             self.generateLinkPreviewRelay.accept(context)
             return false
         }
+        
         return true
     }
     
@@ -141,7 +153,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
                             effectiveRange: nil)
             
             // NOTE: Block current location attributes during drag-selection
-            guard fromSelectedRange.length < 1 else { return }
+            guard toSelectedRange.length < 1 else { return }
             
             guard let xmlTags = attributes?[VEditorAttributeKey] as? [String] else {
                 return
@@ -170,6 +182,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     open func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
         self.textStorage?.didUpdateText(self)
+        
         guard self.isDisplayingPlaceholder() else { return }
         self.textEmptiedRelay.accept(())
     }
