@@ -193,8 +193,9 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                                         return ASCellNode()
                 }
                 
-                if let textCellNode = cellNode as? VEditorTextCellNode,
-                    textCellNode.isEdit {
+                switch cellNode {
+                case let textCellNode as VEditorTextCellNode:
+                    guard textCellNode.isEdit else { break }
                     
                     textCellNode.rx.becomeActive
                         .subscribe(onNext: { [weak self, weak textCellNode] _ in
@@ -202,6 +203,18 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                             self?.fetchNewActiveTextNode(node)
                         })
                         .disposed(by: textCellNode.disposeBag)
+                case let mediaCellNode as VEditorMediaNodeEventProtocol:
+                    guard mediaCellNode.isEdit else { break }
+                    
+                    mediaCellNode.didTapDeleteObservable
+                        .bind(to: self.rx.deleteContent(animated: true))
+                        .disposed(by: mediaCellNode.disposeBag)
+                    
+                    mediaCellNode.didTapTextInsertObservable
+                        .bind(to: self.rx.insertText())
+                        .disposed(by: mediaCellNode.disposeBag)
+                default:
+                    break
                 }
                 
                 return cellNode

@@ -11,157 +11,114 @@ import AsyncDisplayKit
 import RxSwift
 import RxCocoa
 
-extension Reactive where Base: VEditorVideoNode {
+open class VEditorVideoNode: VEditorMediaNode<ASVideoNode> {
     
-    /**
-     Delete imageNode event
-     */
-    public var didTapDelete: Observable<Void> {
-        return base.deleteControlNode.rx.didTapDelete
-    }
-    
-    /**
-     Text insertion event
-    */
-    public var didTapTextInsert: Observable<IndexPath> {
-        return base.textInsertionRelay.asObservable()
-    }
-}
-
-open class VEditorVideoNode: ASCellNode {
-    
-    public lazy var videoNode: ASVideoNode = {
-        let node = ASVideoNode()
-        node.backgroundColor = .black
-        node.shouldAutoplay = false
-        return node
-    }()
-    
-    public lazy var textInsertionNode: ASControlNode = {
-        let node = ASControlNode()
-        node.backgroundColor = .clear
-        node.style.height = .init(unit: .points, value: 5.0)
-        return node
-    }()
-    
-    public lazy var deleteControlNode: VEditorDeleteMediaNode =
-        .init(.red, deleteIconImage: nil)
-    
-    public let textInsertionRelay = PublishRelay<IndexPath>()
-    public var insets: UIEdgeInsets = .zero
-    public var isEdit: Bool = true
-    public var ratio: CGFloat = 1.0
     public var assetURL: URL?
     public var posterURL: URL?
     public var videoAsset: AVAsset? {
         guard let url = assetURL else { return nil }
         return AVURLAsset(url: url)
     }
-    public let disposeBag = DisposeBag()
     
     public required init(isEdit: Bool) {
-        self.isEdit = isEdit
-        super.init()
+        super.init(node: .init(), isEdit: isEdit)
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
-        self.videoNode.backgroundColor = .lightGray
-        self.videoNode.placeholderColor = .lightGray
+        self.node.backgroundColor = .black
+        self.node.shouldAutoplay = false
+        self.node.backgroundColor = .lightGray
+        self.node.placeholderColor = .lightGray
     }
     
-    @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
-        self.insets = insets
-        return self
+    public required init(node: ASVideoNode, isEdit: Bool) {
+        fatalError("init(node:isEdit:) has not been implemented")
     }
     
-    @discardableResult open func setTextInsertionHeight(_ height: CGFloat) -> Self {
-        self.textInsertionNode.style.height = .init(unit: .points, value: height)
-        return self
-    }
-    
+    /**
+     Set video preview image url
+     
+     - parameters:
+     - url: video preview image url
+     - returns: self (VEditorVideoNode)
+     */
     @discardableResult open func setPreviewURL(_ url: URL?) -> Self {
-        self.videoNode.setURL(url, resetToDefault: true)
+        self.node.setURL(url, resetToDefault: true)
         return self
     }
     
+    /**
+     Set video asset url
+     
+     - parameters:
+     - url: video asset url
+     - returns: self (VEditorVideoNode)
+     */
     @discardableResult open func setAssetURL(_ url: URL?) -> Self {
         self.assetURL = url
         return self
     }
     
+    /**
+     Set video gravity
+     
+     - parameters:
+     - gravity: video gravity
+     - returns: self (VEditorVideoNode)
+     */
+    @discardableResult open func setGravity(_ gravity: AVLayerVideoGravity) -> Self {
+        self.node.contentsGravity = gravity.rawValue
+        return self
+    }
+    
+    /**
+     Set video ratio
+     
+     - parameters:
+     - ratop: video ratio
+     - returns: self (VEditorVideoNode)
+     */
     @discardableResult open func setVideoRatio(_ ratio: CGFloat) -> Self {
         self.ratio = ratio
         return self
     }
     
+    /**
+     Set video placeholder color
+     
+     - parameters:
+     - color: video placeholder color
+     - returns: self (VEditorVideoNode)
+     */
     @discardableResult open func setPlaceholderColor(_ color: UIColor) -> Self {
-        self.videoNode.placeholderColor = color
+        self.node.placeholderColor = color
         return self
     }
     
+    /**
+     Set video background color
+     
+     - parameters:
+     - color: video background color
+     - returns: self (VEditorVideoNode)
+     */
     @discardableResult open func setBackgroundColor(_ color: UIColor) -> Self {
-        self.videoNode.backgroundColor = color
+        self.node.backgroundColor = color
         return self
     }
     
     override open func didLoad() {
         super.didLoad()
-        self.videoNode.asset = self.videoAsset
-        guard self.isEdit else { return }
-        self.deleteControlNode.isHidden = true
-        videoNode.addTarget(self,
-                            action: #selector(didTapVideo),
-                            forControlEvents: .touchUpInside)
-        deleteControlNode.addTarget(self,
-                                    action: #selector(didTapVideo),
-                                    forControlEvents: .touchUpInside)
-        textInsertionNode.addTarget(self,
-                                    action: #selector(didTapTextInsertion),
-                                    forControlEvents: .touchUpInside)
+        self.node.asset = self.videoAsset
     }
     
-    @objc public func didTapVideo() {
+    @objc override open func didTapMedia() {
+        super.didTapMedia()
         guard self.isEdit else { return }
-        self.deleteControlNode.isHidden = !self.deleteControlNode.isHidden
+        
         if self.deleteControlNode.isHidden {
-            self.videoNode.pause()
+            self.node.pause()
         } else {
-            self.videoNode.play()
+            self.node.play()
         }
-        self.setNeedsLayout()
-    }
-    
-    @objc public func didTapTextInsertion() {
-        guard let indexPath = self.indexPath else { return }
-        self.textInsertionRelay.accept(indexPath)
-    }
-    
-    override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        let mediaRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: videoNode)
-        
-        let mediaContentLayout: ASLayoutElement
-        
-        if isEdit {
-            mediaContentLayout = ASOverlayLayoutSpec(child: mediaRatioLayout,
-                                                     overlay: deleteControlNode)
-        } else {
-            mediaContentLayout = mediaRatioLayout
-        }
-        
-        let videoNodeLayout: ASLayoutElement
-        
-        if isEdit {
-            videoNodeLayout =
-                ASStackLayoutSpec(direction: .vertical,
-                                  spacing: 0.0,
-                                  justifyContent: .start,
-                                  alignItems: .stretch,
-                                  children: [textInsertionNode,
-                                             mediaContentLayout])
-        } else {
-            videoNodeLayout = mediaContentLayout
-        }
-        
-        return ASInsetLayoutSpec(insets: insets,
-                                 child: videoNodeLayout)
     }
 }

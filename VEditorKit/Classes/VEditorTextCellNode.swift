@@ -28,12 +28,16 @@ open class VEditorTextCellNode: ASCellNode {
     public required init(isEdit: Bool,
                          placeholderText: NSAttributedString?,
                          attributedText: NSAttributedString,
-                         rule: VEditorRule) {
+                         rule: VEditorRule,
+                         regexDelegate: VEditorRegexApplierDelegate? = nil,
+                         automaticallyGenerateLinkPreview: Bool = false) {
         self.isEdit = isEdit
         self.textNode = VEditorTextNode(rule,
                                         isEdit: isEdit,
                                         placeholderText: placeholderText,
                                         attributedText: attributedText)
+        self.textNode.regexDelegate = regexDelegate
+        self.textNode.automaticallyGenerateLinkPreview = automaticallyGenerateLinkPreview
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
