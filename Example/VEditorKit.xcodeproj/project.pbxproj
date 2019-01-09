@@ -27,6 +27,11 @@
 		9B7CEE8C21E5D70500CA328E /* VEditorTextNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8B21E5D70500CA328E /* VEditorTextNodeSpec.swift */; };
 		9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
 		9B88A6AB21DCDEC300EF3CC8 /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
+		9BB5832721E5E13D0036C9FE /* VEditorNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BB5832621E5E13D0036C9FE /* VEditorNodeSpec.swift */; };
+		9BB5832821E5E1AA0036C9FE /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
+		9BB5832921E5E3EC0036C9FE /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */; };
+		9BB5832A21E5E4730036C9FE /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
+		9BB5832B21E5E4C80036C9FE /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
 		9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
 		9BE5C47F21E32168009EF52B /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */; };
 		C191B86EDFC34EB0AF1131BD /* Pods_VEditorKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48D26DEF356E2D9A26CBD914 /* Pods_VEditorKit_Tests.framework */; };
@@ -71,6 +76,7 @@
 		9B7CEE8B21E5D70500CA328E /* VEditorTextNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTextNodeSpec.swift; sourceTree = "<group>"; };
 		9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorControlAreaNode.swift; sourceTree = "<group>"; };
 		9B88A6AA21DCDEC300EF3CC8 /* content.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = content.xml; sourceTree = "<group>"; };
+		9BB5832621E5E13D0036C9FE /* VEditorNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorNodeSpec.swift; sourceTree = "<group>"; };
 		9BE5C47A21E310D5009EF52B /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockService.swift; sourceTree = "<group>"; };
 		9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorOpenGraphPlaceholder.swift; sourceTree = "<group>"; };
 		C3E3AB57DFE5DE8299572A7A /* Pods-VEditorKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Tests/Pods-VEditorKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -169,6 +175,7 @@
 				9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */,
 				9B7CEE8921E5CDA200CA328E /* VEditorTextStorageSpec.swift */,
 				9B7CEE8B21E5D70500CA328E /* VEditorTextNodeSpec.swift */,
+				9BB5832621E5E13D0036C9FE /* VEditorNodeSpec.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -301,6 +308,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9BB5832B21E5E4C80036C9FE /* content.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -448,10 +456,14 @@
 				9B7CEE8C21E5D70500CA328E /* VEditorTextNodeSpec.swift in Sources */,
 				9B7CEE7E21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift in Sources */,
 				9B7CEE8021E5C08600CA328E /* VEditorTextCellNodeSpec.swift in Sources */,
+				9BB5832921E5E3EC0036C9FE /* EditorOpenGraphPlaceholder.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* VEditorParserSpec.swift in Sources */,
 				9B7CEE8621E5C62800CA328E /* VEditorImageNodeSpec.swift in Sources */,
 				9B7CEE8A21E5CDA200CA328E /* VEditorTextStorageSpec.swift in Sources */,
 				9B7CEE8821E5C67000CA328E /* VEditorMediaNodeSpec.swift in Sources */,
+				9BB5832A21E5E4730036C9FE /* MockService.swift in Sources */,
+				9BB5832821E5E1AA0036C9FE /* EditorControlAreaNode.swift in Sources */,
+				9BB5832721E5E13D0036C9FE /* VEditorNodeSpec.swift in Sources */,
 				9B457E1821DEFCDA00391EC9 /* VEditorXMLBuilderSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

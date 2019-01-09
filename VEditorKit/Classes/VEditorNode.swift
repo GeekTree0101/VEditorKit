@@ -101,6 +101,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         self.editorRule = editorRule
         super.init()
         self.automaticallyManagesSubnodes = true
+        self.automaticallyRelayoutOnSafeAreaChanges = true
         self.backgroundColor = .white
     }
     
@@ -366,14 +367,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             fatalError("VEditorFatalError: Do not pass NSAttributedString on content parameter")
         }
         
-        if editorContents.count == indexPath.row + 1 {
-            self.editorContents.append(contentsOf: contents)
-        } else{
-            self.editorContents.insert(contentsOf: contents, at: indexPath.row + 1)
-        }
+        self.editorContents.insert(contentsOf: contents, at: indexPath.row)
         
         let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
-            return .init(row: indexPath.row + 1 + index, section: indexPath.section)
+            return .init(row: indexPath.row + index, section: indexPath.section)
         })
         
         self.tableNode.performBatchUpdates({
@@ -846,13 +843,13 @@ extension VEditorNode {
             if let activeTextNode = self.activeTextNode {
                 return .splitIndex(activeTextNode.selectedRange.location)
             } else {
-                let lastIndex: Int = max(0, self.editorContents.count - 1)
+                let lastIndex: Int = max(0, self.editorContents.count)
                 return .indexPath(.init(row: lastIndex, section: section))
             }
         case .first:
             return .indexPath(.init(row: 0, section: section))
         case .last:
-            let lastIndex: Int = max(0, self.editorContents.count - 1)
+            let lastIndex: Int = max(0, self.editorContents.count)
             return .indexPath(.init(row: lastIndex, section: section))
         case .insert(let indexPath):
             return .indexPath(indexPath)
