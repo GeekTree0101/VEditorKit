@@ -75,10 +75,18 @@ public final class VEditorParser: NSObject, XMLStyler {
                 
                 // *** Merge topStyle cached xmlTags list with current xmlTag ***
                 if let cachedXmlTags = currentStyle.attributes[VEditorAttributeKey] as? [String],
-                    cachedXmlTags.contains(name) {
+                    !cachedXmlTags.contains(name) {
                     mutableStyle.add(extraAttributes: [VEditorAttributeKey: [name] + cachedXmlTags])
                 } else {
                     mutableStyle.add(extraAttributes: [VEditorAttributeKey: [name]])
+                }
+                
+                // *** In many kinds of xmlTags contained case, remove default XMLTag
+                if let cachedXmlTags = mutableStyle.attributes[VEditorAttributeKey] as? [String],
+                    cachedXmlTags.count > 1,
+                    cachedXmlTags.contains(parserRule.defaultStyleXMLTag) {
+                    let defaultXMLFilteredXMLTags = cachedXmlTags.filter({ $0 != parserRule.defaultStyleXMLTag })
+                    mutableStyle.add(extraAttributes: [VEditorAttributeKey: defaultXMLFilteredXMLTags])
                 }
                 
                 return mutableStyle
