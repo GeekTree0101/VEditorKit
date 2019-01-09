@@ -71,18 +71,6 @@ open class VEditorVideoNode: VEditorMediaNode<ASVideoNode> {
     }
     
     /**
-     Set video ratio
-     
-     - parameters:
-     - ratop: video ratio
-     - returns: self (VEditorVideoNode)
-     */
-    @discardableResult open func setVideoRatio(_ ratio: CGFloat) -> Self {
-        self.ratio = ratio
-        return self
-    }
-    
-    /**
      Set video placeholder color
      
      - parameters:

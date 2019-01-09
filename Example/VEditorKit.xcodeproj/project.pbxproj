@@ -17,6 +17,12 @@
 		9B457E1221DE0C5C00391EC9 /* EditorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1021DE063400391EC9 /* EditorRule.swift */; };
 		9B457E1821DEFCDA00391EC9 /* VEditorXMLBuilderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */; };
 		9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1921DF030300391EC9 /* XMLViewController.swift */; };
+		9B7CEE7E21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE7D21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift */; };
+		9B7CEE8021E5C08600CA328E /* VEditorTextCellNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE7F21E5C08600CA328E /* VEditorTextCellNodeSpec.swift */; };
+		9B7CEE8221E5C22200CA328E /* VEditorTypingControlNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8121E5C22200CA328E /* VEditorTypingControlNodeSpec.swift */; };
+		9B7CEE8421E5C42800CA328E /* VEditorVideoNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8321E5C42800CA328E /* VEditorVideoNodeSpec.swift */; };
+		9B7CEE8621E5C62800CA328E /* VEditorImageNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8521E5C62800CA328E /* VEditorImageNodeSpec.swift */; };
+		9B7CEE8821E5C67000CA328E /* VEditorMediaNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */; };
 		9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
 		9B88A6AB21DCDEC300EF3CC8 /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
 		9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
@@ -53,6 +59,12 @@
 		9B457E1021DE063400391EC9 /* EditorRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorRule.swift; sourceTree = "<group>"; };
 		9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorXMLBuilderSpec.swift; sourceTree = "<group>"; };
 		9B457E1921DF030300391EC9 /* XMLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLViewController.swift; sourceTree = "<group>"; };
+		9B7CEE7D21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorMediaPlaceholderNodeSpec.swift; sourceTree = "<group>"; };
+		9B7CEE7F21E5C08600CA328E /* VEditorTextCellNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTextCellNodeSpec.swift; sourceTree = "<group>"; };
+		9B7CEE8121E5C22200CA328E /* VEditorTypingControlNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTypingControlNodeSpec.swift; sourceTree = "<group>"; };
+		9B7CEE8321E5C42800CA328E /* VEditorVideoNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorVideoNodeSpec.swift; sourceTree = "<group>"; };
+		9B7CEE8521E5C62800CA328E /* VEditorImageNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorImageNodeSpec.swift; sourceTree = "<group>"; };
+		9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorMediaNodeSpec.swift; sourceTree = "<group>"; };
 		9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorControlAreaNode.swift; sourceTree = "<group>"; };
 		9B88A6AA21DCDEC300EF3CC8 /* content.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = content.xml; sourceTree = "<group>"; };
 		9BE5C47A21E310D5009EF52B /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockService.swift; sourceTree = "<group>"; };
@@ -145,6 +157,12 @@
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 				607FACEB1AFB9204008FA782 /* VEditorParserSpec.swift */,
 				9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */,
+				9B7CEE8121E5C22200CA328E /* VEditorTypingControlNodeSpec.swift */,
+				9B7CEE7D21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift */,
+				9B7CEE7F21E5C08600CA328E /* VEditorTextCellNodeSpec.swift */,
+				9B7CEE8321E5C42800CA328E /* VEditorVideoNodeSpec.swift */,
+				9B7CEE8521E5C62800CA328E /* VEditorImageNodeSpec.swift */,
+				9B7CEE8721E5C67000CA328E /* VEditorMediaNodeSpec.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -419,7 +437,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				9B457E1221DE0C5C00391EC9 /* EditorRule.swift in Sources */,
+				9B7CEE8421E5C42800CA328E /* VEditorVideoNodeSpec.swift in Sources */,
+				9B7CEE8221E5C22200CA328E /* VEditorTypingControlNodeSpec.swift in Sources */,
+				9B7CEE7E21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift in Sources */,
+				9B7CEE8021E5C08600CA328E /* VEditorTextCellNodeSpec.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* VEditorParserSpec.swift in Sources */,
+				9B7CEE8621E5C62800CA328E /* VEditorImageNodeSpec.swift in Sources */,
+				9B7CEE8821E5C67000CA328E /* VEditorMediaNodeSpec.swift in Sources */,
 				9B457E1821DEFCDA00391EC9 /* VEditorXMLBuilderSpec.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

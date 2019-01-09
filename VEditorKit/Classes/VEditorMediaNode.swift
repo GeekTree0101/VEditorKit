@@ -33,8 +33,11 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
         return node
     }()
     
-    open lazy var deleteControlNode: VEditorDeleteMediaNode =
-        .init(.red, deleteIconImage: nil)
+    open lazy var deleteControlNode: VEditorDeleteMediaNode = {
+        let node = VEditorDeleteMediaNode(.red, deleteIconImage: nil)
+        node.isHidden = true
+        return node
+    }()
     
     public let textInsertionRelay = PublishRelay<IndexPath>()
     public let didTapDeleteRelay = PublishRelay<IndexPath>()
@@ -60,16 +63,37 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
         self.selectionStyle = .none
     }
     
+    /**
+     Set insets
+     
+     - parameters:
+     - insets: update insets
+     - returns: self (VEditorMediaNode or subclass)
+     */
     @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
         self.insets = insets
         return self
     }
     
-    @discardableResult open func setImageRatio(_ ratio: CGFloat) -> Self {
+    /**
+     Set media node ratio
+     
+     - parameters:
+     - ratio: update media node ratio
+     - returns: self (VEditorMediaNode or subclass)
+     */
+    @discardableResult open func setMediaRatio(_ ratio: CGFloat) -> Self {
         self.ratio = ratio
         return self
     }
     
+    /**
+     Set text insertion area height
+     
+     - parameters:
+     - height: touch area height
+     - returns: self (VEditorMediaNode or subclass)
+     */
     @discardableResult open func setTextInsertionHeight(_ height: CGFloat) -> Self {
         self.textInsertionNode.style.height = .init(unit: .points, value: height)
         return self
@@ -78,7 +102,6 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
     override open func didLoad() {
         super.didLoad()
         guard self.isEdit else { return }
-        self.deleteControlNode.isHidden = true
         node.addTarget(self,
                        action: #selector(didTapMedia),
                        forControlEvents: .touchUpInside)
@@ -130,7 +153,6 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
         guard let indexPath = self.indexPath else { return }
         self.didTapDeleteRelay.accept(indexPath)
     }
-    
     
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
         let mediaRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: node)
