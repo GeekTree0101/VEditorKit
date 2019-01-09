@@ -143,6 +143,7 @@ extension VEditorTextStorage {
             .paragraphRange(for: range)
     }
     
+    
     /**
      Trigger Regex Pattern Base AttributedText Touch Event Hanlder
      
@@ -151,16 +152,18 @@ extension VEditorTextStorage {
      - parameters:
      - textNode: VEditorTextNode
      - customRange: default is VEditorTextNode selectedRange
+     
+     - returns: return touch trigger success status
      */
-    public func triggerTouchEventIfNeeds(_ textNode: VEditorTextNode, customRange: NSRange? = nil) {
-        guard let regexDelegate = textNode.regexDelegate, !textNode.isEdit else { return }
+    @discardableResult public func triggerTouchEventIfNeeds(_ textNode: VEditorTextNode, customRange: NSRange? = nil) -> Bool {
+        guard let regexDelegate = textNode.regexDelegate, !textNode.isEdit else { return false }
         let location = (customRange?.location ?? textNode.selectedRange.location)
         let attributes =
             self.attributes(at: max(0, location - 1), effectiveRange: nil)
         
         if let url = attributes[.link] as? URL {
             regexDelegate.handlURLTouchEvent(url)
-            return
+            return true
         }
         let patternKeys: [NSAttributedString.Key] =
             regexDelegate.allPattern.map({ NSAttributedString.Key.init(rawValue: $0) })
@@ -168,8 +171,11 @@ extension VEditorTextStorage {
         for key in patternKeys {
             if let value = attributes[key] {
                 regexDelegate.handlePatternTouchEvent(key.rawValue, value: value)
+                return true
             }
         }
+        
+        return false
     }
 
     /**
@@ -180,13 +186,16 @@ extension VEditorTextStorage {
      - parameters:
      - textNode: VEditorTextNode
      - customRange: default is full internalAttributedString range
+     
+     - returns: return matched count with regex pattern
      */
-    public func replaceAttributeWithRegexPattenIfNeeds(_ textNode: VEditorTextNode, customRange: NSRange? = nil) {
-        guard let regexDelegate = textNode.regexDelegate else { return }
+    @discardableResult public func replaceAttributeWithRegexPattenIfNeeds(_ textNode: VEditorTextNode, customRange: NSRange? = nil) -> Int {
+        guard let regexDelegate = textNode.regexDelegate else { return 0 }
         let regexs = regexDelegate.allPattern.map({ regexDelegate.regex($0) })
         let range: NSRange = customRange ?? .init(location: 0,
                                                   length: self.internalAttributedString.length)
         let text: String = self.internalAttributedString.string
+        var totalMatchedCount: Int = 0
         
         for regex in regexs {
             let matchs: [NSTextCheckingResult] = regex.matches(in: text, options: [], range: range)
@@ -195,6 +204,7 @@ extension VEditorTextStorage {
                 let attributedStyle: VEditorStyle =
                 regexDelegate.paragraphStyle(pattern: regex.pattern) else { continue }
             
+            totalMatchedCount += matchs.count
             
             for match in matchs {
                 let matchedRange: NSRange = match.range
@@ -211,6 +221,8 @@ extension VEditorTextStorage {
                                                            range: matchedRange)
             }
         }
+        
+        return totalMatchedCount
     }
 }
 
