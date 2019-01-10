@@ -35,13 +35,13 @@ final public class VEditorTextStorage: NSTextStorage {
     }
     
     override public func attributes(at location: Int,
-                             effectiveRange range: NSRangePointer?) -> [NSAttributedString.Key: Any] {
+                                    effectiveRange range: NSRangePointer?) -> [NSAttributedString.Key: Any] {
         guard self.internalAttributedString.length > location else { return [:] }
         return internalAttributedString.attributes(at: location, effectiveRange: range)
     }
     
     override public func setAttributes(_ attrs: [NSAttributedString.Key: Any]?,
-                                range: NSRange) {
+                                       range: NSRange) {
         guard internalAttributedString.length > range.location else { return }
         
         switch status {
@@ -190,7 +190,7 @@ extension VEditorTextStorage {
         
         return false
     }
-
+    
     /**
      Replace attributedStyle with Regex Pattern
      

@@ -89,7 +89,7 @@ public final class VEditorXMLBuilder {
     }
     
     private func generateXMLTag(_ xmlTag: String, scope: PackgingScope) -> String {
-     
+        
         switch scope {
         case .selfClosing(let attrs):
             return "<\(xmlTag) \(attrs.xmlAttributeToString()) />"

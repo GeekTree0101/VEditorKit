@@ -38,7 +38,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         case error(Error?)
     }
     
-    public enum MeidaAppendScope {
+    public enum MediaAppendScope {
         case automatic
         case last
         case first
@@ -89,7 +89,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     open let editorStatusRelay = PublishRelay<Status>()
     open let disposeBag = DisposeBag()
     open weak var delegate: VEditorNodeDelegate!
-
+    
     private var typingControls: [VEditorTypingControlNode] = []
     private var keyboardHeight: CGFloat = 0.0
     private var activeTextDisposeBag = DisposeBag()
@@ -148,12 +148,12 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     }
     
     open func tableNode(_ tableNode: ASTableNode,
-                          numberOfRowsInSection section: Int) -> Int {
+                        numberOfRowsInSection section: Int) -> Int {
         return self.editorContents.count
     }
     
     open func tableNode(_ tableNode: ASTableNode,
-                          nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
+                        nodeBlockForRowAt indexPath: IndexPath) -> ASCellNodeBlock {
         return {
             guard indexPath.row < self.editorContents.count else { return ASCellNode() }
             let content = self.editorContents[indexPath.row]
@@ -162,7 +162,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 guard let cellNode = self.delegate
                     .placeholderCellNode(placeholderContent,
                                          indexPath: indexPath) else {
-                    return ASCellNode()
+                                            return ASCellNode()
                 }
                 
                 cellNode.rx.success
@@ -256,7 +256,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 .map({ $0 as? VEditorTextCellNode })
                 .filter({ $0?.textNode.isFirstResponder() ?? false })
                 .first else {
-                return nil
+                    return nil
         }
         return aciveTextCellNode
     }
@@ -308,7 +308,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - animated: Animation, if you set false than doesn't work all of animation
      */
     open func fetchNewContent(_ content: VEditorContent,
-                              scope: MeidaAppendScope,
+                              scope: MediaAppendScope,
                               section: Int = 0,
                               scrollPosition: UITableView.ScrollPosition = .bottom,
                               animated: Bool = true) {
@@ -332,7 +332,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - animated: Animation, if you set false than doesn't work all of animation
      */
     open func fetchNewContents(_ contents: [VEditorContent],
-                               scope: MeidaAppendScope,
+                               scope: MediaAppendScope,
                                section: Int = 0,
                                scrollPosition: UITableView.ScrollPosition = .bottom,
                                animated: Bool = true) {
@@ -469,7 +469,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             guard fin else { return }
             guard let cellNode = self.tableNode
                 .nodeForRow(at: targetIndexPath) as? VEditorTextCellNode else {
-                return
+                    return
             }
             self.fetchNewActiveTextNode(cellNode)
         })
@@ -512,7 +512,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - complate: complate syncronize callback
      */
     open func synchronizeFetchContents(in section: Int = 0,
-                                         _ complate: @escaping () -> Void) {
+                                       _ complate: @escaping () -> Void) {
         let numberOfSection = self.tableNode.numberOfSections
         guard section >= 0, section < numberOfSection else {
             fatalError("Invalid access section \(section) in \(numberOfSection)")
@@ -547,8 +547,8 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - animated: remove node animation
      */
     open func mergeTextContents(target: IndexPath,
-                                  to: IndexPath,
-                                  animated: Bool) {
+                                to: IndexPath,
+                                animated: Bool) {
         
         guard let targetNode = tableNode.nodeForRow(at: target) as? VEditorTextCellNode,
             let sourceNode = tableNode.nodeForRow(at: to) as? VEditorTextCellNode,
@@ -558,7 +558,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             let sourceAttributedText = sourceNode.textNode
                 .textStorage?
                 .internalAttributedString else {
-                return
+                    return
         }
         
         // NOTE: make merged attributedText
@@ -604,7 +604,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             
             guard let target = beforeCell?.indexPath,
                 let to = currentCell?.indexPath else {
-                return
+                    return
             }
             
             self.mergeTextContents(target: target,
@@ -836,7 +836,7 @@ extension VEditorNode {
             }).disposed(by: disposeBag)
     }
     
-    private func getContentFetchIndexPath(_ scope: MeidaAppendScope,
+    private func getContentFetchIndexPath(_ scope: MediaAppendScope,
                                           section: Int) -> ContentFetchIndexScope {
         switch scope {
         case .automatic:

@@ -163,7 +163,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         } else {
             guard let textPostion: UITextPosition =
                 editableTextNode.textView.selectedTextRange?.end else {
-                return
+                    return
             }
             let caretRect: CGRect = editableTextNode.textView.caretRect(for: textPostion)
             self.caretRectRelay.accept(caretRect)

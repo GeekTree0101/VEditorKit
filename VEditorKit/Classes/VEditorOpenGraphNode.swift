@@ -13,7 +13,7 @@ import RxSwift
 import RxCocoa
 
 extension Reactive where Base: VEditorOpenGraphNode {
-
+    
     public var didTapDelete: Observable<IndexPath> {
         return base.didTapDeleteRelay.asObservable()
     }
@@ -187,7 +187,7 @@ open class VEditorOpenGraphNode: ASCellNode {
         contentAreaLayout.style.flexGrow = 0.0
         imageNode.style.flexShrink = 0.0
         imageNode.style.flexGrow = 0.0
-
+        
         let openGraphLayout = ASStackLayoutSpec(direction: .horizontal,
                                                 spacing: imageWithContentSpacing,
                                                 justifyContent: .spaceBetween,

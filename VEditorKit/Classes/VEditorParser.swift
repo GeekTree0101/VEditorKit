@@ -90,7 +90,7 @@ public final class VEditorParser: NSObject, XMLStyler {
                 }
                 
                 return mutableStyle
-
+                
             default:
                 break
             }
