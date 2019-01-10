@@ -18,14 +18,20 @@ final public class VEditorTextStorage: NSTextStorage {
         case none
     }
     
-    internal var internalAttributedString: NSMutableAttributedString = .init()
+    internal var internalAttributedString: NSMutableAttributedString = .init() {
+        didSet {
+            self.internalString = internalAttributedString.string
+        }
+    }
+    internal var internalString: String = ""
+    
     internal var status: TypingStstus = .none
     internal var currentTypingAttribute: [NSAttributedString.Key: Any] = [:]
     public var urlPattern: String =
     "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
     
     override public var string: String {
-        return self.internalAttributedString.string
+        return self.internalString
     }
     
     override public func attributes(at location: Int,
@@ -57,6 +63,7 @@ final public class VEditorTextStorage: NSTextStorage {
     override public func processEditing() {
         switch status {
         case .typing:
+            guard !self.currentTypingAttribute.isEmpty else { break }
             self.internalAttributedString
                 .setAttributes(self.currentTypingAttribute,
                                range: self.editedRange)
@@ -67,19 +74,25 @@ final public class VEditorTextStorage: NSTextStorage {
     }
     
     override public func replaceCharacters(in range: NSRange, with str: String) {
-        if str.count > 1 {
-            self.status = .paste
-        } else {
+        if self.status != .paste {
             self.status = str.isEmpty ? .remove: .typing
         }
         
         self.beginEditing()
         self.internalAttributedString
             .replaceCharacters(in: range, with: str)
+        self.replaceTextString(in: range, with: str)
         self.edited(.editedCharacters,
                     range: range,
                     changeInLength: str.count - range.length)
         self.endEditing()
+    }
+    
+    internal func replaceTextString(in range: NSRange, with string: String) {
+        let utf16String = internalString.utf16
+        let startIndex = utf16String.index(utf16String.startIndex, offsetBy: range.location)
+        let endIndex = utf16String.index(startIndex, offsetBy: range.length)
+        internalString.replaceSubrange(startIndex..<endIndex, with: string)
     }
 }
 
