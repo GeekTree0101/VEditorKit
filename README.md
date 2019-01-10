@@ -48,7 +48,7 @@ https://developer.apple.com/documentation/uikit/uitextview/1618629-typingattribu
 </table>
 
 ## Usage
-- Wiki: https://github.com/GeekTree0101/VEditorKit/wiki
+- > ## Wiki: https://github.com/GeekTree0101/VEditorKit/wiki
 
 ## Requirements
 - Xcode <~ 9.0
