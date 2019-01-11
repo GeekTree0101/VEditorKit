@@ -1,6 +1,6 @@
 <img src="https://github.com/GeekTree0101/VEditorKit/blob/master/screenshots/logo.png" />
 
-[![CI Status](https://img.shields.io/travis/Geektree0101/VEditorKit.svg?style=flat)](https://travis-ci.org/Geektree0101/VEditorKit)
+[![CI Status](https://travis-ci.org/GeekTree0101/VEditorKit.svg?branch=master)](https://travis-ci.org/GeekTree0101/VEditorKit)
 [![Version](https://img.shields.io/cocoapods/v/VEditorKit.svg?style=flat)](https://cocoapods.org/pods/VEditorKit)
 [![License](https://img.shields.io/cocoapods/l/VEditorKit.svg?style=flat)](https://cocoapods.org/pods/VEditorKit)
 [![Platform](https://img.shields.io/cocoapods/p/VEditorKit.svg?style=flat)](https://cocoapods.org/pods/VEditorKit)
