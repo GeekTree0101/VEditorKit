@@ -55,8 +55,7 @@ open class VEditorOpenGraphNode: ASCellNode {
         return node
     }()
     
-    public lazy var deleteControlNode: VEditorDeleteMediaNode =
-        .init(.red, deleteIconImage: nil)
+    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init()
     
     public var insets: UIEdgeInsets = .zero
     public var containerInsets: UIEdgeInsets = .zero

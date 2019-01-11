@@ -12,32 +12,18 @@ import RxSwift
 
 open class VEditorDeleteMediaNode: ASControlNode {
     
-    open lazy var deleteButtonNode: ASControlNode = {
-        let node = ASControlNode()
-        node.cornerRadius = 5.0
-        node.backgroundColor = self.deleteColor
-        node.style.preferredSize = .init(width: 50.0, height: 50.0)
-        return node
-    }()
+    open let deleteButtonNode = ASButtonNode()
     
-    open lazy var closeIconNode: ASImageNode = {
-        let node = ASImageNode()
-        node.isUserInteractionEnabled = false
-        node.backgroundColor = .white
-        node.style.preferredSize = .init(width: 30.0, height: 10.0)
-        node.cornerRadius = 5.0
-        return node
-    }()
-    
-    open let deleteColor: UIColor
-    open let deleteIconImage: UIImage?
-    
-    public init(_ color: UIColor, deleteIconImage: UIImage?) {
-        self.deleteColor = color
-        self.deleteIconImage = deleteIconImage
+    public init(_ color: UIColor = .red,
+                borderWidth: CGFloat = 5.0, // default is 5.0pt
+                iconImage: UIImage? = nil,
+                buttonSize: CGSize = .init(width: 50.0, height: 50.0)) {
         super.init()
-        self.borderWidth = 5.0
-        self.borderColor = deleteColor.cgColor
+        self.deleteButtonNode.style.preferredSize = buttonSize
+        self.deleteButtonNode.backgroundColor = color
+        self.deleteButtonNode.setImage(iconImage, for: .normal)
+        self.borderWidth = borderWidth
+        self.borderColor = color.cgColor
         self.automaticallyManagesSubnodes = true
         self.isHidden = true
     }
@@ -46,13 +32,6 @@ open class VEditorDeleteMediaNode: ASControlNode {
         return ASRelativeLayoutSpec(horizontalPosition: .end,
                                     verticalPosition: .start,
                                     sizingOption: [],
-                                    child: deleteButtonLayoutSpec())
-    }
-    
-    open func deleteButtonLayoutSpec() -> ASLayoutSpec {
-        let centerLayout = ASCenterLayoutSpec(centeringOptions: .XY,
-                                              sizingOptions: [],
-                                              child: closeIconNode)
-        return ASOverlayLayoutSpec(child: deleteButtonNode, overlay: centerLayout)
+                                    child: deleteButtonNode)
     }
 }

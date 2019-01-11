@@ -52,7 +52,7 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
     public var disposeBag: DisposeBag = DisposeBag()
     
     public init(node: TargetNode,
-                deleteNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil),
+                deleteNode: VEditorDeleteMediaNode = .init(),
                 isEdit: Bool) {
         self.node = node as! TargetNode
         self.isEdit = isEdit
