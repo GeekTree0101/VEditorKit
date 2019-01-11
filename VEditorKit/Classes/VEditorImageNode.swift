@@ -21,10 +21,6 @@ open class VEditorImageNode: VEditorMediaNode<ASNetworkImageNode> {
         self.selectionStyle = .none
     }
     
-    public required init(node: ASNetworkImageNode, isEdit: Bool) {
-        fatalError("init(node:isEdit:) has not been implemented")
-    }
-    
     /**
      Set image url
      

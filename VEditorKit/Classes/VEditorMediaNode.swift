@@ -33,11 +33,7 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
         return node
     }()
     
-    open lazy var deleteControlNode: VEditorDeleteMediaNode = {
-        let node = VEditorDeleteMediaNode(.red, deleteIconImage: nil)
-        node.isHidden = true
-        return node
-    }()
+    open let deleteControlNode: VEditorDeleteMediaNode
     
     public let textInsertionRelay = PublishRelay<IndexPath>()
     public let didTapDeleteRelay = PublishRelay<IndexPath>()
@@ -55,9 +51,12 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
     
     public var disposeBag: DisposeBag = DisposeBag()
     
-    public required init(node: TargetNode, isEdit: Bool) {
-        self.node = node
+    public init(node: TargetNode,
+                deleteNode: VEditorDeleteMediaNode = .init(.red, deleteIconImage: nil),
+                isEdit: Bool) {
+        self.node = node as! TargetNode
         self.isEdit = isEdit
+        self.deleteControlNode = deleteNode
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
@@ -154,8 +153,21 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
         self.didTapDeleteRelay.accept(indexPath)
     }
     
+    /**
+     Make media content layoutSpec
+     
+     - important: If you needs attach subnodes or layout on media content
+     than you have to override this method
+     
+     - parameters: constrainedSize(ASSizeRange)
+     - returns: Media content layout spec (default is media ratioLayout)
+     */
+    open func mediaContentLayoutSpec(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
+        return ASRatioLayoutSpec(ratio: ratio, child: node)
+    }
+    
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        let mediaRatioLayout = ASRatioLayoutSpec(ratio: ratio, child: node)
+        let mediaRatioLayout = self.mediaContentLayoutSpec(constrainedSize)
         
         let mediaContentLayout: ASLayoutElement
         

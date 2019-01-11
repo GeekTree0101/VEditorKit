@@ -30,10 +30,6 @@ open class VEditorVideoNode: VEditorMediaNode<ASVideoNode> {
         self.node.placeholderColor = .lightGray
     }
     
-    public required init(node: ASVideoNode, isEdit: Bool) {
-        fatalError("init(node:isEdit:) has not been implemented")
-    }
-    
     /**
      Set video preview image url
      

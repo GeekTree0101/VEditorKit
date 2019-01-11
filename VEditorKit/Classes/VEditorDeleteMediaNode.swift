@@ -39,6 +39,7 @@ open class VEditorDeleteMediaNode: ASControlNode {
         self.borderWidth = 5.0
         self.borderColor = deleteColor.cgColor
         self.automaticallyManagesSubnodes = true
+        self.isHidden = true
     }
     
     override open func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
