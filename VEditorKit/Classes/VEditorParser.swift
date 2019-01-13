@@ -60,6 +60,10 @@ public final class VEditorParser: NSObject, XMLStyler {
         }
     }
     
+    public func parseXMLToAttributedString(_ xmlString: String) -> NSAttributedString {
+        return xmlString.styled(with: StringStyle(.xmlStyler(self)))
+    }
+    
     public func style(forElement name: String,
                       attributes: [String : String],
                       currentStyle: StringStyle) -> StringStyle? {

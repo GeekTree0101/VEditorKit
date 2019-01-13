@@ -66,6 +66,11 @@ class VEditorParserSpec: QuickSpec {
                     let url = (resultContents?.last as? NSAttributedString)?.attributes(at: 0, effectiveRange: nil)[NSAttributedString.Key.link] as? URL
                     expect(url?.absoluteString ?? "").to(equal("https://www.vingle.net"))
                 }
+                
+                it("should be parse to NSAttributedString Only") {
+                    expect(parser.parseXMLToAttributedString("<p>hello</p>").string == "hello")
+                        .to(beTrue())
+                }
             }
         }
     }
