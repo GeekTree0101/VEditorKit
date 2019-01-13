@@ -20,8 +20,11 @@ open class VEditorVideoNode: VEditorMediaNode<ASVideoNode> {
         return AVURLAsset(url: url)
     }
     
-    public required init(isEdit: Bool) {
-        super.init(node: .init(), isEdit: isEdit)
+    public required init(isEdit: Bool,
+                         deleteNode: VEditorDeleteMediaNode = .init()) {
+        super.init(node: .init(),
+                   deleteNode: deleteNode,
+                   isEdit: isEdit)
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
         self.node.backgroundColor = .black

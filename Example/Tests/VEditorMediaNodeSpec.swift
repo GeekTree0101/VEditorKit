@@ -26,8 +26,12 @@ class VEditorMediaNodeSpec: QuickSpec {
                 var node2: VEditorMediaNode<ASNetworkImageNode>!
                 
                 beforeEach {
-                    node = VEditorMediaNode.init(node: ASVideoNode(), isEdit: true)
-                    node2 = VEditorMediaNode.init(node: ASNetworkImageNode(), isEdit: true)
+                    node = VEditorMediaNode.init(node: ASVideoNode(),
+                                                 deleteNode: .init(),
+                                                 isEdit: true)
+                    node2 = VEditorMediaNode.init(node: ASNetworkImageNode(),
+                                                  deleteNode: .init(),
+                                                  isEdit: true)
                 }
                 
                 it("should be success") {
@@ -47,7 +51,9 @@ class VEditorMediaNodeSpec: QuickSpec {
                 var node: VEditorMediaNode<ASVideoNode>!
                 
                 beforeEach {
-                    node = VEditorMediaNode.init(node: ASVideoNode(), isEdit: true)
+                    node = VEditorMediaNode.init(node: ASVideoNode(),
+                                                 deleteNode: .init(),
+                                                 isEdit: true)
                 }
                 
                 it("should be update ratio") {
@@ -76,8 +82,12 @@ class VEditorMediaNodeSpec: QuickSpec {
                 var viewOnlyNode: VEditorMediaNode<ASVideoNode>!
                 
                 beforeEach {
-                    node = VEditorMediaNode.init(node: ASVideoNode(), isEdit: true)
-                    viewOnlyNode = VEditorMediaNode.init(node: ASVideoNode(), isEdit: false)
+                    node = VEditorMediaNode.init(node: ASVideoNode(),
+                                                 deleteNode: .init(),
+                                                 isEdit: true)
+                    viewOnlyNode = VEditorMediaNode.init(node: ASVideoNode(),
+                                                         deleteNode: .init(),
+                                                         isEdit: false)
                     node.didLoad()
                     viewOnlyNode.didLoad()
                 }

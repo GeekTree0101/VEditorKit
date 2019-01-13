@@ -13,8 +13,11 @@ import RxSwift
 
 open class VEditorImageNode: VEditorMediaNode<ASNetworkImageNode> {
     
-    public required init(isEdit: Bool) {
-        super.init(node: .init(), isEdit: isEdit)
+    public required init(isEdit: Bool,
+                         deleteNode: VEditorDeleteMediaNode = .init()) {
+        super.init(node: .init(),
+                   deleteNode: deleteNode,
+                   isEdit: isEdit)
         self.node.backgroundColor = .lightGray
         self.node.placeholderColor = .lightGray
         self.automaticallyManagesSubnodes = true
