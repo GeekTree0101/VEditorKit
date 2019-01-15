@@ -89,9 +89,9 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     open let editorStatusRelay = PublishRelay<Status>()
     open let disposeBag = DisposeBag()
     open weak var delegate: VEditorNodeDelegate!
+    open var keyboardHeight: CGFloat = 0.0
     
     private var typingControls: [VEditorTypingControlNode] = []
-    private var keyboardHeight: CGFloat = 0.0
     private var activeTextDisposeBag = DisposeBag()
     
     public init(editorRule: VEditorRule,
@@ -122,23 +122,42 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     }
     
     open override func layoutSpecThatFits(_ constrainedSize: ASSizeRange) -> ASLayoutSpec {
-        var tableNodeInsets: UIEdgeInsets = .zero
-        tableNodeInsets.bottom = keyboardHeight
-        
+        var tableNodeInsets: UIEdgeInsets = self.safeAreaInsets
+        tableNodeInsets.bottom += keyboardHeight
         let tableLayout = ASInsetLayoutSpec(insets: tableNodeInsets,
                                             child: tableNode)
         
         if let node = controlAreaNode {
-            var controlAreaInsets: UIEdgeInsets =
-                .init(top: .infinity, left: 0.0, bottom: 0.0, right: 0.0)
-            controlAreaInsets.bottom = keyboardHeight
-            let controlLayout = ASInsetLayoutSpec(insets: controlAreaInsets,
-                                                  child: node)
+            let controlLayout = controlAreaLayoutSpec(constrainedSize, controlAreaNode: node)
             return ASOverlayLayoutSpec(child: tableLayout,
                                        overlay: controlLayout)
+            
         } else {
             return tableLayout
         }
+    }
+
+    /**
+     Create controlArea Layout Spec
+     
+     - important: If you needs customize control area layout than you have to override this methods
+     
+     - parameter constrainedSize: VEditorNode constrainedSize
+     - parameter controlAreaNode: controlAreaNode
+     
+     - returns: ControlAreaLayout
+     */
+    open func controlAreaLayoutSpec(_ constrainedSize: ASSizeRange,
+                                    controlAreaNode: ASDisplayNode) -> ASLayoutSpec {
+        var controlAreaInsets: UIEdgeInsets = self.safeAreaInsets
+        controlAreaInsets.top = .infinity
+        if keyboardHeight > 0.0 {
+            controlAreaInsets.bottom = keyboardHeight
+        } else {
+            controlAreaInsets.bottom += keyboardHeight
+        }
+        return ASInsetLayoutSpec(insets: controlAreaInsets,
+                                 child: controlAreaNode)
     }
     
     override open func layout() {

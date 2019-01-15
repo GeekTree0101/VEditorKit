@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     
   s.name             = 'VEditorKit'
-  s.version          = '1.2.0'
+  s.version          = '1.2.1'
   s.summary          = 'Lightweight and Powerful Editor Kit'
   
   s.description      = 'Lightweight and Powerful Editor Kit built on Texture(AsyncDisplayKit)'
