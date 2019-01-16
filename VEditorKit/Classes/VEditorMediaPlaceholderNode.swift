@@ -13,7 +13,7 @@ import AsyncDisplayKit
 
 extension Reactive where Base: VEditorMediaPlaceholderNode {
     
-    public var success: Observable<(VEditorMediaContent, IndexPath)> {
+    public var success: Observable<(VEditorContent, IndexPath)> {
         return base.successRelay.asObservable().take(1)
     }
     
@@ -24,7 +24,7 @@ extension Reactive where Base: VEditorMediaPlaceholderNode {
 
 open class VEditorMediaPlaceholderNode: ASCellNode {
     
-    internal let successRelay = PublishRelay<(VEditorMediaContent, IndexPath)>()
+    internal let successRelay = PublishRelay<(VEditorContent, IndexPath)>()
     internal let failedRelay = PublishRelay<IndexPath>()
     internal var lazyHandlerWorkItem: DispatchWorkItem?
     
@@ -44,7 +44,7 @@ open class VEditorMediaPlaceholderNode: ASCellNode {
         DispatchQueue.main.async(execute: workItem)
     }
     
-    public func onSuccess(_ replaceContent: VEditorMediaContent) {
+    public func onSuccess(_ replaceContent: VEditorContent) {
         guard let indexPath = self.indexPath else {
             lazyHandlerWorkItem = DispatchWorkItem(block: {
                 self.onSuccess(replaceContent)
