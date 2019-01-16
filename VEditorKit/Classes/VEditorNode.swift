@@ -444,7 +444,8 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
             return .init(row: indexPath.row + 1 + index, section: indexPath.section)
         })
-        let splitedTextIndexPath: IndexPath = .init(row: indexPath.row + 2, section: indexPath.section)
+        let splitedTextIndexPath: IndexPath = .init(row: (contentIndexPaths.last?.row ?? 0) + 1,
+                                                    section: indexPath.section)
         
         // STEP3: Fetch Placeholder or MediaContent with splitted text
         self.tableNode.performBatchUpdates({
