@@ -44,8 +44,6 @@ class VEditorTextNodeSpec: QuickSpec {
                 it("should be success") {
                     expect(node.isEdit).to(beTrue())
                     expect(node.delegate).toNot(beNil())
-                    expect(node.linkRegexPattern == "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?")
-                        .to(beTrue())
                     expect(node.regexDelegate).toNot(beNil())
                     expect(node.automaticallyGenerateLinkPreview).to(beFalse())
                     expect(node.currentTypingAttribute.isEmpty).to(beFalse())

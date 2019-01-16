@@ -55,17 +55,6 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     open var automaticallyGenerateLinkPreview: Bool = false
     open let becomeActiveRelay = PublishRelay<Void>()
     
-    open var linkRegexPattern: String? {
-        // default: "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
-        get {
-            return self.textStorage?.urlPattern
-        }
-        set(pattern) {
-            guard let pattern = pattern else { return }
-            self.textStorage?.urlPattern = pattern
-        }
-    }
-    
     internal let rule: VEditorRule
     internal let currentLocationXMLTagsRelay = PublishRelay<[String]>()
     internal let caretRectRelay = PublishRelay<CGRect>()

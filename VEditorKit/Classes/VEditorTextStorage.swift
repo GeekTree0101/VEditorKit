@@ -27,8 +27,6 @@ final public class VEditorTextStorage: NSTextStorage {
     
     internal var status: TypingStstus = .none
     internal var currentTypingAttribute: [NSAttributedString.Key: Any] = [:]
-    public var urlPattern: String =
-    "((?:http|https)://)(?:www\\.)?[\\w\\d\\-_]+\\.\\w{2,3}(\\.\\w{2})?(/(?<=/)(?:[\\w\\d\\-./_]+)?)?"
     
     override public var string: String {
         return self.internalString
@@ -250,8 +248,7 @@ extension VEditorTextStorage {
     }
     
     internal func automaticallyApplyLinkAttribute(_ textNode: VEditorTextNode) -> (URL, Int)? {
-        guard let regex = try? NSRegularExpression(pattern: self.urlPattern,
-                                                   options: []) else { return nil }
+        guard let regex = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return nil }
         let blockRange = self.paragraphBlockRange(textNode.selectedRange)
         let text: String = self.internalAttributedString.string
         
