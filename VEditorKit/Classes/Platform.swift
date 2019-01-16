@@ -36,6 +36,11 @@ public protocol VEditorMediaContent: VEditorContent {
 public struct VEditorPlaceholderContent: VEditorContent {
     public var xmlTag: String
     public var model: Any
+    
+    public init(xmlTag: String, model: Any) {
+        self.xmlTag = xmlTag
+        self.model = model
+    }
 }
 
 // MARK: - VEditorKit Editor Rule
