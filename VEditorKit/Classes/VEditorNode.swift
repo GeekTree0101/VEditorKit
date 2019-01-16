@@ -835,7 +835,8 @@ extension VEditorNode {
     }
     
     private func deleteUnnecessaryEditableTextIfNeeds(with: UITableView.RowAnimation = .automatic) {
-        guard let indexPath = self.activeTextIndexPath else { return }
+        guard let indexPath = self.activeTextIndexPath,
+            self.editorContents.count > 1 else { return }
         self.resignActiveTextNode()
         self.editorContents.remove(at: indexPath.row)
         self.tableNode.deleteRows(at: [indexPath], with: with)
