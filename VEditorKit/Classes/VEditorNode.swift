@@ -782,6 +782,7 @@ extension VEditorNode {
                 control.isSelected = false
                 control.isEnabled = true
             } else if disableXMLs.contains(control.xmlTag) {
+                control.isSelected = false
                 control.isEnabled = false
             }
         }
