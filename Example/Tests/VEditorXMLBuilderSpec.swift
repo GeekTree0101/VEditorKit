@@ -42,9 +42,14 @@ class VEditorXMLBuilderSpec: QuickSpec {
                 }
                 
                 it("should be build to xmlString") {
+                    
                     expect(VEditorXMLBuilder.shared.buildXML(testContents, rule: rule, packageTag: "content")).toNot(beNil())
                     expect(VEditorXMLBuilder.shared.buildXML(testContents2, rule: rule, packageTag: "content")).toNot(beNil())
                     expect(VEditorXMLBuilder.shared.buildXML(testContents3, rule: rule, packageTag: "content")).toNot(beNil())
+                    
+                    expect(VEditorXMLBuilder.shared.buildXML(testContents, rule: rule, packageTag: nil)).toNot(beNil())
+                    expect(VEditorXMLBuilder.shared.buildXML(testContents2, rule: rule, packageTag: nil)).toNot(beNil())
+                    expect(VEditorXMLBuilder.shared.buildXML(testContents3, rule: rule, packageTag: nil)).toNot(beNil())
                 }
             }
         }

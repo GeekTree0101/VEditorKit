@@ -15,7 +15,7 @@ public final class VEditorXMLBuilder {
     
     public func buildXML(_ contents: [VEditorContent],
                          rule: VEditorRule,
-                         packageTag: String) -> String? {
+                         packageTag: String?) -> String? {
         
         var xmlString: String = ""
         
@@ -35,9 +35,10 @@ public final class VEditorXMLBuilder {
         xmlString = xmlString.squeezXMLString(rule)
         if xmlString.isEmpty {
             return nil
+        } else if let packageTag = packageTag {
+            return self.packageXML(packageTag, content: xmlString)
         } else {
-            return self.packageXML(packageTag,
-                                   content: xmlString)
+            return xmlString
         }
     }
     
