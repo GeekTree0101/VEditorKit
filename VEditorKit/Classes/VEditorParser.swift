@@ -38,9 +38,20 @@ public final class VEditorParser: NSObject, XMLStyler {
     public func parseXML(_ xmlString: String,
                          onSuccess: (([VEditorContent]) -> Void)? = nil,
                          onError: ((Error?) -> Void)? = nil) {
-        let parser = VEditorContentParser(xmlString
+        var xmlString = xmlString
             .replacingOccurrences(of: "\\n", with: "\n")
-            .replacingOccurrences(of: "\\", with: ""), rule: self.parserRule)
+            .replacingOccurrences(of: "\\", with: "")
+        
+        // make newlink before block heading if needs
+        for blockXML in parserRule.blockStyleXMLTags {
+            let defaultCloseTag: String = "</\(parserRule.defaultStyleXMLTag)>"
+            let blockOpenTag: String = "<\(blockXML)>"
+            let targetPairTag: String = defaultCloseTag + blockOpenTag
+            xmlString = xmlString.replacingOccurrences(of: targetPairTag,
+                                                       with: "\n" + targetPairTag)
+        }
+        
+        let parser = VEditorContentParser(xmlString, rule: self.parserRule)
         
         switch parser.parseXMLContents() {
         case .success(let contents):

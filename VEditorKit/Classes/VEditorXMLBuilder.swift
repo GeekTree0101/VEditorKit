@@ -33,6 +33,17 @@ public final class VEditorXMLBuilder {
         }
         
         xmlString = xmlString.squeezXMLString(rule)
+        
+        for xml in rule.allXML {
+            let open = self.generateXMLTag(xml, scope: .open(nil))
+            let close = self.generateXMLTag(xml, scope: .close)
+            let emptyContent = open + close
+            let duplicatedPairedXMLTags = close + open
+            xmlString = xmlString
+                .replacingOccurrences(of: emptyContent, with: "")
+                .replacingOccurrences(of: duplicatedPairedXMLTags, with: "")
+        }
+        
         if xmlString.isEmpty {
             return nil
         } else if let packageTag = packageTag {
