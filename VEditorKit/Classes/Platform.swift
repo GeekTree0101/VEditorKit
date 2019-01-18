@@ -48,6 +48,7 @@ public protocol VEditorRule {
     
     var allXML: [String] { get }
     var defaultStyleXMLTag: String { get }
+    var blockStyleXMLTags: [String] { get }
     var linkStyleXMLTag: String? { get }
     func paragraphStyle(_ xmlTag: String, attributes: [String: String]) -> VEditorStyle?
     func build(_ xmlTag: String, attributes: [String: String]) -> VEditorMediaContent?

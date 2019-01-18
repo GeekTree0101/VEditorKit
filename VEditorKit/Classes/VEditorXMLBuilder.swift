@@ -54,6 +54,8 @@ public final class VEditorXMLBuilder {
         var xmlString: String = ""
         let range = NSRange(location: 0, length: attrText.length)
         
+        xmlString += self.generateXMLTag(rule.defaultStyleXMLTag, scope: .open(nil))
+        
         attrText
             .enumerateAttributes(in: range,
                                  options: [],
@@ -63,11 +65,15 @@ public final class VEditorXMLBuilder {
                                     content = content
                                         .replacingOccurrences(of: "\"", with: "\\")
                                     
-                                    let tags = (attributes[VEditorAttributeKey] as? [String])
-                                        ?? [rule.defaultStyleXMLTag]
-                                    
                                     guard !content.isEmpty else { return }
                                     
+                                    guard let tags = (attributes[VEditorAttributeKey] as? [String])?
+                                        .filter({ $0 != rule.defaultStyleXMLTag }) else {
+                                            xmlString += content
+                                            return
+                                    }
+                                    
+                                    let isBlockStyle: Bool = tags.contains(where: { rule.blockStyleXMLTags.contains($0) })
                                     
                                     let openTag = tags
                                         .map({ tag -> String in
@@ -83,8 +89,19 @@ public final class VEditorXMLBuilder {
                                             return generateXMLTag(tag, scope: .close)
                                         }).joined()
                                     
-                                    xmlString += [openTag, content, closeTag].joined()
+                                    let inlineXMLString: String = [openTag, content, closeTag].joined()
+                                    
+                                    if isBlockStyle {
+                                        xmlString += [self.generateXMLTag(rule.defaultStyleXMLTag, scope: .close),
+                                                      inlineXMLString,
+                                                      self.generateXMLTag(rule.defaultStyleXMLTag, scope: .open(nil))].joined()
+                                    } else {
+                                        xmlString += inlineXMLString
+                                    }
             })
+        
+        
+        xmlString += self.generateXMLTag(rule.defaultStyleXMLTag, scope: .close)
         
         return xmlString
     }

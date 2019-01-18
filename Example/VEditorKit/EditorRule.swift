@@ -11,6 +11,7 @@ import VEditorKit
 
 struct EditorRule: VEditorRule {
     
+    
     enum XML: String, CaseIterable {
         
         case article = "a"
@@ -30,6 +31,10 @@ struct EditorRule: VEditorRule {
     
     var linkStyleXMLTag: String? {
         return XML.article.rawValue
+    }
+    
+    var blockStyleXMLTags: [String] {
+        return [XML.heading, XML.quote].map({ $0.rawValue })
     }
     
     var allXML: [String] {
