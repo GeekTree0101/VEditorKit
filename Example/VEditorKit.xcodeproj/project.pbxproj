@@ -137,17 +137,15 @@
 		607FACD21AFB9204008FA782 /* Example for VEditorKit */ = {
 			isa = PBXGroup;
 			children = (
+				9B3036DE21F41AE200489340 /* Services */,
+				9B3036DD21F41AD700489340 /* Controllers */,
+				9B3036DC21F41AC000489340 /* Views */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
-				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
-				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
-				607FACD71AFB9204008FA782 /* EditorNodeController.swift */,
 				9B457E1021DE063400391EC9 /* EditorRule.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
+				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				9B457E1921DF030300391EC9 /* XMLViewController.swift */,
-				9BE5C47A21E310D5009EF52B /* MockService.swift */,
-				9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */,
 			);
 			name = "Example for VEditorKit";
 			path = VEditorKit;
@@ -207,6 +205,32 @@
 				D262A91D97AC2BCBF155C159 /* Pods-VEditorKit_Tests.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		9B3036DC21F41AC000489340 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */,
+				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9B3036DD21F41AD700489340 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				607FACD71AFB9204008FA782 /* EditorNodeController.swift */,
+				9B457E1921DF030300391EC9 /* XMLViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		9B3036DE21F41AE200489340 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9BE5C47A21E310D5009EF52B /* MockService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

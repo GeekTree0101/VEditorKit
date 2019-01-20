@@ -11,7 +11,6 @@ import VEditorKit
 
 struct EditorRule: VEditorRule {
     
-    
     enum XML: String, CaseIterable {
         
         case article = "a"
@@ -188,7 +187,6 @@ class VImageContent: VEditorMediaContent {
 }
 
 class VVideoContent: VEditorMediaContent {
-    
     
     var xmlTag: String
     
