@@ -55,7 +55,7 @@ open class VEditorOpenGraphNode: ASCellNode {
         return node
     }()
     
-    public lazy var deleteControlNode: VEditorDeleteMediaNode = .init()
+    public let deleteControlNode: VEditorDeleteMediaNode
     
     public var insets: UIEdgeInsets = .zero
     public var containerInsets: UIEdgeInsets = .zero
@@ -66,8 +66,10 @@ open class VEditorOpenGraphNode: ASCellNode {
     public var disposeBag = DisposeBag()
     public let didTapDeleteRelay = PublishRelay<IndexPath>()
     
-    public required init(isEdit: Bool) {
+    public required init(isEdit: Bool,
+                         deleteNode: VEditorDeleteMediaNode = .init()) {
         self.isEdit = isEdit
+        self.deleteControlNode = deleteNode
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
