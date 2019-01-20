@@ -21,7 +21,6 @@ public enum VEditorParserResultScope {
 }
 
 // MARK: - VEditor Unit Content
-
 extension NSAttributedString: VEditorContent { }
 
 public let VEditorAttributeKey: NSAttributedString.Key = .init(rawValue: "VEditorKit.AttributeKey")
