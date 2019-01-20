@@ -14,10 +14,20 @@
 		607FACEC1AFB9204008FA782 /* VEditorParserSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* VEditorParserSpec.swift */; };
 		762F65C6A4DFBE7A2F677703 /* Pods_VEditorKit_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 19D9AE0E2039B88F94616CCC /* Pods_VEditorKit_Example.framework */; };
 		9B3036DA21F4162D00489340 /* UIImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036D921F4162D00489340 /* UIImage+Extension.swift */; };
+		9B3036E221F41BAF00489340 /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036E121F41BAF00489340 /* MockService.swift */; };
+		9B3036E321F41BAF00489340 /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036E121F41BAF00489340 /* MockService.swift */; };
+		9B3036E521F41BBE00489340 /* XMLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036E421F41BBE00489340 /* XMLViewController.swift */; };
+		9B3036E721F41BC800489340 /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036E621F41BC800489340 /* EditorOpenGraphPlaceholder.swift */; };
+		9B3036E821F41C0100489340 /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036E621F41BC800489340 /* EditorOpenGraphPlaceholder.swift */; };
+		9B3036EB21F41C3800489340 /* VImageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036EA21F41C3800489340 /* VImageContent.swift */; };
+		9B3036ED21F41C4C00489340 /* VVideoContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036EC21F41C4C00489340 /* VVideoContent.swift */; };
+		9B3036EF21F41C6200489340 /* VOpenGraphContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036EE21F41C6200489340 /* VOpenGraphContent.swift */; };
+		9B3036F021F41C8B00489340 /* VImageContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036EA21F41C3800489340 /* VImageContent.swift */; };
+		9B3036F121F41C9600489340 /* VVideoContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036EC21F41C4C00489340 /* VVideoContent.swift */; };
+		9B3036F221F41CAD00489340 /* VOpenGraphContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B3036EE21F41C6200489340 /* VOpenGraphContent.swift */; };
 		9B457E1121DE063400391EC9 /* EditorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1021DE063400391EC9 /* EditorRule.swift */; };
 		9B457E1221DE0C5C00391EC9 /* EditorRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1021DE063400391EC9 /* EditorRule.swift */; };
 		9B457E1821DEFCDA00391EC9 /* VEditorXMLBuilderSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */; };
-		9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B457E1921DF030300391EC9 /* XMLViewController.swift */; };
 		9B7CEE7E21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE7D21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift */; };
 		9B7CEE8021E5C08600CA328E /* VEditorTextCellNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE7F21E5C08600CA328E /* VEditorTextCellNodeSpec.swift */; };
 		9B7CEE8221E5C22200CA328E /* VEditorTypingControlNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7CEE8121E5C22200CA328E /* VEditorTypingControlNodeSpec.swift */; };
@@ -30,11 +40,7 @@
 		9B88A6AB21DCDEC300EF3CC8 /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
 		9BB5832721E5E13D0036C9FE /* VEditorNodeSpec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BB5832621E5E13D0036C9FE /* VEditorNodeSpec.swift */; };
 		9BB5832821E5E1AA0036C9FE /* EditorControlAreaNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */; };
-		9BB5832921E5E3EC0036C9FE /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */; };
-		9BB5832A21E5E4730036C9FE /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
 		9BB5832B21E5E4C80036C9FE /* content.xml in Resources */ = {isa = PBXBuildFile; fileRef = 9B88A6AA21DCDEC300EF3CC8 /* content.xml */; };
-		9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47A21E310D5009EF52B /* MockService.swift */; };
-		9BE5C47F21E32168009EF52B /* EditorOpenGraphPlaceholder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */; };
 		C191B86EDFC34EB0AF1131BD /* Pods_VEditorKit_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48D26DEF356E2D9A26CBD914 /* Pods_VEditorKit_Tests.framework */; };
 /* End PBXBuildFile section */
 
@@ -65,9 +71,14 @@
 		607FACEB1AFB9204008FA782 /* VEditorParserSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorParserSpec.swift; sourceTree = "<group>"; };
 		678C76B2ADE22C77779D368C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		9B3036D921F4162D00489340 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
+		9B3036E121F41BAF00489340 /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockService.swift; path = /Users/vingle/Desktop/VEditorKit/Example/VEditorKit/Services/MockService.swift; sourceTree = "<absolute>"; };
+		9B3036E421F41BBE00489340 /* XMLViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XMLViewController.swift; sourceTree = "<group>"; };
+		9B3036E621F41BC800489340 /* EditorOpenGraphPlaceholder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorOpenGraphPlaceholder.swift; sourceTree = "<group>"; };
+		9B3036EA21F41C3800489340 /* VImageContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VImageContent.swift; sourceTree = "<group>"; };
+		9B3036EC21F41C4C00489340 /* VVideoContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VVideoContent.swift; sourceTree = "<group>"; };
+		9B3036EE21F41C6200489340 /* VOpenGraphContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VOpenGraphContent.swift; sourceTree = "<group>"; };
 		9B457E1021DE063400391EC9 /* EditorRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorRule.swift; sourceTree = "<group>"; };
 		9B457E1521DEFAF300391EC9 /* VEditorXMLBuilderSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorXMLBuilderSpec.swift; sourceTree = "<group>"; };
-		9B457E1921DF030300391EC9 /* XMLViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMLViewController.swift; sourceTree = "<group>"; };
 		9B7CEE7D21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorMediaPlaceholderNodeSpec.swift; sourceTree = "<group>"; };
 		9B7CEE7F21E5C08600CA328E /* VEditorTextCellNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTextCellNodeSpec.swift; sourceTree = "<group>"; };
 		9B7CEE8121E5C22200CA328E /* VEditorTypingControlNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorTypingControlNodeSpec.swift; sourceTree = "<group>"; };
@@ -79,8 +90,6 @@
 		9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorControlAreaNode.swift; sourceTree = "<group>"; };
 		9B88A6AA21DCDEC300EF3CC8 /* content.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = content.xml; sourceTree = "<group>"; };
 		9BB5832621E5E13D0036C9FE /* VEditorNodeSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorNodeSpec.swift; sourceTree = "<group>"; };
-		9BE5C47A21E310D5009EF52B /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockService.swift; sourceTree = "<group>"; };
-		9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditorOpenGraphPlaceholder.swift; sourceTree = "<group>"; };
 		C3E3AB57DFE5DE8299572A7A /* Pods-VEditorKit_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Tests/Pods-VEditorKit_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		D262A91D97AC2BCBF155C159 /* Pods-VEditorKit_Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Tests.release.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Tests/Pods-VEditorKit_Tests.release.xcconfig"; sourceTree = "<group>"; };
 		D47C1AE2E83656FF20DAB7F4 /* Pods-VEditorKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-VEditorKit_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-VEditorKit_Example/Pods-VEditorKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -139,18 +148,16 @@
 		607FACD21AFB9204008FA782 /* Example for VEditorKit */ = {
 			isa = PBXGroup;
 			children = (
+				9B3036E921F41C1F00489340 /* EditorServices */,
+				9B3036E021F41B9B00489340 /* Extensions */,
+				9B3036DE21F41AE200489340 /* Services */,
+				9B3036DD21F41AD700489340 /* Controllers */,
+				9B3036DC21F41AC000489340 /* Views */,
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
-				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
-				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
-				607FACD71AFB9204008FA782 /* EditorNodeController.swift */,
-				9B457E1021DE063400391EC9 /* EditorRule.swift */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
+				9B88A6AA21DCDEC300EF3CC8 /* content.xml */,
 				607FACDE1AFB9204008FA782 /* LaunchScreen.xib */,
 				607FACD31AFB9204008FA782 /* Supporting Files */,
-				9B457E1921DF030300391EC9 /* XMLViewController.swift */,
-				9BE5C47A21E310D5009EF52B /* MockService.swift */,
-				9BE5C47E21E32168009EF52B /* EditorOpenGraphPlaceholder.swift */,
-				9B3036D921F4162D00489340 /* UIImage+Extension.swift */,
 			);
 			name = "Example for VEditorKit";
 			path = VEditorKit;
@@ -210,6 +217,51 @@
 				D262A91D97AC2BCBF155C159 /* Pods-VEditorKit_Tests.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		9B3036DC21F41AC000489340 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				9B88A6A621DCB76F00EF3CC8 /* EditorControlAreaNode.swift */,
+				9B3036E621F41BC800489340 /* EditorOpenGraphPlaceholder.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		9B3036DD21F41AD700489340 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				607FACD71AFB9204008FA782 /* EditorNodeController.swift */,
+				9B3036E421F41BBE00489340 /* XMLViewController.swift */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		9B3036DE21F41AE200489340 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9B3036E121F41BAF00489340 /* MockService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		9B3036E021F41B9B00489340 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				9B3036D921F4162D00489340 /* UIImage+Extension.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		9B3036E921F41C1F00489340 /* EditorServices */ = {
+			isa = PBXGroup;
+			children = (
+				9B457E1021DE063400391EC9 /* EditorRule.swift */,
+				9B3036EA21F41C3800489340 /* VImageContent.swift */,
+				9B3036EC21F41C4C00489340 /* VVideoContent.swift */,
+				9B3036EE21F41C6200489340 /* VOpenGraphContent.swift */,
+			);
+			path = EditorServices;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -440,13 +492,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				607FACD81AFB9204008FA782 /* EditorNodeController.swift in Sources */,
-				9B457E1A21DF030300391EC9 /* XMLViewController.swift in Sources */,
-				9BE5C47F21E32168009EF52B /* EditorOpenGraphPlaceholder.swift in Sources */,
+				9B3036E221F41BAF00489340 /* MockService.swift in Sources */,
+				9B3036ED21F41C4C00489340 /* VVideoContent.swift in Sources */,
+				9B3036E721F41BC800489340 /* EditorOpenGraphPlaceholder.swift in Sources */,
+				9B3036E521F41BBE00489340 /* XMLViewController.swift in Sources */,
 				9B3036DA21F4162D00489340 /* UIImage+Extension.swift in Sources */,
+				9B3036EF21F41C6200489340 /* VOpenGraphContent.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
 				9B457E1121DE063400391EC9 /* EditorRule.swift in Sources */,
 				9B88A6A721DCB76F00EF3CC8 /* EditorControlAreaNode.swift in Sources */,
-				9BE5C47B21E310D5009EF52B /* MockService.swift in Sources */,
+				9B3036EB21F41C3800489340 /* VImageContent.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,16 +511,19 @@
 			files = (
 				9B457E1221DE0C5C00391EC9 /* EditorRule.swift in Sources */,
 				9B7CEE8421E5C42800CA328E /* VEditorVideoNodeSpec.swift in Sources */,
+				9B3036F021F41C8B00489340 /* VImageContent.swift in Sources */,
 				9B7CEE8221E5C22200CA328E /* VEditorTypingControlNodeSpec.swift in Sources */,
+				9B3036F121F41C9600489340 /* VVideoContent.swift in Sources */,
 				9B7CEE8C21E5D70500CA328E /* VEditorTextNodeSpec.swift in Sources */,
 				9B7CEE7E21E5BA6700CA328E /* VEditorMediaPlaceholderNodeSpec.swift in Sources */,
 				9B7CEE8021E5C08600CA328E /* VEditorTextCellNodeSpec.swift in Sources */,
-				9BB5832921E5E3EC0036C9FE /* EditorOpenGraphPlaceholder.swift in Sources */,
+				9B3036E321F41BAF00489340 /* MockService.swift in Sources */,
+				9B3036F221F41CAD00489340 /* VOpenGraphContent.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* VEditorParserSpec.swift in Sources */,
 				9B7CEE8621E5C62800CA328E /* VEditorImageNodeSpec.swift in Sources */,
 				9B7CEE8A21E5CDA200CA328E /* VEditorTextStorageSpec.swift in Sources */,
 				9B7CEE8821E5C67000CA328E /* VEditorMediaNodeSpec.swift in Sources */,
-				9BB5832A21E5E4730036C9FE /* MockService.swift in Sources */,
+				9B3036E821F41C0100489340 /* EditorOpenGraphPlaceholder.swift in Sources */,
 				9BB5832821E5E1AA0036C9FE /* EditorControlAreaNode.swift in Sources */,
 				9BB5832721E5E13D0036C9FE /* VEditorNodeSpec.swift in Sources */,
 				9B457E1821DEFCDA00391EC9 /* VEditorXMLBuilderSpec.swift in Sources */,
