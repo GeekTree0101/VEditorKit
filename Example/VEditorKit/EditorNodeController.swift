@@ -16,6 +16,7 @@ import MobileCoreServices
 class EditorNodeController: ASViewController<VEditorNode> {
     
     struct Const {
+        static let deleteIcon = UIImage.init(named: "cancel")?.withColor(.white)
         static let defaultContentInsets: UIEdgeInsets =
             .init(top: 15.0, left: 5.0, bottom: 15.0, right: 5.0)
         static let ogObjectContainerInsets: UIEdgeInsets =
@@ -91,7 +92,8 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .setContentInsets(Const.defaultContentInsets)
             
         case let imageNode as VImageContent:
-            return VEditorImageNode(isEdit: isEditMode)
+            return VEditorImageNode(isEdit: isEditMode,
+                                    deleteNode: .init(iconImage: Const.deleteIcon))
                 .setContentInsets(Const.defaultContentInsets)
                 .setTextInsertionHeight(16.0)
                 .setURL(imageNode.url)
@@ -100,7 +102,8 @@ extension EditorNodeController: VEditorNodeDelegate {
                 .setBackgroundColor(.lightGray)
             
         case let videoNode as VVideoContent:
-            return VEditorVideoNode(isEdit: isEditMode)
+            return VEditorVideoNode(isEdit: isEditMode,
+                                    deleteNode: .init(iconImage: Const.deleteIcon))
                 .setContentInsets(Const.defaultContentInsets)
                 .setTextInsertionHeight(16.0)
                 .setAssetURL(videoNode.url)
@@ -111,7 +114,8 @@ extension EditorNodeController: VEditorNodeDelegate {
             
         case let ogObjectNode as VOpenGraphContent:
             // custom media content example
-            let cellNode = VEditorOpenGraphNode(isEdit: isEditMode)
+            let cellNode = VEditorOpenGraphNode(isEdit: isEditMode,
+                                                deleteNode: .init(iconImage: Const.deleteIcon))
                 .setContentInsets(Const.ogObjectContainerInsets)
                 .setContainerInsets(Const.ogObjectContainerInsets)
                 .setPreviewImageURL(ogObjectNode.posterURL)
