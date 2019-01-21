@@ -13,8 +13,12 @@ import RxCocoa
 
 extension Reactive where Base: VEditorTextCellNode {
     
-    var becomeActive: Observable<Void> {
+    public var becomeActive: Observable<Void> {
         return base.textNode.rx.becomeActive.asObservable()
+    }
+    
+    public var deleted: Observable<IndexPath> {
+        return base.deleteRelay.filter({ $0 != nil }).map({ $0! })
     }
 }
 
@@ -24,6 +28,7 @@ open class VEditorTextCellNode: ASCellNode {
     public var isEdit: Bool = true
     public var textNode: VEditorTextNode
     public let disposeBag = DisposeBag()
+    public let deleteRelay = PublishRelay<IndexPath?>()
     
     public required init(isEdit: Bool,
                          placeholderText: NSAttributedString?,
@@ -41,6 +46,13 @@ open class VEditorTextCellNode: ASCellNode {
         super.init()
         self.automaticallyManagesSubnodes = true
         self.selectionStyle = .none
+        
+        self.textNode.rx.textEmptied
+            .map { [weak self] _ -> IndexPath? in
+                return self?.indexPath
+            }
+            .bind(to: deleteRelay)
+            .disposed(by: disposeBag)
     }
     
     @discardableResult open func setContentInsets(_ insets: UIEdgeInsets) -> Self {
