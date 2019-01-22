@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     
   s.name             = 'VEditorKit'
-  s.version          = '1.3.3'
+  s.version          = '1.3.4'
   s.summary          = 'Lightweight and Powerful Editor Kit'
   
   s.description      = 'Lightweight and Powerful Editor Kit built on Texture(AsyncDisplayKit)'
@@ -12,7 +12,10 @@ Pod::Spec.new do |s|
   
   s.ios.deployment_target = '9.0'
   s.source_files = 'VEditorKit/Classes/**/*'
-  
+  s.public_header_files = ["VEditorKit/VEditorKit.h"]
+
+  s.source_files = 'VEditorKit/**/*'
+  s.requires_arc = true  
   s.dependency 'Texture', '~> 2.7'
   s.dependency 'BonMot'
   s.dependency 'RxSwift'
