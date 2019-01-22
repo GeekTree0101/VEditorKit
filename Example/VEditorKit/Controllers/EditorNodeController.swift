@@ -117,7 +117,7 @@ extension EditorNodeController: VEditorNodeDelegate {
             let cellNode = VEditorOpenGraphNode(isEdit: isEditMode,
                                                 deleteNode: .init(iconImage: Const.deleteIcon))
                 .setContentInsets(Const.ogObjectContainerInsets)
-                .setOpenGraphContainerInsets(Const.ogObjectContainerInsets)
+                .setContainerInsets(Const.ogObjectContainerInsets)
                 .setPreviewImageURL(ogObjectNode.posterURL)
                 .setPreviewImageSize(.init(width: 100.0, height: 100.0), cornerRadius: 5.0)
                 .setTitleAttribute(ogObjectNode.title,

@@ -37,7 +37,7 @@ extension Reactive where Base: VEditorTextNode {
     }
 }
 
-@objcMembers open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
+open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     open var textStorage: VEditorTextStorage? {
         return self.textView.textStorage as? VEditorTextStorage

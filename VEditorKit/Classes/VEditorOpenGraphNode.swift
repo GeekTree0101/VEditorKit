@@ -19,7 +19,7 @@ extension Reactive where Base: VEditorOpenGraphNode {
     }
 }
 
-@objcMembers open class VEditorOpenGraphNode: ASCellNode {
+open class VEditorOpenGraphNode: ASCellNode {
     
     lazy var imageNode: ASNetworkImageNode = {
         let node = ASNetworkImageNode()
@@ -106,7 +106,7 @@ extension Reactive where Base: VEditorOpenGraphNode {
         return self
     }
     
-    @discardableResult open func setOpenGraphContainerInsets(_ insets: UIEdgeInsets) -> Self {
+    @discardableResult open func setContainerInsets(_ insets: UIEdgeInsets) -> Self {
         self.containerInsets = insets
         return self
     }

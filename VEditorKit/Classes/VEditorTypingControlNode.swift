@@ -11,7 +11,7 @@ import AsyncDisplayKit
 import RxSwift
 import RxCocoa
 
-@objcMembers open class VEditorTypingControlNode: ASButtonNode {
+open class VEditorTypingControlNode: ASButtonNode {
     
     public var typingStyle: VEditorStyle
     public let xmlTag: String

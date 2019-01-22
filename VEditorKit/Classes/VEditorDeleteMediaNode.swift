@@ -10,7 +10,7 @@ import AsyncDisplayKit
 import RxCocoa
 import RxSwift
 
-@objcMembers open class VEditorDeleteMediaNode: ASControlNode {
+open class VEditorDeleteMediaNode: ASControlNode {
     
     open let deleteButtonNode = ASButtonNode()
     

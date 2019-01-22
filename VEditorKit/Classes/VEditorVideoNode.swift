@@ -11,7 +11,7 @@ import AsyncDisplayKit
 import RxSwift
 import RxCocoa
 
-@objcMembers open class VEditorVideoNode: VEditorMediaNode<ASVideoNode> {
+open class VEditorVideoNode: VEditorMediaNode<ASVideoNode> {
     
     public var assetURL: URL?
     public var posterURL: URL?
