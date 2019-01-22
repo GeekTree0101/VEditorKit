@@ -11,7 +11,7 @@ import AsyncDisplayKit
 import RxCocoa
 import RxSwift
 
-open class VEditorImageNode: VEditorMediaNode<ASNetworkImageNode> {
+@objcMembers open class VEditorImageNode: VEditorMediaNode<ASNetworkImageNode> {
     
     public required init(isEdit: Bool,
                          deleteNode: VEditorDeleteMediaNode = .init()) {

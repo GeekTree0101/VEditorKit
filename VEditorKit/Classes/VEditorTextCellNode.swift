@@ -22,7 +22,7 @@ extension Reactive where Base: VEditorTextCellNode {
     }
 }
 
-open class VEditorTextCellNode: ASCellNode {
+@objcMembers open class VEditorTextCellNode: ASCellNode {
     
     public var insets: UIEdgeInsets = .zero
     public var isEdit: Bool = true

@@ -22,7 +22,7 @@ public protocol VEditorMediaNodeEventProtocol {
     var disposeBag: DisposeBag { get }
 }
 
-open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMediaNodeEventProtocol {
+@objcMembers open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMediaNodeEventProtocol {
     
     open let node: TargetNode
     

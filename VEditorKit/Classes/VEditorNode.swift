@@ -30,7 +30,7 @@ extension Reactive where Base: VEditorNode {
     }
 }
 
-open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
+@objcMembers open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     
     public enum Status {
         case loading

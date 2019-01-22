@@ -22,7 +22,7 @@ extension Reactive where Base: VEditorMediaPlaceholderNode {
     }
 }
 
-open class VEditorMediaPlaceholderNode: ASCellNode {
+@objcMembers open class VEditorMediaPlaceholderNode: ASCellNode {
     
     internal let successRelay = PublishRelay<(VEditorContent, IndexPath)>()
     internal let failedRelay = PublishRelay<IndexPath>()
