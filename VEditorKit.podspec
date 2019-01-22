@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     
   s.name             = 'VEditorKit'
-  s.version          = '1.3.4'
+  s.version          = '1.3.5'
   s.summary          = 'Lightweight and Powerful Editor Kit'
   
   s.description      = 'Lightweight and Powerful Editor Kit built on Texture(AsyncDisplayKit)'
@@ -11,11 +11,9 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/Geektree0101/VEditorKit.git', :tag => s.version.to_s }
   
   s.ios.deployment_target = '9.0'
-  s.source_files = 'VEditorKit/Classes/**/*'
-  s.public_header_files = ["VEditorKit/VEditorKit.h"]
+  s.requires_arc = true
 
   s.source_files = 'VEditorKit/**/*'
-  s.requires_arc = true  
   s.dependency 'Texture', '~> 2.7'
   s.dependency 'BonMot'
   s.dependency 'RxSwift'
