@@ -200,16 +200,17 @@ class VEditorNodeSpec: QuickSpec {
                     node.fetchNewContent(mockContent, scope: .last)
                     
                     expect(node.editorContents.count)
-                        .to(equal(10))
+                        .to(equal(11))
                     expect(node.editorContents.filter({ $0 is NSAttributedString }).count)
-                        .to(equal(5))
+                        .to(equal(6))
                     expect(node.editorContents.filter({ $0 is VVideoContent }).count)
                         .to(equal(2))
                     expect(node.editorContents.filter({ $0 is VImageContent }).count)
                         .to(equal(2))
                     expect(node.editorContents.filter({ $0 is VOpenGraphContent }).count)
                         .to(equal(1))
-                    expect(node.editorContents.last is VImageContent).to(beTrue())
+                    expect(node.editorContents.last is VImageContent).to(beFalse())
+                    expect(node.editorContents[node.editorContents.count - 2] is VImageContent).to(beTrue())
                 }
                 
                 it("should be append contents at last") {
@@ -229,16 +230,17 @@ class VEditorNodeSpec: QuickSpec {
                     node.fetchNewContents([mockContent, mockContent, mockContent], scope: .last)
                     
                     expect(node.editorContents.count)
-                        .to(equal(12))
+                        .to(equal(13))
                     expect(node.editorContents.filter({ $0 is NSAttributedString }).count)
-                        .to(equal(5))
+                        .to(equal(6))
                     expect(node.editorContents.filter({ $0 is VVideoContent }).count)
                         .to(equal(5))
                     expect(node.editorContents.filter({ $0 is VImageContent }).count)
                         .to(equal(1))
                     expect(node.editorContents.filter({ $0 is VOpenGraphContent }).count)
                         .to(equal(1))
-                    expect(node.editorContents.last is VVideoContent).to(beTrue())
+                    expect(node.editorContents.last is VVideoContent).to(beFalse())
+                    expect(node.editorContents[node.editorContents.count - 2] is VVideoContent).to(beTrue())
                 }
                 
                 it("should be append content at fisrt") {
@@ -408,16 +410,17 @@ class VEditorNodeSpec: QuickSpec {
                     node.fetchNewContent(mockContent, scope: .automatic)
                     
                     expect(node.editorContents.count)
-                        .to(equal(10))
+                        .to(equal(11))
                     expect(node.editorContents.filter({ $0 is NSAttributedString }).count)
-                        .to(equal(5))
+                        .to(equal(6))
                     expect(node.editorContents.filter({ $0 is VVideoContent }).count)
                         .to(equal(3))
                     expect(node.editorContents.filter({ $0 is VImageContent }).count)
                         .to(equal(1))
                     expect(node.editorContents.filter({ $0 is VOpenGraphContent }).count)
                         .to(equal(1))
-                    expect(node.editorContents.last is VVideoContent).to(beTrue())
+                    expect(node.editorContents[node.editorContents.count - 2] is VVideoContent).to(beTrue())
+                    expect(node.editorContents.last is VVideoContent).to(beFalse())
                 }
             }
         }
