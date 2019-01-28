@@ -388,9 +388,16 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         
         self.editorContents.insert(contentsOf: contents, at: indexPath.row)
         
-        let contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
+        var contentIndexPaths: [IndexPath] = contents.enumerated().map({ index, _ -> IndexPath in
             return .init(row: indexPath.row + index, section: indexPath.section)
         })
+        
+        // NOTE: ** automatically append textContent if last is mediaContent **
+        if !(self.editorContents.last is NSAttributedString),
+            let lastRow = contentIndexPaths.last?.row {
+            contentIndexPaths.append(.init(row: lastRow + 1, section: indexPath.section))
+            self.editorContents.append(NSAttributedString(string: ""))
+        }
         
         self.tableNode.performBatchUpdates({
             self.tableNode.insertRows(at: contentIndexPaths,
