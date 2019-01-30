@@ -172,27 +172,20 @@ open class VEditorMediaNode<TargetNode: ASControlNode>: ASCellNode, VEditorMedia
         let mediaContentLayout: ASLayoutElement
         
         if isEdit {
-            mediaContentLayout = ASOverlayLayoutSpec(child: mediaRatioLayout,
-                                                     overlay: deleteControlNode)
-        } else {
-            mediaContentLayout = mediaRatioLayout
-        }
-        
-        let videoNodeLayout: ASLayoutElement
-        
-        if isEdit {
-            videoNodeLayout =
+            let deleteableMediaLayout = ASOverlayLayoutSpec(child: mediaRatioLayout,
+                                                            overlay: deleteControlNode)
+            mediaContentLayout =
                 ASStackLayoutSpec(direction: .vertical,
                                   spacing: 0.0,
                                   justifyContent: .start,
                                   alignItems: .stretch,
                                   children: [textInsertionNode,
-                                             mediaContentLayout])
+                                             deleteableMediaLayout])
         } else {
-            videoNodeLayout = mediaContentLayout
+            mediaContentLayout = mediaRatioLayout
         }
         
         return ASInsetLayoutSpec(insets: insets,
-                                 child: videoNodeLayout)
+                                 child: mediaContentLayout)
     }
 }
