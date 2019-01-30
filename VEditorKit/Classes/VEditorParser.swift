@@ -146,11 +146,11 @@ public final class VEditorParser: NSObject, XMLStyler {
  Editor Content Parser
  
  General pattern would be:
- xml: <content><p>hello <b>world</b></p><img src="~~~~" /><p>done></p></content>
+ xml: <content><p>hello <b>world</b></p><img src="~~~~" /><p>done</p></content>
  will convert to
  - [0]: <p>hello <b>world</b></p>
  - [1]: VEditorMediaContent
- - [2]: <p>done></p>
+ - [2]: <p>done</p>
  */
 internal class VEditorContentParser: NSObject, XMLParserDelegate {
     

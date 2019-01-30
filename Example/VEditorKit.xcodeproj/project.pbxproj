@@ -71,7 +71,7 @@
 		607FACEB1AFB9204008FA782 /* VEditorParserSpec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VEditorParserSpec.swift; sourceTree = "<group>"; };
 		678C76B2ADE22C77779D368C /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
 		9B3036D921F4162D00489340 /* UIImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+Extension.swift"; sourceTree = "<group>"; };
-		9B3036E121F41BAF00489340 /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MockService.swift; path = /Users/vingle/Desktop/VEditorKit/Example/VEditorKit/Services/MockService.swift; sourceTree = "<absolute>"; };
+		9B3036E121F41BAF00489340 /* MockService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockService.swift; sourceTree = "<group>"; };
 		9B3036E421F41BBE00489340 /* XMLViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XMLViewController.swift; sourceTree = "<group>"; };
 		9B3036E621F41BC800489340 /* EditorOpenGraphPlaceholder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EditorOpenGraphPlaceholder.swift; sourceTree = "<group>"; };
 		9B3036EA21F41C3800489340 /* VImageContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VImageContent.swift; sourceTree = "<group>"; };

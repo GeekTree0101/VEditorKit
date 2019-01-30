@@ -198,9 +198,9 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                     .subscribe(onNext: { [weak self] indexPath in
                         self?.editorContents.remove(at: indexPath.row)
                         self?.tableNode.deleteRows(at: [indexPath], with: .automatic)
-                        self?.mergeTextContents(target: .init(row: indexPath.row - 1,
-                                                              section: indexPath.section),
-                                                to: indexPath,
+                        self?.mergeTextContents(target: indexPath,
+                                                to: .init(row: indexPath.row - 1,
+                                                          section: indexPath.section),
                                                 animated: false)
                     })
                     .disposed(by: cellNode.disposeBag)
@@ -589,12 +589,12 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
         
         // NOTE: make merged attributedText
-        var mutableAttrText = NSMutableAttributedString(attributedString: targetAttributedText)
+        var mutableAttrText = NSMutableAttributedString(attributedString: sourceAttributedText)
         var newlineAttribute = self.editorRule.defaultAttribute()
         newlineAttribute[VEditorAttributeKey] = [self.editorRule.defaultStyleXMLTag]
         mutableAttrText.append(NSAttributedString.init(string: "\n",
                                                        attributes: newlineAttribute))
-        mutableAttrText.append(sourceAttributedText)
+        mutableAttrText.append(targetAttributedText)
         
         // NOTE: update editor
         self.editorContents.remove(at: target.row)
@@ -629,8 +629,8 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 .nodeForRow(at: .init(row: indexPath.row,
                                       section: indexPath.section)) as? VEditorTextCellNode
             
-            guard let target = beforeCell?.indexPath,
-                let to = currentCell?.indexPath else {
+            guard let target = currentCell?.indexPath,
+                let to = beforeCell?.indexPath else {
                     return
             }
             
