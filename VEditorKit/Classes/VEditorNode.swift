@@ -830,9 +830,11 @@ extension VEditorNode {
     }
     
     private func scrollToCursor(_ caretRect: CGRect) {
-        let visibleRect =
+        var visibleRect =
             self.tableNode.view.convert(caretRect,
                                         from: self.activeTextNode?.view)
+        visibleRect.origin.y = min(visibleRect.origin.y,
+                                   self.tableNode.view.contentSize.height)
         (self.tableNode.view as UIScrollView)
             .scrollRectToVisible(visibleRect, animated: false)
     }
