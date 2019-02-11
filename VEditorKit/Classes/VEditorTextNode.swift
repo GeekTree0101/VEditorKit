@@ -104,6 +104,10 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         self.becomeActiveRelay.accept(())
     }
     
+    open func editableTextNodeDidFinishEditing(_ editableTextNode: ASEditableTextNode) {
+        self.selectedRange = NSRange(location: self.selectedRange.location, length: 0)
+    }
+    
     open func editableTextNode(_ editableTextNode: ASEditableTextNode,
                                shouldChangeTextIn range: NSRange,
                                replacementText text: String) -> Bool {
