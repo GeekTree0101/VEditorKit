@@ -81,6 +81,7 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         super.init(textKitComponents: textKitComponents,
                    placeholderTextKitComponents: placeholderTextKit)
         super.delegate = self
+        self.style.minHeight = .init(unit: .points, value: self.minimumTextContainerTextLineHeight())
         self.scrollEnabled = false
         self.attributedText = attributedText
     }
@@ -94,6 +95,13 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
         }
         
         self.textStorage?.replaceAttributeWithRegexPattenIfNeeds(self)
+    }
+    
+    open func minimumTextContainerTextLineHeight() -> CGFloat {
+        guard let paragraph = rule.defaultAttribute()[.paragraphStyle] as? NSParagraphStyle else {
+            return 0.0
+        }
+        return paragraph.minimumLineHeight
     }
     
     open func editableTextNodeShouldBeginEditing(_ editableTextNode: ASEditableTextNode) -> Bool {
