@@ -55,6 +55,11 @@ class VEditorTextNodeSpec: QuickSpec {
                     expect(node.editableTextNodeShouldBeginEditing(node)).to(beFalse())
                     node.isEdit = true
                 }
+                
+                it("should be setup minimum text container line height") {
+                    expect(node.minimumTextContainerTextLineHeight())
+                        .to(equal(((rule.defaultAttribute()[.paragraphStyle] as? NSParagraphStyle)?.minimumLineHeight ?? -1.0)))
+                }
             }
             
             context("forceFetchCurrentLocationAttribute: test") {
