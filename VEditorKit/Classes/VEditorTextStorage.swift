@@ -82,7 +82,7 @@ final public class VEditorTextStorage: NSTextStorage {
         self.replaceTextString(in: range, with: str)
         self.edited(.editedCharacters,
                     range: range,
-                    changeInLength: str.count - range.length)
+                    changeInLength: str.utf16.count - range.length)
         self.endEditing()
     }
     
