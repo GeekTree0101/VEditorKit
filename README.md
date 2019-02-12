@@ -66,8 +66,16 @@ pod 'VEditorKit'
 
 ## Author
 
-Geektree0101, h2s1880@gmail.com
+- #### Geektree0101, hyeonsu.ha@vingle.net
+- #### OhKanghoon, kanghoon.oh@vingle.net
+- #### gkdlfm, https://github.com/gkdlfm
+
+##### Powered by Vingle.inc
 
 ## License
 
 VEditorKit is available under the MIT license. See the LICENSE file for more info.
+
+> ## Very Community Vingle is looking for iOS Developer in Republic of Korea.
+https://careers.vingle.net/#/engineering/ios
+
