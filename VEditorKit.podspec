@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     
   s.name             = 'VEditorKit'
-  s.version          = '1.3.8'
+  s.version          = '1.4.0'
   s.summary          = 'Lightweight and Powerful Editor Kit'
   
   s.description      = 'Lightweight and Powerful Editor Kit built on Texture(AsyncDisplayKit)'
@@ -12,9 +12,10 @@ Pod::Spec.new do |s|
   
   s.ios.deployment_target = '9.0'
   s.requires_arc = true
-
+  s.xcconfig = { 'GCC_PREPROCESSOR_DEFINITIONS' => '$(inherited) AS_USE_VIDEO=1' }
+  
   s.source_files = 'VEditorKit/**/*'
-  s.dependency 'Texture', '~> 2.7'
+  s.dependency 'Texture', '2.8'
   s.dependency 'BonMot'
   s.dependency 'RxSwift'
   s.dependency 'RxCocoa'
