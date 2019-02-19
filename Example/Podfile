@@ -3,7 +3,7 @@ inhibit_all_warnings!
 
 target 'VEditorKit_Example' do
   pod 'VEditorKit', :path => '../'
-  pod 'Texture', '2.7'
+  pod 'Texture', '2.8'
   pod 'RxSwift'
   pod 'RxCocoa'
 
