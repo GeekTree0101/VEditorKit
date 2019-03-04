@@ -72,6 +72,21 @@ class VEditorParserSpec: QuickSpec {
                         .to(beTrue())
                 }
             }
+            
+            context("HTML Entities handling test") {
+                
+                it("should be success to parse with HTML entities") {
+                    
+                    expect(parser.parseXMLToAttributedString("<p>hello &amp; world</p>").string == "hello & world")
+                        .to(beTrue())
+                }
+                
+                it("should be fail to parse with HTML entities") {
+                    
+                    expect(parser.parseXMLToAttributedString("<p>hello & world</p>").string == "hello & world")
+                        .to(beFalse())
+                }
+            }
         }
     }
 }

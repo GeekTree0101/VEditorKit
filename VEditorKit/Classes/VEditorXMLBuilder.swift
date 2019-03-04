@@ -12,6 +12,7 @@ import BonMot
 public final class VEditorXMLBuilder {
     
     public static let shared: VEditorXMLBuilder = .init()
+    public var encodingHTMLEntitiesExternalHandler: ((String) -> String)?
     
     public func buildXML(_ contents: [VEditorContent],
                          rule: VEditorRule,
@@ -73,8 +74,7 @@ public final class VEditorXMLBuilder {
                                  using: { attributes, subRange, _ in
                                     
                                     var content = attrText.attributedSubstring(from: subRange).string
-                                    content = content
-                                        .replacingOccurrences(of: "\"", with: "\\")
+                                    content = content.encodingHTMLEntities()
                                     
                                     guard !content.isEmpty else { return }
                                     
@@ -147,5 +147,27 @@ extension String {
             xmlString = xmlString.replacingOccurrences(of: targetTag, with: "")
         }
         return xmlString
+    }
+    
+    internal func encodingHTMLEntities() -> String {
+        guard let handler = VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler else {
+            // NOTE: default encoding HTML Entities for VEditor
+            // ref: https://dev.w3.org/html5/html-author/charref
+            return self.replacingOccurrences(of: "&", with: "&amp;")
+                .replacingOccurrences(of: "<", with: "&lt;")
+                .replacingOccurrences(of: ">", with: "&gt;")
+                .replacingOccurrences(of: "\"", with: "&quot;")
+                .replacingOccurrences(of: "'", with: "&#x27;")
+                .replacingOccurrences(of: "'", with: "&#x39;")
+                .replacingOccurrences(of: "'", with: "&#x92;")
+                .replacingOccurrences(of: "'", with: "&#x96;")
+        }
+        
+        return handler(self)
+    }
+    
+    internal func convertDuplicatedBackSlashToValidParserXML() -> String {
+        return self.replacingOccurrences(of: "\\n", with: "\n")
+            .replacingOccurrences(of: "\\", with: "")
     }
 }

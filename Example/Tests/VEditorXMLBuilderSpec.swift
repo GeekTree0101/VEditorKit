@@ -92,6 +92,50 @@ class VEditorXMLBuilderSpec: QuickSpec {
                         .to(equal("<content><p>hello<b>world</b>!</p><h2>headingTest</h2><p><b><i>boldItalicTest</i></b></p></content>"))
                 }
             }
+            
+            context("HTML Entities handling test") {
+                
+                var testContents: [VEditorContent]!
+                
+                beforeEach {
+                    var pTagStyle = EditorRule.init().paragraphStyle("p", attributes: [:])
+                    pTagStyle?.add(extraAttributes: [VEditorAttributeKey: ["p"]])
+                    let textNode = NSMutableAttributedString.init()
+                    textNode.append("hello & world".styled(with: pTagStyle!))
+                    testContents = [textNode]
+                    VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler = nil
+                }
+                
+                it("should be success to build with default HTML entities") {
+                    expect(VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler)
+                        .to(beNil())
+                    expect(VEditorXMLBuilder.shared.buildXML(testContents, rule: rule, packageTag: "content"))
+                        .to(equal("<content><p>hello &amp; world</p></content>"))
+                }
+                
+                it("should be success to build with custom HTML entities") {
+                    VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler = { text -> String in
+                        return text.replacingOccurrences(of: "&", with: "&amp;")
+                    }
+                    
+                    expect(VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler)
+                        .toNot(beNil())
+                    expect(VEditorXMLBuilder.shared.buildXML(testContents, rule: rule, packageTag: "content"))
+                        .to(equal("<content><p>hello &amp; world</p></content>"))
+                }
+                
+                it("should be fail to build with custom HTML entities") {
+                    
+                    VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler = { text -> String in
+                        return text
+                    }
+                    
+                    expect(VEditorXMLBuilder.shared.encodingHTMLEntitiesExternalHandler)
+                        .toNot(beNil())
+                    expect(VEditorXMLBuilder.shared.buildXML(testContents, rule: rule, packageTag: "content"))
+                        .toNot(equal("<content><p>hello &amp; world</p></content>"))
+                }
+            }
         }
         
     }

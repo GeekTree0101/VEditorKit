@@ -38,9 +38,7 @@ public final class VEditorParser: NSObject, XMLStyler {
     public func parseXML(_ xmlString: String,
                          onSuccess: (([VEditorContent]) -> Void)? = nil,
                          onError: ((Error?) -> Void)? = nil) {
-        var xmlString = xmlString
-            .replacingOccurrences(of: "\\n", with: "\n")
-            .replacingOccurrences(of: "\\", with: "")
+        var xmlString = xmlString.convertDuplicatedBackSlashToValidParserXML()
         
         // make newlink before block heading if needs
         for blockXML in parserRule.blockStyleXMLTags {
@@ -193,7 +191,7 @@ internal class VEditorContentParser: NSObject, XMLParserDelegate {
     
     func parser(_ parser: XMLParser, foundCharacters string: String) {
         if self.contents.last is String {
-            self.contents.append(string)
+            self.contents.append(string.encodingHTMLEntities())
         }
     }
     
