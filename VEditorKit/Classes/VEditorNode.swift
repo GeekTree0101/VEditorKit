@@ -770,9 +770,16 @@ extension VEditorNode {
                 inactiveXMLs.append(contentsOf: editorRule.inactiveTypingXMLs(currentXMLTag) ?? [])
             }
         case .location:
-            // NODE: current cursor location chagned
-            break
+            for activeXML in activeXMLs {
+                disableXMLs.append(contentsOf: editorRule.disableTypingXMLs(activeXML) ?? [])
+                inactiveXMLs.append(contentsOf: editorRule.inactiveTypingXMLs(activeXML) ?? [])
+            }
         }
+        
+        // reduce duplicated xml-keys
+        activeXMLs = activeXMLs.reduceDuplicateXML()
+        inactiveXMLs = inactiveXMLs.reduceDuplicateXML()
+        disableXMLs = disableXMLs.reduceDuplicateXML()
         
         activeXMLs = activeXMLs
             .filter({ !inactiveXMLs.contains($0) })
@@ -891,5 +898,12 @@ extension VEditorNode {
     
     private func isContentFetchAvailable(_ contents: [VEditorContent]) -> Bool {
         return !contents.contains(where: { $0 is NSAttributedString })
+    }
+}
+
+extension Array where Element == String {
+    
+    internal func reduceDuplicateXML() -> [String] {
+        return Array<String>(Set(self))
     }
 }
