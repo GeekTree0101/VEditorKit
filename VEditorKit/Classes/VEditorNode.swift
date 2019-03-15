@@ -195,14 +195,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 
                 cellNode.rx.failed
                     .observeOn(MainScheduler.instance)
-                    .subscribe(onNext: { [weak self] indexPath in
-                        self?.editorContents.remove(at: indexPath.row)
-                        self?.tableNode.deleteRows(at: [indexPath], with: .automatic)
-                        self?.mergeTextContents(target: indexPath,
-                                                to: .init(row: indexPath.row - 1,
-                                                          section: indexPath.section),
-                                                animated: false)
-                    })
+                    .bind(to: self.rx.deleteContent(animated: true))
                     .disposed(by: cellNode.disposeBag)
                 
                 return cellNode
@@ -573,19 +566,22 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - to: attach text node indexPath
      - animated: remove node animation
      */
-    open func mergeTextContents(target: IndexPath,
-                                to: IndexPath,
-                                animated: Bool) {
+    open func mergeTextContents(from deleteTargetIndexPath: IndexPath,
+                                to mergeTargetIndexPath: IndexPath) -> Bool {
+        guard deleteTargetIndexPath.row < self.editorContents.count,
+            mergeTargetIndexPath.row < self.editorContents.count,
+            deleteTargetIndexPath.row >= 0,
+            mergeTargetIndexPath.row >= 0 else { return false }
         
-        guard let targetNode = tableNode.nodeForRow(at: target) as? VEditorTextCellNode,
-            let sourceNode = tableNode.nodeForRow(at: to) as? VEditorTextCellNode,
+        guard let targetNode = tableNode.nodeForRow(at: deleteTargetIndexPath) as? VEditorTextCellNode,
+            let sourceNode = tableNode.nodeForRow(at: mergeTargetIndexPath) as? VEditorTextCellNode,
             let targetAttributedText = targetNode.textNode
                 .textStorage?
                 .internalAttributedString,
             let sourceAttributedText = sourceNode.textNode
                 .textStorage?
                 .internalAttributedString else {
-                    return
+                    return false
         }
         
         // NOTE: make merged attributedText
@@ -595,12 +591,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         mutableAttrText.append(NSAttributedString.init(string: "\n",
                                                        attributes: newlineAttribute))
         mutableAttrText.append(targetAttributedText)
-        
-        // NOTE: update editor
-        self.editorContents.remove(at: target.row)
-        self.tableNode.deleteRows(at: [target], with: animated ? .automatic: .none)
         sourceNode.textNode.textStorage?.setAttributedString(mutableAttrText)
         sourceNode.textNode.setNeedsLayout()
+        
+        return true
     }
     
     /**
@@ -612,31 +606,31 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     open func deleteTargetContent(_ indexPath: IndexPath?, animated: Bool) {
         guard let indexPath = indexPath,
             indexPath.row < self.editorContents.count else { return }
-        self.editorContents.remove(at: indexPath.row)
-        self.tableNode.performBatch(animated: animated, updates: {
-            self.tableNode.deleteRows(at: [indexPath], with: animated ? .automatic: .none)
-        }, completion: { fin in
-            guard fin else { return }
-            let beforeIndex: Int = indexPath.row - 1
-            
-            guard indexPath.row < self.editorContents.count,
-                beforeIndex >= 0 else { return }
-            
-            let beforeCell = self.tableNode
-                .nodeForRow(at: .init(row: beforeIndex,
-                                      section: indexPath.section)) as? VEditorTextCellNode
-            let currentCell = self.tableNode
-                .nodeForRow(at: .init(row: indexPath.row,
-                                      section: indexPath.section)) as? VEditorTextCellNode
-            
-            guard let target = currentCell?.indexPath,
-                let to = beforeCell?.indexPath else {
-                    return
-            }
-            
-            self.mergeTextContents(target: target,
-                                   to: to,
-                                   animated: animated)
+        var deleteIndexPaths: [IndexPath] = [indexPath]
+        let beforeIndex = IndexPath(row: indexPath.row - 1, section: indexPath.section)
+        let afterIndex = IndexPath(row: indexPath.row + 1, section: indexPath.section)
+        
+        if self.mergeTextContents(from: afterIndex, to: beforeIndex) {
+            deleteIndexPaths.append(afterIndex)
+            self.editorContents.removeSubrange(indexPath.row...afterIndex.row)
+        } else {
+            self.editorContents.remove(at: indexPath.row)
+        }
+        
+        for deleteIndexPath in deleteIndexPaths {
+            self.tableNode.view.cellForRow(at: deleteIndexPath)?.removeFromSuperview()
+        }
+        
+        self.tableNode.performBatchUpdates({
+            self.tableNode.deleteRows(at: deleteIndexPaths,
+                                      with: animated ? .automatic: .none)
+        }, completion: { _ in
+            // Texture Bug Issue, ref: https://github.com/TextureGroup/Texture/issues/1407
+            _ = self.tableNode.view.subviews
+                .filter({ $0 is UITableViewCell })
+                .filter { $0.subviews.first?.subviews.isEmpty ?? false ||
+                    $0.subviews.first?.subviews.first is UIImageView }
+                .map { $0.removeFromSuperview() }
         })
     }
     
