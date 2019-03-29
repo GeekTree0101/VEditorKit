@@ -119,8 +119,11 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     open func editableTextNode(_ editableTextNode: ASEditableTextNode,
                                shouldChangeTextIn range: NSRange,
                                replacementText text: String) -> Bool {
-        
-        if (text == "\n" || text == " "),
+        if text.isEmpty {
+            guard self.isDisplayingPlaceholder() else { return true }
+            self.textEmptiedRelay.accept(())
+            return true
+        } else if (text == "\n" || text == " "),
             let context = self.textStorage?
                 .automaticallyApplyLinkAttribute(self) {
             guard self.automaticallyGenerateLinkPreview else { return true }
@@ -172,9 +175,6 @@ open class VEditorTextNode: ASEditableTextNode, ASEditableTextNodeDelegate {
     
     open func editableTextNodeDidUpdateText(_ editableTextNode: ASEditableTextNode) {
         self.textStorage?.didUpdateText(self)
-        
-        guard self.isDisplayingPlaceholder() else { return }
-        self.textEmptiedRelay.accept(())
     }
     
     open func updateCurrentTypingAttribute(_ attribute: VEditorStyleAttribute,
