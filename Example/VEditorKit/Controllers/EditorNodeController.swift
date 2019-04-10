@@ -221,25 +221,17 @@ extension EditorNodeController {
     }
     
     @objc func pushXMLViewer() {
-        self.node.synchronizeFetchContents { [weak self] () in
-            
-            guard let output = self?.node.buildXML(packageTag: "content") else {
-                return
-            }
-            let vc = XMLViewController.init(output)
-            self?.navigationController?.pushViewController(vc, animated: true)
-        }
+        self.node.synchronizeFetchContents()
+        guard let output = self.node.buildXML(packageTag: "content") else { return }
+        let vc = XMLViewController.init(output)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func previewViewer() {
-        self.node.synchronizeFetchContents { [weak self] () in
-            guard let xmlString = self?.node
-                .buildXML(packageTag: "content") else {
-                    return
-            }
-            let vc = EditorNodeController(isEditMode: false, xmlString: xmlString)
-            self?.navigationController?.pushViewController(vc, animated: true)
-        }
+        self.node.synchronizeFetchContents()
+        let xmlString = self.node.buildXML(packageTag: "content")
+        let vc = EditorNodeController(isEditMode: false, xmlString: xmlString)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
 }
 

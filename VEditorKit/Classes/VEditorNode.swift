@@ -93,6 +93,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
     
     private var typingControls: [VEditorTypingControlNode] = []
     private var activeTextDisposeBag = DisposeBag()
+    private let synchronizeContentLock = NSLock()
     
     public init(editorRule: VEditorRule,
                 controlAreaNode: ASDisplayNode?) {
@@ -531,8 +532,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
      - section: editor target section
      - complate: complate syncronize callback
      */
-    open func synchronizeFetchContents(in section: Int = 0,
-                                       _ complate: @escaping () -> Void) {
+    open func synchronizeFetchContents(in section: Int = 0) {
+        defer { self.synchronizeContentLock.unlock() }
+        self.synchronizeContentLock.lock()
+        
         let numberOfSection = self.tableNode.numberOfSections
         guard section >= 0, section < numberOfSection else {
             fatalError("Invalid access section \(section) in \(numberOfSection)")
@@ -552,8 +555,6 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                     .attributedString() else { return }
             self.editorContents[index] = currentAttributedText
         }
-        
-        complate()
     }
     
     /**
