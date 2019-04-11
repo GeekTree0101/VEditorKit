@@ -69,7 +69,7 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         }
     }
     
-    open var activeTextContainCellNode: VEditorTextCellNode? {
+    open weak var activeTextContainCellNode: VEditorTextCellNode? {
         didSet {
             self.observeActiveTextNode()
         }
@@ -195,7 +195,6 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                     .disposed(by: cellNode.disposeBag)
                 
                 cellNode.rx.failed
-                    .observeOn(MainScheduler.instance)
                     .bind(to: self.rx.deleteContent(animated: true))
                     .disposed(by: cellNode.disposeBag)
                 
@@ -234,6 +233,32 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
                 return cellNode
             }
         }
+    }
+    
+    private func removeUnusedInternalASTableCellViewIfNeeds() {
+        // Bug Issue:  https://github.com/TextureGroup/Texture/issues/1407
+        let currentActiveTextASCellView = self.activeTextContainCellNode?.view.superview?.superview
+        
+        let invalidSubViews = self.tableNode.view.subviews.filter({ subView -> Bool in
+            
+            for visibleCell in self.tableNode.view.visibleCells {
+                if subView.frame == visibleCell.frame {
+                    return false
+                }
+            }
+            
+            return true
+        }).filter({ $0 != currentActiveTextASCellView })
+        
+        guard !invalidSubViews.filter({ $0 != currentActiveTextASCellView }).isEmpty else { return }
+        
+        for view in invalidSubViews {
+            view.removeFromSuperview()
+        }
+    }
+    
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.removeUnusedInternalASTableCellViewIfNeeds()
     }
     
     /**
@@ -618,21 +643,10 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
             self.editorContents.remove(at: indexPath.row)
         }
         
-        for deleteIndexPath in deleteIndexPaths {
-            self.tableNode.view.cellForRow(at: deleteIndexPath)?.removeFromSuperview()
-        }
-        
         self.tableNode.performBatchUpdates({
             self.tableNode.deleteRows(at: deleteIndexPaths,
                                       with: animated ? .automatic: .none)
-        }, completion: { _ in
-            // Texture Bug Issue, ref: https://github.com/TextureGroup/Texture/issues/1407
-            _ = self.tableNode.view.subviews
-                .filter({ $0 is UITableViewCell })
-                .filter { $0.subviews.first?.subviews.isEmpty ?? false ||
-                    $0.subviews.first?.subviews.first is UIImageView }
-                .map { $0.removeFromSuperview() }
-        })
+        }, completion: nil)
     }
     
     /**
@@ -876,7 +890,12 @@ extension VEditorNode {
         switch scope {
         case .automatic:
             if let activeTextNode = self.activeTextNode {
-                return .splitIndex(activeTextNode.selectedRange.location)
+                if activeTextNode.selectedRange.location == 0,
+                    let indexPath = activeTextContainCellNode?.indexPath {
+                    return .indexPath(indexPath)
+                } else {
+                    return .splitIndex(activeTextNode.selectedRange.location)
+                }
             } else {
                 let lastIndex: Int = max(0, self.editorContents.count)
                 return .indexPath(.init(row: lastIndex, section: section))
