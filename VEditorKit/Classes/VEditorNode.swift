@@ -239,16 +239,11 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         // Bug Issue:  https://github.com/TextureGroup/Texture/issues/1407
         let currentActiveTextASCellView = self.activeTextContainCellNode?.view.superview?.superview
         
-        let invalidSubViews = self.tableNode.view.subviews.filter({ subView -> Bool in
-            
-            for visibleCell in self.tableNode.view.visibleCells {
-                if subView.frame == visibleCell.frame {
-                    return false
-                }
-            }
-            
-            return true
-        }).filter({ $0 != currentActiveTextASCellView })
+        let invalidSubViews = self.tableNode.view.subviews
+            .filter({ subView -> Bool in
+                return !self.tableNode.view.visibleCells.map({ $0.frame }).contains(subView.frame)
+            })
+            .filter({ $0 != currentActiveTextASCellView })
         
         guard !invalidSubViews.filter({ $0 != currentActiveTextASCellView }).isEmpty else { return }
         
