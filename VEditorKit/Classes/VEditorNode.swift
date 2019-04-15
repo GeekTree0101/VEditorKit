@@ -304,6 +304,9 @@ open class VEditorNode: ASDisplayNode, ASTableDelegate, ASTableDataSource {
         guard let range = self.activeTextNode?.selectedRange,
             let attr = self.editorRule.linkAttribute(url)  else { return }
         self.activeTextNode?.textStorage?.setAttributes(attr, range: range)
+        let nextLocation = range.location + range.length + 1
+        // NOTE: selectedRange doesn't occur out of bounds crash :) don't worry
+        self.activeTextNode?.selectedRange = .init(location: nextLocation, length: 0)
     }
     
     /**
