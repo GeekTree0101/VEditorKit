@@ -381,9 +381,9 @@ class VEditorNodeSpec: QuickSpec {
                     node.fetchNewContent(mockContent, scope: .automatic)
                     
                     expect(node.editorContents.count)
-                        .to(equal(11))
+                        .to(equal(10))
                     expect(node.editorContents.filter({ $0 is NSAttributedString }).count)
-                        .to(equal(6))
+                        .to(equal(5))
                     expect(node.editorContents.filter({ $0 is VVideoContent }).count)
                         .to(equal(3))
                     expect(node.editorContents.filter({ $0 is VImageContent }).count)
