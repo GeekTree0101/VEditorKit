@@ -66,9 +66,9 @@ pod 'VEditorKit'
 
 ## Author
 
-- #### Geektree0101, hyeonsu.ha@vingle.net
-- #### OhKanghoon, kanghoon.oh@vingle.net
-- #### gkdlfm, https://github.com/gkdlfm
+- #### Geektree0101
+- #### OhKanghoon
+- #### gkdlfm
 
 ## License
 
