@@ -76,10 +76,3 @@ pod 'VEditorKit'
 
 VEditorKit is available under the MIT license. See the LICENSE file for more info.
 
-<br/>
-
-# Very Community Vingle is looking for iOS Developer in Republic of Korea.
-https://careers.vingle.net/#/engineering/ios
-
-<img src="https://cdn-images-1.medium.com/max/800/1*ITnqfOszUVIimLTxrGhGwA.png" width=400px />
-
