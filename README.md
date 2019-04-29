@@ -70,8 +70,6 @@ pod 'VEditorKit'
 - #### OhKanghoon, kanghoon.oh@vingle.net
 - #### gkdlfm, https://github.com/gkdlfm
 
-##### Powered by Vingle.inc
-
 ## License
 
 VEditorKit is available under the MIT license. See the LICENSE file for more info.
